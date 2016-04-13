@@ -17,7 +17,6 @@ public class CircuitSimulatorClient extends WebSocketHandler {
     public CircuitSimulatorClient(){
 
     }
-git init
         
     public void connect() throws WebSocketException {
         mConnection.connect(WSURI, this);

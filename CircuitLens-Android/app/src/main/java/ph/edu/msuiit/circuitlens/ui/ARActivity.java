@@ -16,10 +16,12 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 import ph.edu.msuiit.circuitlens.CircuitLensClientController;
-import ph.edu.msuiit.circuitlens.CircuitSimulatorClient;
+import ph.edu.msuiit.circuitlens.RemoteNetlistGenerator;
 import ph.edu.msuiit.circuitlens.R;
 
-public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, CircuitLensClientView{
+import static org.opencv.imgproc.Imgproc.cvtColor;
+
+public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, CircuitLensView {
     private static final String TAG = "CircuitLens::ARActivity";
     private long startTime;
     private CircuitLensClientController mController;
@@ -61,7 +63,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         }
         setContentView(R.layout.activity_ar);
 
-        CircuitSimulatorClient circuitSimulatorClient = new CircuitSimulatorClient();
+        RemoteNetlistGenerator circuitSimulatorClient = new RemoteNetlistGenerator();
         mController = new CircuitLensClientController(this, circuitSimulatorClient);
         mController.onCreate();
         initializeViews();
@@ -113,6 +115,9 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         if((currentTime - startTime) >= 1000){
             Log.d(TAG,"diff: "+String.valueOf(currentTime-startTime));
             startTime = currentTime;
+
+            // TODO: check if image is blurry
+
             mController.onFocus(inputFrame);
         }
         return inputFrame.rgba();

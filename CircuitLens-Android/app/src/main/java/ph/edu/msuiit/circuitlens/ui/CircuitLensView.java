@@ -1,5 +1,5 @@
 package ph.edu.msuiit.circuitlens.ui;
 
-public interface CircuitLensClientView {
+public interface CircuitLensView {
     void showMessage(String netlist);
 }

@@ -7,14 +7,15 @@ import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
+import ph.edu.msuiit.circuitlens.circuit.NetlistGenerator;
 
-public class CircuitSimulatorClient extends WebSocketHandler {
+public class RemoteNetlistGenerator extends WebSocketHandler implements NetlistGenerator {
     private static final String WSURI = "ws://localhost:9000";
     private static final String TAG = "CircuitLens::CSSC";
     private WebSocketConnection mConnection = new WebSocketConnection();
     private CircuitLensClientController netlistReceivedListener;
 
-    public CircuitSimulatorClient(){
+    public RemoteNetlistGenerator(){
 
     }
         

@@ -3,13 +3,13 @@ package ph.edu.msuiit.circuitlens;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 
 import de.tavendo.autobahn.WebSocketException;
-import ph.edu.msuiit.circuitlens.ui.CircuitLensClientView;
+import ph.edu.msuiit.circuitlens.ui.CircuitLensView;
 
 public class CircuitLensClientController implements CircuitSimulatorClientListener{
-    CircuitSimulatorClient mClient;
-    CircuitLensClientView mView;
+    RemoteNetlistGenerator mClient;
+    CircuitLensView mView;
 
-    public CircuitLensClientController(CircuitLensClientView view, CircuitSimulatorClient client){
+    public CircuitLensClientController(CircuitLensView view, RemoteNetlistGenerator client){
         mClient = client;
         mView = view;
     }

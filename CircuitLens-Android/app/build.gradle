@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/io.netty.versions.properties'
+    }
 }
 
 dependencies {
@@ -24,6 +28,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:support-v4:23.3.0'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.7.2'
+    compile 'ws.wamp.jawampa:jawampa-core:0.4.1'
+    compile 'ws.wamp.jawampa:jawampa-netty:0.4.0'
     compile project(':openCVLibrary310')
 }

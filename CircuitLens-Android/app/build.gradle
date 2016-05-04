@@ -18,7 +18,6 @@ android {
         }
     }
 
-    sourceSets { main { jni.srcDirs = ['src/main/jni', 'src/main/jniLibs/'] } }
 
     packagingOptions {
         exclude 'META-INF/INDEX.LIST'

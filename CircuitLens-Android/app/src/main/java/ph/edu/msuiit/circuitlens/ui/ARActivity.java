@@ -15,14 +15,16 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
-import ph.edu.msuiit.circuitlens.CircuitLensClientController;
-import ph.edu.msuiit.circuitlens.CircuitSimulatorClient;
+import ph.edu.msuiit.circuitlens.CircuitLensController;
+import ph.edu.msuiit.circuitlens.RemoteNetlistGenerator;
 import ph.edu.msuiit.circuitlens.R;
 
-public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, CircuitLensClientView{
+import static org.opencv.imgproc.Imgproc.cvtColor;
+
+public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, CircuitLensView {
     private static final String TAG = "CircuitLens::ARActivity";
     private long startTime;
-    private CircuitLensClientController mController;
+    private CircuitLensController mController;
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
@@ -61,8 +63,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         }
         setContentView(R.layout.activity_ar);
 
-        CircuitSimulatorClient circuitSimulatorClient = new CircuitSimulatorClient();
-        mController = new CircuitLensClientController(this, circuitSimulatorClient);
+        mController = new CircuitLensController(this);
         mController.onCreate();
         initializeViews();
     }
@@ -110,9 +111,12 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         long currentTime = System.currentTimeMillis();
-        if((currentTime - startTime) >= 1000){
+        if((currentTime - startTime) >= 3000){
             Log.d(TAG,"diff: "+String.valueOf(currentTime-startTime));
             startTime = currentTime;
+
+            // TODO: check if image is blurry
+
             mController.onFocus(inputFrame);
         }
         return inputFrame.rgba();

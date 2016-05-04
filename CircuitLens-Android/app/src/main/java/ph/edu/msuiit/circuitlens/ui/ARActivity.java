@@ -1,8 +1,10 @@
 package ph.edu.msuiit.circuitlens.ui;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -16,10 +18,7 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 import ph.edu.msuiit.circuitlens.CircuitLensController;
-import ph.edu.msuiit.circuitlens.RemoteNetlistGenerator;
 import ph.edu.msuiit.circuitlens.R;
-
-import static org.opencv.imgproc.Imgproc.cvtColor;
 
 public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, CircuitLensView {
     private static final String TAG = "CircuitLens::ARActivity";
@@ -63,7 +62,9 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         }
         setContentView(R.layout.activity_ar);
 
-        mController = new CircuitLensController(this);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String serverUri = preferences.getString("server_uri","ws://127.0.0.1:8080/ws");
+        mController = new CircuitLensController(this,serverUri);
         mController.onCreate();
         initializeViews();
     }

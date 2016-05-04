@@ -12,9 +12,9 @@ public class CircuitLensController{
     RemoteNetlistGenerator mNetlistGenerator;
     CircuitLensView mView;
 
-    public CircuitLensController(CircuitLensView view){
+    public CircuitLensController(CircuitLensView view, String serverUri){
         mView = view;
-        mNetlistGenerator = new RemoteNetlistGenerator();
+        mNetlistGenerator = new RemoteNetlistGenerator(serverUri);
     }
 
     public void onCreate(){

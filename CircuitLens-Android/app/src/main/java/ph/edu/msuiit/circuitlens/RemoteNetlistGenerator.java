@@ -14,17 +14,21 @@ import ws.wamp.jawampa.connection.IWampConnectorProvider;
 import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 
 public class RemoteNetlistGenerator {
-    private static final String URI = "ws://aa7e360f.ngrok.io/ws";
-    private static final String REALM = "realm1";
+    String mUri;
     IWampConnectorProvider connectorProvider = new NettyWampClientConnectorProvider();
     WampClient client;
+    private static final String REALM = "realm1";
+
+    public RemoteNetlistGenerator(String uri) {
+        mUri = uri;
+    }
 
     public void connect() {
         try {
             // Create a builder and configure the client
             WampClientBuilder builder = new WampClientBuilder();
             builder.withConnectorProvider(connectorProvider)
-                    .withUri(URI)
+                    .withUri(mUri)
                     .withRealm(REALM)
                     .withInfiniteReconnects()
                     .withReconnectInterval(5, TimeUnit.SECONDS);

@@ -1,5 +1,7 @@
 package ph.edu.msuiit.circuitlens;
 
+import android.util.Log;
+
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -29,9 +31,7 @@ public class OverlayImageTransformationMapper {
     // Also the circuit diagram image from camera frame
     private Mat mTrackingImage;
 
-    public Mat getmGrayTrackingImage() {
-        return mGrayTrackingImage;
-    }
+
 
     // Grayscale version of the tracking image
     private Mat mGrayTrackingImage;
@@ -77,8 +77,16 @@ public class OverlayImageTransformationMapper {
 
     private final Scalar mLineColor = new Scalar(0,255,0);
 
+    public OverlayImageTransformationMapper(){
 
-    public void map(Mat currentFrame) {
+    }
+
+    public Mat getmGrayTrackingImage() {
+
+        return mGrayTrackingImage;
+    }
+
+    public void map(Mat currentFrame,Mat dst) {
 
 
         //convert current frame image to grayscale
@@ -86,25 +94,29 @@ public class OverlayImageTransformationMapper {
 
 
         //find features of the current frame
-        mFeatureDetector.detect(currentFrame,mCurrentFrameKeypoints);
+        mFeatureDetector.detect(mGrayCurrentFrame,mCurrentFrameKeypoints);
 
         //find descriptors of the current frame
-        mDescriptorExtrator.compute(currentFrame,mCurrentFrameKeypoints,mCurrentFrameDescriptors);
+        mDescriptorExtrator.compute(mGrayCurrentFrame,mCurrentFrameKeypoints,mCurrentFrameDescriptors);
 
         //match tracking image descriptors with current frame descriptors
         mDescriptorMatcher.match(mCurrentFrameDescriptors,mTrackingImageDescriptors,mMatches);
 
         //Attempt to find the tracking image's corners in the current frame
         findCurrentFrameCorners();
+        draw(currentFrame,dst);
     }
 
 
-    public void setTrackingImage(Mat trackingImg) {
+    public void setTrackingImage(Mat trackingImg, Mat dst) {
         mTrackingImage = trackingImg;
+        mGrayTrackingImage = dst;
 
         //convert tracking image to grayscale
         //TODO check the input color format if correct
         Imgproc.cvtColor(mTrackingImage,mGrayTrackingImage,Imgproc.COLOR_RGB2GRAY);
+
+
 
         //find features of the tracking image
         mFeatureDetector.detect(mGrayTrackingImage,mTrackingImageKeypoints);
@@ -143,13 +155,13 @@ public class OverlayImageTransformationMapper {
                 maxDist = dist;
             }
         }
-
-        if(minDist > 50.0){
+        Log.d("MinDist: ",minDist + "");
+        if(minDist > 80.0){
             // The target is completely lost
             // Discard any previously found corners
             mCurrentFrameCorners.create(0,0,mCurrentFrameCorners.type());
             return;
-        } else if(minDist > 25.0){
+        } else if(minDist > 40.0){
             // The target is lost but maybe it is still close
             // keep any previously found corners
             return;
@@ -167,6 +179,8 @@ public class OverlayImageTransformationMapper {
 
             }
         }
+        Log.d("goodTrack: ", goodTrackingImagePointsList.size() + "");
+        Log.d("goodCurr: ", goodCurrentFramePointsList.size() + "");
         if(goodTrackingImagePointsList.size() < 4 || goodCurrentFramePointsList.size() < 4){
             // There are too few good points to find homography
             return;
@@ -180,7 +194,7 @@ public class OverlayImageTransformationMapper {
         goodTrackingImagePoints.fromList(goodTrackingImagePointsList);
 
         MatOfPoint2f goodCurrentFramePoints = new MatOfPoint2f();
-        goodCurrentFramePoints.fromList(goodTrackingImagePointsList);
+        goodCurrentFramePoints.fromList(goodCurrentFramePointsList);
 
         // find the homography
         Mat homography = Calib3d.findHomography(goodTrackingImagePoints,goodCurrentFramePoints);

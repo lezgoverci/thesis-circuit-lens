@@ -30,8 +30,8 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
     private CameraBridgeViewBase mOpenCvCameraView;
 
     // V: camera shutter
-    private boolean mTakePhoto;
-    private boolean isSetTrackingImage;
+    private boolean mTakePhoto = false;
+    private boolean isSetTrackingImage = false;
     private boolean isMapped;
     private boolean isDrawn;
 
@@ -43,6 +43,8 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
                 {
                     Log.d(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
+                    String str = mController.onResume();
+                    Toast.makeText(ARActivity.this, str, Toast.LENGTH_SHORT).show();
 
 
                 } break;
@@ -102,6 +104,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         if (!OpenCVLoader.initDebug()) {
             Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, mLoaderCallback);
+
         } else {
             Log.d(TAG, "OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
@@ -124,6 +127,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
+        Mat frame = inputFrame.rgba();
         long currentTime = System.currentTimeMillis();
         if((currentTime - startTime) >= 3000){
             Log.d(TAG,"diff: "+String.valueOf(currentTime-startTime));
@@ -133,7 +137,23 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
             mController.onFocus(inputFrame);
         }
-        return inputFrame.rgba();
+
+        if(isSetTrackingImage){
+            isSetTrackingImage = false;
+            mController.map(frame,frame);
+
+        }
+
+        if(mTakePhoto){
+            mTakePhoto = false;
+            isSetTrackingImage = true;
+            mController.setTrackingImage(frame,frame);
+
+        }
+
+
+
+        return frame;
     }
 
     @Override
@@ -141,9 +161,10 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
     }
 
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        mTakePhoto = true;
-//        return super.onTouchEvent(event);
-//    }
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        boolean ret = super.onTouchEvent(event);
+        mTakePhoto = true;
+        return ret;
+    }
 }

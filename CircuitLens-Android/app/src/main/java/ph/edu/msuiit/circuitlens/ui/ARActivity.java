@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
@@ -28,14 +29,22 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
+    // V: camera shutter
+    private boolean mTakePhoto;
+    private boolean isSetTrackingImage;
+    private boolean isMapped;
+    private boolean isDrawn;
+
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
                 {
-                    Log.i(TAG, "OpenCV loaded successfully");
+                    Log.d(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
+
+
                 } break;
                 default:
                 {
@@ -66,6 +75,10 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         mController = new CircuitLensController(this);
         mController.onCreate();
         initializeViews();
+
+
+
+
     }
 
     private void initializeViews(){
@@ -110,6 +123,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+
         long currentTime = System.currentTimeMillis();
         if((currentTime - startTime) >= 3000){
             Log.d(TAG,"diff: "+String.valueOf(currentTime-startTime));
@@ -124,6 +138,12 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
     @Override
     public void showMessage(String message) {
-        Toast.makeText(this,message,Toast.LENGTH_LONG).show();
+        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
     }
+
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        mTakePhoto = true;
+//        return super.onTouchEvent(event);
+//    }
 }

@@ -35,7 +35,7 @@ public class OverlayImageTransformationMapper {
 
     private boolean isSetTracking = false;
 
-    private Size blurKernel = new Size(3,3);
+    private Size blurKernel = new Size(5,5);
 
     // Grayscale version of the tracking image
     private Mat mGrayTrackingImage = new Mat();
@@ -85,7 +85,9 @@ public class OverlayImageTransformationMapper {
     // A descriptor matcher, which matches features based on their descriptors
     private final DescriptorMatcher mDescriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMINGLUT);
 
-    private final Scalar mLineColor = new Scalar(0,255,0);
+    private final Scalar mLineColor = new Scalar(255);
+
+    private Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT,new Size(5.0,5.0));
 
     public OverlayImageTransformationMapper(){
 
@@ -103,17 +105,20 @@ public class OverlayImageTransformationMapper {
         Imgproc.cvtColor(currentFrame,mGrayCurrentFrame,Imgproc.COLOR_RGB2GRAY);
         //Imgproc.GaussianBlur(mGrayCurrentFrame,mGrayCurrentFrame,blurKernel,5.0);
         Imgproc.blur(mGrayCurrentFrame,mGrayCurrentFrame,blurKernel);
-        Imgproc.Canny(mGrayCurrentFrame,mGrayCurrentFrame,150,200);
-        //Imgproc.adaptiveThreshold(mGrayCurrentFrame,mGrayCurrentFrame,200,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY_INV,3,5.0);
+        Imgproc.Canny(mGrayCurrentFrame,mGrayCurrentFrame,150,250);
+        Imgproc.dilate(mGrayCurrentFrame,mGrayCurrentFrame,dilateKernel);
 
         ///tteeesssttttthhasdjbsd
         Imgproc.findContours(mGrayCurrentFrame.clone(),contours,hierarchy,Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_NONE);
 
-        Imgproc.drawContours(mGrayCurrentFrame,contours,findLargestContour(contours),new Scalar(255),5);
-        if(isTakePhoto){
-            setTrackingImage(mGrayCurrentFrame);
-            isSetTracking = true;
-        }
+        Imgproc.drawContours(currentFrame,contours,findLargestContour(contours),mLineColor,5);
+
+        contours.clear();
+
+//        if(isTakePhoto){
+//            setTrackingImage(mGrayCurrentFrame);
+//            isSetTracking = true;
+//        }
 
         //Features2d.drawKeypoints(mGrayCurrentFrame,mTrackingImageKeypoints,mGrayCurrentFrame);
 
@@ -136,13 +141,13 @@ public class OverlayImageTransformationMapper {
        // draw(currentFrame,mGrayCurrentFrame);
         // see production frame
         //draw(currentFrame);
-        return mGrayCurrentFrame;
+        return currentFrame;
 
     }
 
     private int findLargestContour(List<MatOfPoint> contours) {
-        double largestArea = -1;
-        int largestIndex = -1;
+        double largestArea = 0;
+        int largestIndex = 0;
 
         for(int i = 0; i < contours.size();i++){
             Mat cnt = contours.get(i);

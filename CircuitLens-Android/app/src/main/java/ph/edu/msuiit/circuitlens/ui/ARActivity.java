@@ -138,22 +138,15 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
             mController.onFocus(inputFrame);
         }
 
-        if(isSetTrackingImage){
-            isSetTrackingImage = false;
-            mController.map(frame,frame);
-
-        }
+        Mat f = mController.map(frame,mTakePhoto);
 
         if(mTakePhoto){
             mTakePhoto = false;
-            isSetTrackingImage = true;
-            mController.setTrackingImage(frame,frame);
-
         }
 
 
 
-        return frame;
+        return f;
     }
 
     @Override
@@ -167,4 +160,8 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         mTakePhoto = true;
         return ret;
     }
+
+    
+
+
 }

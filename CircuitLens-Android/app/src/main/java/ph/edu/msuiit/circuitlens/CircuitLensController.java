@@ -18,7 +18,6 @@ public class CircuitLensController{
     public CircuitLensController(CircuitLensView view){
         mView = view;
         mNetlistGenerator = new RemoteNetlistGenerator();
-
     }
 
     public void onCreate(){
@@ -49,17 +48,14 @@ public class CircuitLensController{
         }
     };
 
-    public void setTrackingImage(Mat img, Mat dst){
-        mMapper.setTrackingImage(img,dst);
-    }
 
     public String onResume(){
         mMapper = new OverlayImageTransformationMapper();
         return "yehey";
     }
 
-    public void map(Mat src,Mat dst){
-        mMapper.map(src,dst);
+    public Mat map(Mat src,boolean isTakePhoto){
+       return mMapper.map(src,isTakePhoto);
     }
 
 //    public void draw(Mat src, Mat dst){

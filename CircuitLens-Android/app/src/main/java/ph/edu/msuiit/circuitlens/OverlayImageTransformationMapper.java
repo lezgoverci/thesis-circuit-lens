@@ -14,9 +14,11 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
+import org.opencv.features2d.Features2d;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
@@ -29,12 +31,14 @@ public class OverlayImageTransformationMapper {
 
     // The tracking image.
     // Also the circuit diagram image from camera frame
-    private Mat mTrackingImage;
+    private Mat mTrackingImage = new Mat();
 
+    private boolean isSetTracking = false;
 
+    private Size blurKernel = new Size(3,3);
 
     // Grayscale version of the tracking image
-    private Mat mGrayTrackingImage;
+    private Mat mGrayTrackingImage = new Mat();
 
     // Features of the tracking image
     private final MatOfKeyPoint mTrackingImageKeypoints = new MatOfKeyPoint();
@@ -61,7 +65,13 @@ public class OverlayImageTransformationMapper {
     private final MatOfPoint mIntCurrentFrameCorners = new MatOfPoint();
 
     // A grayscale version of the current frame
-    private final Mat mGrayCurrentFrame = new Mat();
+    private Mat mGrayCurrentFrame = new Mat();
+
+    // contours hierarchy
+    Mat hierarchy = new Mat();
+
+    // a list of the current frame's contours
+    private List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 
     // Tentative matches of current frame features and tracking image features
     private final MatOfDMatch mMatches = new MatOfDMatch();
@@ -81,48 +91,86 @@ public class OverlayImageTransformationMapper {
 
     }
 
-    public Mat getmGrayTrackingImage() {
 
-        return mGrayTrackingImage;
-    }
+    public Mat map(Mat currentFrame,boolean isTakePhoto) {
 
-    public void map(Mat currentFrame,Mat dst) {
+//        Mat small = new Mat();
+//        Imgproc.pyrDown(currentFrame,small);
 
+       // mGrayCurrentFrame = currentFrame;
 
         //convert current frame image to grayscale
         Imgproc.cvtColor(currentFrame,mGrayCurrentFrame,Imgproc.COLOR_RGB2GRAY);
+        //Imgproc.GaussianBlur(mGrayCurrentFrame,mGrayCurrentFrame,blurKernel,5.0);
+        Imgproc.blur(mGrayCurrentFrame,mGrayCurrentFrame,blurKernel);
+        Imgproc.Canny(mGrayCurrentFrame,mGrayCurrentFrame,150,200);
+        //Imgproc.adaptiveThreshold(mGrayCurrentFrame,mGrayCurrentFrame,200,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY_INV,3,5.0);
+
+        ///tteeesssttttthhasdjbsd
+        Imgproc.findContours(mGrayCurrentFrame.clone(),contours,hierarchy,Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_NONE);
+
+        Imgproc.drawContours(mGrayCurrentFrame,contours,findLargestContour(contours),new Scalar(255),5);
+        if(isTakePhoto){
+            setTrackingImage(mGrayCurrentFrame);
+            isSetTracking = true;
+        }
+
+        //Features2d.drawKeypoints(mGrayCurrentFrame,mTrackingImageKeypoints,mGrayCurrentFrame);
 
 
         //find features of the current frame
-        mFeatureDetector.detect(mGrayCurrentFrame,mCurrentFrameKeypoints);
+       // mFeatureDetector.detect(mGrayCurrentFrame,mCurrentFrameKeypoints);
 
         //find descriptors of the current frame
-        mDescriptorExtrator.compute(mGrayCurrentFrame,mCurrentFrameKeypoints,mCurrentFrameDescriptors);
+        //mDescriptorExtrator.compute(mGrayCurrentFrame,mCurrentFrameKeypoints,mCurrentFrameDescriptors);
 
-        //match tracking image descriptors with current frame descriptors
-        mDescriptorMatcher.match(mCurrentFrameDescriptors,mTrackingImageDescriptors,mMatches);
+        if(isSetTracking ){
+            //match tracking image descriptors with current frame descriptors
+            mDescriptorMatcher.match(mCurrentFrameDescriptors,mTrackingImageDescriptors,mMatches);
+            //Attempt to find the tracking image's corners in the current frame
+            findCurrentFrameCorners();
+        }
 
-        //Attempt to find the tracking image's corners in the current frame
-        findCurrentFrameCorners();
-        draw(currentFrame,dst);
+
+        // see debug frame
+       // draw(currentFrame,mGrayCurrentFrame);
+        // see production frame
+        //draw(currentFrame);
+        return mGrayCurrentFrame;
+
+    }
+
+    private int findLargestContour(List<MatOfPoint> contours) {
+        double largestArea = -1;
+        int largestIndex = -1;
+
+        for(int i = 0; i < contours.size();i++){
+            Mat cnt = contours.get(i);
+            double cntArea = Imgproc.contourArea(cnt);
+            if(cntArea > largestArea){
+                largestArea = cntArea;
+                largestIndex = i;
+            }
+        }
+
+        return largestIndex;
     }
 
 
-    public void setTrackingImage(Mat trackingImg, Mat dst) {
-        mTrackingImage = trackingImg;
-        mGrayTrackingImage = dst;
+    public void setTrackingImage(Mat trackingImg) {
+        mGrayTrackingImage = trackingImg;
 
         //convert tracking image to grayscale
-        //TODO check the input color format if correct
-        Imgproc.cvtColor(mTrackingImage,mGrayTrackingImage,Imgproc.COLOR_RGB2GRAY);
-
+        //Imgproc.cvtColor(trackingImg,mGrayTrackingImage,Imgproc.COLOR_RGB2GRAY);
+        //Imgproc.Canny(mGrayTrackingImage,mGrayTrackingImage,100,255);
 
 
         //find features of the tracking image
         mFeatureDetector.detect(mGrayTrackingImage,mTrackingImageKeypoints);
 
+
         //find descriptors of the tracking image
-        mDescriptorExtrator.compute(mGrayTrackingImage,mTrackingImageKeypoints,mTrackingImageDescriptors);
+       mDescriptorExtrator.compute(mGrayTrackingImage,mTrackingImageKeypoints,mTrackingImageDescriptors);
 
 
         //Store the tracking image's corner coordinates, in pixels
@@ -130,12 +178,13 @@ public class OverlayImageTransformationMapper {
         mTrackingImageCorners.put(1,0,new double[]{mGrayTrackingImage.cols(),0.0});
         mTrackingImageCorners.put(2,0,new double[]{mGrayTrackingImage.cols(),mGrayTrackingImage.rows()});
         mTrackingImageCorners.put(3,0,new double[]{0.0,mGrayTrackingImage.rows()});
+        Log.d("mapper","Done Set tracking image");
     }
 
     private void findCurrentFrameCorners() {
         List<DMatch> matchesList = mMatches.toList();
 
-        if(matchesList.size() < 4){
+        if(matchesList.size() < 8){
             //There are too few matches to find the homography
             return;
         }
@@ -156,18 +205,18 @@ public class OverlayImageTransformationMapper {
             }
         }
         Log.d("MinDist: ",minDist + "");
-        if(minDist > 80.0){
+        if(minDist > 20.0){
             // The target is completely lost
             // Discard any previously found corners
             mCurrentFrameCorners.create(0,0,mCurrentFrameCorners.type());
             return;
-        } else if(minDist > 40.0){
+        } else if(minDist > 10.0){
             // The target is lost but maybe it is still close
             // keep any previously found corners
             return;
         }
 
-        // Identify good keypoints based on match distance
+        // Identify good keypoints based on match distancezzz
         ArrayList<Point> goodTrackingImagePointsList = new ArrayList<Point>();
         ArrayList<Point> goodCurrentFramePointsList = new ArrayList<Point>();
 
@@ -221,14 +270,12 @@ public class OverlayImageTransformationMapper {
         return  mCurrentFrameCorners;
     }
 
-    public void draw(Mat src, Mat dst){
-        if(dst != src){
-            src.copyTo(dst);
-        }
-        Imgproc.line(dst,new Point(mCurrentFrameCorners.get(0,0)), new Point(mCurrentFrameCorners.get(1,0)), mLineColor, 4);
-        Imgproc.line(dst,new Point(mCurrentFrameCorners.get(1,0)), new Point(mCurrentFrameCorners.get(2,0)), mLineColor, 4);
-        Imgproc.line(dst,new Point(mCurrentFrameCorners.get(2,0)), new Point(mCurrentFrameCorners.get(3,0)), mLineColor, 4);
-        Imgproc.line(dst,new Point(mCurrentFrameCorners.get(3,0)), new Point(mCurrentFrameCorners.get(0,0)), mLineColor, 4);
+    public void draw(Mat src){
+
+        Imgproc.line(src,new Point(mCurrentFrameCorners.get(0,0)), new Point(mCurrentFrameCorners.get(1,0)), mLineColor, 4);
+        Imgproc.line(src,new Point(mCurrentFrameCorners.get(1,0)), new Point(mCurrentFrameCorners.get(2,0)), mLineColor, 4);
+        Imgproc.line(src,new Point(mCurrentFrameCorners.get(2,0)), new Point(mCurrentFrameCorners.get(3,0)), mLineColor, 4);
+        Imgproc.line(src,new Point(mCurrentFrameCorners.get(3,0)), new Point(mCurrentFrameCorners.get(0,0)), mLineColor, 4);
 
     }
 

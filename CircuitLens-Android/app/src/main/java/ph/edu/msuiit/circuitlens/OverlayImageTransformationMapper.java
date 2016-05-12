@@ -9,6 +9,7 @@ import org.opencv.core.DMatch;
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
+import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
@@ -86,9 +87,13 @@ public class OverlayImageTransformationMapper {
     private final DescriptorMatcher mDescriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMINGLUT);
 
     private final Scalar mLineColor = new Scalar(255);
+    private final Scalar mLineColor2 = new Scalar(0.0,0.0,255.0);
 
     private Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT,new Size(5.0,5.0));
 
+    private Mat mCurrentFrameContour = new Mat();
+    private Mat triangle = new Mat();
+    private List<Point> triangleArray = new ArrayList<Point>();
     public OverlayImageTransformationMapper(){
 
     }
@@ -100,6 +105,7 @@ public class OverlayImageTransformationMapper {
 //        Imgproc.pyrDown(currentFrame,small);
 
        // mGrayCurrentFrame = currentFrame;
+        mTrackingImage = currentFrame;
 
         //convert current frame image to grayscale
         Imgproc.cvtColor(currentFrame,mGrayCurrentFrame,Imgproc.COLOR_RGB2GRAY);
@@ -111,12 +117,26 @@ public class OverlayImageTransformationMapper {
         ///tteeesssttttthhasdjbsd
         Imgproc.findContours(mGrayCurrentFrame.clone(),contours,hierarchy,Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_NONE);
 
-        Imgproc.drawContours(currentFrame,contours,findLargestContour(contours),mLineColor,5);
+        int indexLargest = findLargestContour(contours);
+
+        //MatOfInt hull = new MatOfInt();
+
+        //Imgproc.convexHull(contours.get(indexLargest),hull);
+
+        mCurrentFrameContour = Mat.zeros(currentFrame.size(),currentFrame.type());
+        Imgproc.drawContours(mCurrentFrameContour,contours,indexLargest,mLineColor2,5);
+        if(contours.size() > 0){
+            Imgproc.minEnclosingTriangle(contours.get(indexLargest),triangle);
+            contours.clear();
+            return drawTriangle(triangle);
+        }
+
 
         contours.clear();
 
+
 //        if(isTakePhoto){
-//            setTrackingImage(mGrayCurrentFrame);
+//            setTrackingImage(mCurrentFrameContour);
 //            isSetTracking = true;
 //        }
 
@@ -124,10 +144,10 @@ public class OverlayImageTransformationMapper {
 
 
         //find features of the current frame
-       // mFeatureDetector.detect(mGrayCurrentFrame,mCurrentFrameKeypoints);
+       // mFeatureDetector.detect(mCurrentFrameContour,mCurrentFrameKeypoints);
 
         //find descriptors of the current frame
-        //mDescriptorExtrator.compute(mGrayCurrentFrame,mCurrentFrameKeypoints,mCurrentFrameDescriptors);
+       // mDescriptorExtrator.compute(mCurrentFrameContour,mCurrentFrameKeypoints,mCurrentFrameDescriptors);
 
         if(isSetTracking ){
             //match tracking image descriptors with current frame descriptors
@@ -140,9 +160,19 @@ public class OverlayImageTransformationMapper {
         // see debug frame
        // draw(currentFrame,mGrayCurrentFrame);
         // see production frame
-        //draw(currentFrame);
-        return currentFrame;
 
+        return  mCurrentFrameContour;
+
+    }
+
+    private Mat drawTriangle(Mat triangle) {
+        if((triangle.get(0,0) != null) && (triangle.get(1,0) != null) && (triangle.get(2,0) != null)){
+            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(0,0)[0],triangle.get(0,0)[1]),new Point(triangle.get(1,0)[0],triangle.get(1,0)[1]),mLineColor2);
+            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(1,0)[0],triangle.get(1,0)[1]),new Point(triangle.get(2,0)[0],triangle.get(2,0)[1]),mLineColor2);
+            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(2,0)[0],triangle.get(2,0)[1]),new Point(triangle.get(0,0)[0],triangle.get(0,0)[1]),mLineColor2);
+        }
+
+        return mCurrentFrameContour;
     }
 
     private int findLargestContour(List<MatOfPoint> contours) {
@@ -275,13 +305,14 @@ public class OverlayImageTransformationMapper {
         return  mCurrentFrameCorners;
     }
 
-    public void draw(Mat src){
+    public Mat draw(Mat src){
 
         Imgproc.line(src,new Point(mCurrentFrameCorners.get(0,0)), new Point(mCurrentFrameCorners.get(1,0)), mLineColor, 4);
         Imgproc.line(src,new Point(mCurrentFrameCorners.get(1,0)), new Point(mCurrentFrameCorners.get(2,0)), mLineColor, 4);
         Imgproc.line(src,new Point(mCurrentFrameCorners.get(2,0)), new Point(mCurrentFrameCorners.get(3,0)), mLineColor, 4);
         Imgproc.line(src,new Point(mCurrentFrameCorners.get(3,0)), new Point(mCurrentFrameCorners.get(0,0)), mLineColor, 4);
 
+        return src;
     }
 
 }

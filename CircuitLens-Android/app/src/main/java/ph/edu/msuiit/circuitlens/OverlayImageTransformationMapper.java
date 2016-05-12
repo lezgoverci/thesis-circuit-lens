@@ -9,6 +9,7 @@ import org.opencv.core.DMatch;
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
+import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
@@ -21,8 +22,10 @@ import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.utils.Converters;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -93,7 +96,9 @@ public class OverlayImageTransformationMapper {
 
     private Mat mCurrentFrameContour = new Mat();
     private Mat triangle = new Mat();
-    private List<Point> triangleArray = new ArrayList<Point>();
+
+    private Mat mTrianglePoints = new Mat(3,1, CvType.CV_32FC2);
+
     public OverlayImageTransformationMapper(){
 
     }
@@ -128,7 +133,8 @@ public class OverlayImageTransformationMapper {
         if(contours.size() > 0){
             Imgproc.minEnclosingTriangle(contours.get(indexLargest),triangle);
             contours.clear();
-            return drawTriangle(triangle);
+            return drawTriangle(sortTrianglePoints(triangle));
+
         }
 
 
@@ -165,12 +171,77 @@ public class OverlayImageTransformationMapper {
 
     }
 
+    private Mat sortTrianglePoints(Mat triangle){
+
+        Log.d("typeOfTri",triangle.toString());
+
+
+
+        List<Point> pts = new ArrayList<Point>();
+        Mat ptsMat = new Mat();
+
+
+
+        double dst[] = new double[3];
+        dst[0] = getDistanceFromOrigin(triangle.get(0,0));
+        dst[1] = getDistanceFromOrigin(triangle.get(1,0));
+        dst[2]= getDistanceFromOrigin(triangle.get(2,0));
+
+        double[] tmp = dst.clone();
+        Arrays.sort(tmp);
+        Log.d("dst1",dst[0] +"");
+        Log.d("dst2",dst[1] +"");
+        Log.d("dst3",dst[2] +"");
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                if(tmp[i] == dst[j]){
+                    if(triangle.get(j,0) != null){
+                        pts.add(new Point(triangle.get(j,0)));
+                    }
+
+
+                    Log.d("add",pts.toString());
+                }
+            }
+        }
+
+//        Log.d("devdst0 ", dst[0] + "" );
+//        Log.d("devtmp0 ", tmp[0] + "" );
+//        Log.d("devdst1 ", dst[1] + "" );
+//        Log.d("devtmp1 ", tmp[1] + "" );
+//        Log.d("devdst2 ", dst[2] + "" );
+//        Log.d("devtmp2 ", tmp[2] + "" );
+
+
+        ptsMat = Converters.vector_Point_to_Mat(pts);
+        Log.d("ptsMat",ptsMat.dump());
+
+        return ptsMat;
+
+
+    }
+
+    private double getDistanceFromOrigin(double[] pt) {
+        double tmp = 0;
+        if(pt != null){
+            if(pt.length == 2){
+                tmp = Math.sqrt((pt[0] * pt[0]) + (pt[1] * pt[1]));
+            }
+        }
+        else{
+            tmp = 0.0;
+        }
+        return tmp;
+    }
+
     private Mat drawTriangle(Mat triangle) {
         if((triangle.get(0,0) != null) && (triangle.get(1,0) != null) && (triangle.get(2,0) != null)){
-            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(0,0)[0],triangle.get(0,0)[1]),new Point(triangle.get(1,0)[0],triangle.get(1,0)[1]),mLineColor2);
-            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(1,0)[0],triangle.get(1,0)[1]),new Point(triangle.get(2,0)[0],triangle.get(2,0)[1]),mLineColor2);
-            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(2,0)[0],triangle.get(2,0)[1]),new Point(triangle.get(0,0)[0],triangle.get(0,0)[1]),mLineColor2);
+            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(0,0)[0],triangle.get(0,0)[1]),new Point(triangle.get(1,0)[0],triangle.get(1,0)[1]),new Scalar(255,0,0));
+            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(1,0)[0],triangle.get(1,0)[1]),new Point(triangle.get(2,0)[0],triangle.get(2,0)[1]),new Scalar(0,255,0));
+            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(2,0)[0],triangle.get(2,0)[1]),new Point(triangle.get(0,0)[0],triangle.get(0,0)[1]),new Scalar(0,0,255));
         }
+
+
 
         return mCurrentFrameContour;
     }
@@ -215,6 +286,7 @@ public class OverlayImageTransformationMapper {
         mTrackingImageCorners.put(3,0,new double[]{0.0,mGrayTrackingImage.rows()});
         Log.d("mapper","Done Set tracking image");
     }
+
 
     private void findCurrentFrameCorners() {
         List<DMatch> matchesList = mMatches.toList();

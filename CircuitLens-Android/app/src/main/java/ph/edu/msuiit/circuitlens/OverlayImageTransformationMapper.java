@@ -98,6 +98,8 @@ public class OverlayImageTransformationMapper {
     private Mat triangle = new Mat();
 
     private Mat mTrianglePoints = new Mat(3,1, CvType.CV_32FC2);
+    private MatOfPoint mhullMatOfPoint = new MatOfPoint();
+    private MatOfPoint mLargestContour = new MatOfPoint();
 
     public OverlayImageTransformationMapper(){
 
@@ -124,21 +126,32 @@ public class OverlayImageTransformationMapper {
 
         int indexLargest = findLargestContour(contours);
 
-        //MatOfInt hull = new MatOfInt();
 
-        //Imgproc.convexHull(contours.get(indexLargest),hull);
+        MatOfInt hull = new MatOfInt();
+        Imgproc.convexHull(mLargestContour,hull,true);
+        mhullMatOfPoint = convertHullToMatOfPoint(hull);
 
         mCurrentFrameContour = Mat.zeros(currentFrame.size(),currentFrame.type());
-        Imgproc.drawContours(mCurrentFrameContour,contours,indexLargest,mLineColor2,5);
-        if(contours.size() > 0){
-            Imgproc.minEnclosingTriangle(contours.get(indexLargest),triangle);
-            contours.clear();
-            return drawTriangle(sortTrianglePoints(triangle));
 
+        List<MatOfPoint> hullList = new ArrayList<>();
+        hullList.add(mhullMatOfPoint);
+
+        Imgproc.drawContours(mCurrentFrameContour,contours,indexLargest,mLineColor2,5);
+        if(hullList.size() > 0){
+            Imgproc.drawContours(mCurrentFrameContour,hullList,-1,mLineColor,5);
         }
 
 
+//        if(contours.size() > 0){
+//            Imgproc.minEnclosingTriangle(contours.get(indexLargest),triangle);
+//            contours.clear();
+//            return drawTriangle(sortTrianglePoints(triangle));
+//
+//        }
+
+
         contours.clear();
+        hullList.clear();
 
 
         if(isTakePhoto){
@@ -168,6 +181,23 @@ public class OverlayImageTransformationMapper {
         // see production frame
 
         return  mCurrentFrameContour;
+
+    }
+
+    private MatOfPoint convertHullToMatOfPoint(MatOfInt hull) {
+        List<Point> hullPointsList = new ArrayList<>();
+        int[] hullIntList = hull.toArray();
+        MatOfPoint res = new MatOfPoint();
+
+        List<Point> largestContourPointsList = mLargestContour.toList();
+
+        for(int i = 0; i < hullIntList.length; i++){
+            hullPointsList.add(largestContourPointsList.get(hullIntList[i]));
+        }
+
+        res.fromList(hullPointsList);
+
+        return res;
 
     }
 
@@ -248,16 +278,22 @@ public class OverlayImageTransformationMapper {
 
     private int findLargestContour(List<MatOfPoint> contours) {
         double largestArea = 0;
-        int largestIndex = 0;
+        int largestIndex = -1;
 
-        for(int i = 0; i < contours.size();i++){
-            Mat cnt = contours.get(i);
-            double cntArea = Imgproc.contourArea(cnt);
-            if(cntArea > largestArea){
-                largestArea = cntArea;
-                largestIndex = i;
+        if(contours.size() > 0){
+            for(int i = 0; i < contours.size();i++){
+                Mat cnt = contours.get(i);
+                double cntArea = Imgproc.contourArea(cnt);
+                if(cntArea > largestArea){
+                    largestArea = cntArea;
+                    largestIndex = i;
+                }
             }
+
+            mLargestContour = contours.get(largestIndex);
         }
+
+
 
         return largestIndex;
     }

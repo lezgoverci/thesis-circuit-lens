@@ -141,10 +141,10 @@ public class OverlayImageTransformationMapper {
         contours.clear();
 
 
-//        if(isTakePhoto){
-//            setTrackingImage(mCurrentFrameContour);
-//            isSetTracking = true;
-//        }
+        if(isTakePhoto){
+            setTrackingImage(mCurrentFrameContour);
+            isSetTracking = true;
+        }
 
         //Features2d.drawKeypoints(mGrayCurrentFrame,mTrackingImageKeypoints,mGrayCurrentFrame);
 

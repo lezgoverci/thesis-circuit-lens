@@ -122,14 +122,22 @@ public class OverlayImageTransformationMapper {
         Imgproc.dilate(mGrayCurrentFrame,mGrayCurrentFrame,dilateKernel);
 
         ///tteeesssttttthhasdjbsd
-        Imgproc.findContours(mGrayCurrentFrame.clone(),contours,hierarchy,Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_NONE);
+        Imgproc.findContours(mGrayCurrentFrame.clone(),contours,hierarchy,Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_SIMPLE);
 
         int indexLargest = findLargestContour(contours);
+
+//        MatOfPoint2f approxContour = approxLargestContour();
+//        Log.d("approxSize",approxContour.toArray().length + "");
+//        MatOfPoint approx = new MatOfPoint();
+//        approxContour.convertTo(approx,mLargestContour.type());
 
 
         MatOfInt hull = new MatOfInt();
         Imgproc.convexHull(mLargestContour,hull,true);
+        Log.d("hull",hull.toArray().length + "");
         mhullMatOfPoint = convertHullToMatOfPoint(hull);
+
+        MatOfPoint2f approxHull = approxHull();
 
         mCurrentFrameContour = Mat.zeros(currentFrame.size(),currentFrame.type());
 
@@ -139,6 +147,10 @@ public class OverlayImageTransformationMapper {
         Imgproc.drawContours(mCurrentFrameContour,contours,indexLargest,mLineColor2,5);
         if(hullList.size() > 0){
             Imgproc.drawContours(mCurrentFrameContour,hullList,-1,mLineColor,5);
+            if(approxHull.toArray().length == 3){
+                drawTriangleVertices(approxHull);
+            }
+
         }
 
 
@@ -184,6 +196,33 @@ public class OverlayImageTransformationMapper {
 
     }
 
+    private void drawTriangleVertices(MatOfPoint2f approxHull) {
+        //mhullMatOfPoint
+
+        Imgproc.circle(mCurrentFrameContour,approxHull.toArray()[0],10,new Scalar(255,0,0),0);
+        Imgproc.circle(mCurrentFrameContour,approxHull.toArray()[1],10,new Scalar(0,255,0),0);
+        Imgproc.circle(mCurrentFrameContour,approxHull.toArray()[2],10,new Scalar(0,0,255),0);
+
+
+    }
+
+    private MatOfPoint2f approxHull() {
+        MatOfPoint2f curve = new MatOfPoint2f(mhullMatOfPoint.toArray());
+        MatOfPoint2f res = new MatOfPoint2f();
+
+
+
+
+        double arcLength = Imgproc.arcLength(curve,true);
+        double epsilon = 0.01* arcLength;
+
+        Imgproc.approxPolyDP(curve,res,epsilon,true);
+
+        Log.d("approxHull",res.dump() + "size: " + res.toArray().length + "");
+
+        return res;
+    }
+
     private MatOfPoint convertHullToMatOfPoint(MatOfInt hull) {
         List<Point> hullPointsList = new ArrayList<>();
         int[] hullIntList = hull.toArray();
@@ -201,11 +240,7 @@ public class OverlayImageTransformationMapper {
 
     }
 
-    private Mat sortTrianglePoints(Mat triangle){
-
-        Log.d("typeOfTri",triangle.toString());
-
-
+    private Mat sortPoints(Mat hull){
 
         List<Point> pts = new ArrayList<Point>();
         Mat ptsMat = new Mat();

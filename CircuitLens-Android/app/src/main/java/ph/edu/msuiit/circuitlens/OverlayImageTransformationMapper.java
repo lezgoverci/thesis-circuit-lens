@@ -26,6 +26,7 @@ import org.opencv.utils.Converters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -135,9 +136,10 @@ public class OverlayImageTransformationMapper {
         MatOfInt hull = new MatOfInt();
         Imgproc.convexHull(mLargestContour,hull,true);
         Log.d("hull",hull.toArray().length + "");
+       // mhullMatOfPoint = convertHullToMatOfPoint(sortHullPoints(hull));
         mhullMatOfPoint = convertHullToMatOfPoint(hull);
 
-        MatOfPoint2f approxHull = approxHull();
+        MatOfPoint2f approxHull = approxHull(mhullMatOfPoint);
 
         mCurrentFrameContour = Mat.zeros(currentFrame.size(),currentFrame.type());
 
@@ -147,9 +149,12 @@ public class OverlayImageTransformationMapper {
         Imgproc.drawContours(mCurrentFrameContour,contours,indexLargest,mLineColor2,5);
         if(hullList.size() > 0){
             Imgproc.drawContours(mCurrentFrameContour,hullList,-1,mLineColor,5);
-            if(approxHull.toArray().length == 3){
-                drawTriangleVertices(approxHull);
-            }
+//            if(approxHull.toArray().length == 3){
+//                drawTriangleVertices(approxHull);
+//            }
+
+            // draw labels
+            drawLabels(approxHull);
 
         }
 
@@ -196,6 +201,16 @@ public class OverlayImageTransformationMapper {
 
     }
 
+    private void drawLabels(MatOfPoint2f approxHull) {
+        List<Point> list = approxHull.toList();
+
+        for(int i =0; i < list.size(); i++){
+            Imgproc.putText(mCurrentFrameContour,i+1 + "",list.get(i),1,10.,new Scalar(0,255,0));
+        }
+
+
+    }
+
     private void drawTriangleVertices(MatOfPoint2f approxHull) {
         //mhullMatOfPoint
 
@@ -206,8 +221,8 @@ public class OverlayImageTransformationMapper {
 
     }
 
-    private MatOfPoint2f approxHull() {
-        MatOfPoint2f curve = new MatOfPoint2f(mhullMatOfPoint.toArray());
+    private MatOfPoint2f approxHull(MatOfPoint hull) {
+        MatOfPoint2f curve = new MatOfPoint2f(hull.toArray());
         MatOfPoint2f res = new MatOfPoint2f();
 
 
@@ -223,8 +238,45 @@ public class OverlayImageTransformationMapper {
         return res;
     }
 
+    private MatOfInt sortHullPoints(MatOfInt hullInt){
+        List hullPointsList = new ArrayList();
+        hullPointsList = hullInt.toList();
+        MatOfInt res = new MatOfInt();
+        List resList = new ArrayList();
+
+        int startIndex;
+        int middleIndex1;
+        int endIndex;
+
+        startIndex = hullPointsList.indexOf(0);
+        if(startIndex < 0){
+            startIndex = 0;
+        }
+        middleIndex1 = hullPointsList.size() - 1;
+        endIndex = startIndex - 1;
+
+
+        if(hullPointsList.size() > 0){
+            if(startIndex != 0){
+                resList.addAll(hullPointsList.subList(startIndex,middleIndex1));
+                resList.addAll(hullPointsList.subList(0,endIndex));
+            }
+            else{
+                resList.addAll(hullPointsList.subList(startIndex,middleIndex1));
+            }
+
+        }
+
+
+
+        res.fromList(resList);
+
+        return res;
+    }
+
     private MatOfPoint convertHullToMatOfPoint(MatOfInt hull) {
         List<Point> hullPointsList = new ArrayList<>();
+
         int[] hullIntList = hull.toArray();
         MatOfPoint res = new MatOfPoint();
 
@@ -233,6 +285,7 @@ public class OverlayImageTransformationMapper {
         for(int i = 0; i < hullIntList.length; i++){
             hullPointsList.add(largestContourPointsList.get(hullIntList[i]));
         }
+        Log.d("hullInt",hull.dump());
 
         res.fromList(hullPointsList);
 

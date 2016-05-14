@@ -109,50 +109,38 @@ public class OverlayImageTransformationMapper {
 
     public Mat map(Mat currentFrame,boolean isTakePhoto) {
 
-//        Mat small = new Mat();
-//        Imgproc.pyrDown(currentFrame,small);
-
-       // mGrayCurrentFrame = currentFrame;
         mTrackingImage = currentFrame;
 
-        //convert current frame image to grayscale
+        // Enhance features
         Imgproc.cvtColor(currentFrame,mGrayCurrentFrame,Imgproc.COLOR_RGB2GRAY);
-        //Imgproc.GaussianBlur(mGrayCurrentFrame,mGrayCurrentFrame,blurKernel,5.0);
         Imgproc.blur(mGrayCurrentFrame,mGrayCurrentFrame,blurKernel);
         Imgproc.Canny(mGrayCurrentFrame,mGrayCurrentFrame,150,250);
         Imgproc.dilate(mGrayCurrentFrame,mGrayCurrentFrame,dilateKernel);
 
-        ///tteeesssttttthhasdjbsd
+        // Find Contours
         Imgproc.findContours(mGrayCurrentFrame.clone(),contours,hierarchy,Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_SIMPLE);
 
+        // Find the largest contour
         int indexLargest = findLargestContour(contours);
 
-//        MatOfPoint2f approxContour = approxLargestContour();
-//        Log.d("approxSize",approxContour.toArray().length + "");
-//        MatOfPoint approx = new MatOfPoint();
-//        approxContour.convertTo(approx,mLargestContour.type());
-
-
+        // find convex hull of largest contour
         MatOfInt hull = new MatOfInt();
         Imgproc.convexHull(mLargestContour,hull,true);
-        Log.d("hull",hull.toArray().length + "");
+
+        // Convert hull to MatOfPoint from MatOfInt
        // mhullMatOfPoint = convertHullToMatOfPoint(sortHullPoints(hull));
         mhullMatOfPoint = convertHullToMatOfPoint(hull);
 
+        // Approximate convex hull polygon
         MatOfPoint2f approxHull = approxHull(mhullMatOfPoint);
 
+        // Draw contour and convex hull
         mCurrentFrameContour = Mat.zeros(currentFrame.size(),currentFrame.type());
-
         List<MatOfPoint> hullList = new ArrayList<>();
         hullList.add(mhullMatOfPoint);
-
         Imgproc.drawContours(mCurrentFrameContour,contours,indexLargest,mLineColor2,5);
         if(hullList.size() > 0){
             Imgproc.drawContours(mCurrentFrameContour,hullList,-1,mLineColor,5);
-//            if(approxHull.toArray().length == 3){
-//                drawTriangleVertices(approxHull);
-//            }
-
             // draw labels
             drawLabels(approxHull);
 
@@ -209,15 +197,6 @@ public class OverlayImageTransformationMapper {
         }
 
 
-    }
-
-    private void drawTriangleVertices(MatOfPoint2f approxHull) {
-        //mhullMatOfPoint
-
-        Imgproc.circle(mCurrentFrameContour,approxHull.toArray()[0],10,new Scalar(255,0,0),0);
-        Imgproc.circle(mCurrentFrameContour,approxHull.toArray()[1],10,new Scalar(0,255,0),0);
-        Imgproc.circle(mCurrentFrameContour,approxHull.toArray()[2],10,new Scalar(0,0,255),0);
-
 
     }
 
@@ -271,6 +250,10 @@ public class OverlayImageTransformationMapper {
 
         res.fromList(resList);
 
+        // clear lists
+        hullPointsList.clear();
+        resList.clear();
+
         return res;
     }
 
@@ -289,80 +272,16 @@ public class OverlayImageTransformationMapper {
 
         res.fromList(hullPointsList);
 
+        // clear lists
+        hullPointsList.clear();
+
+
+
         return res;
 
     }
 
-    private Mat sortPoints(Mat hull){
 
-        List<Point> pts = new ArrayList<Point>();
-        Mat ptsMat = new Mat();
-
-
-
-        double dst[] = new double[3];
-        dst[0] = getDistanceFromOrigin(triangle.get(0,0));
-        dst[1] = getDistanceFromOrigin(triangle.get(1,0));
-        dst[2]= getDistanceFromOrigin(triangle.get(2,0));
-
-        double[] tmp = dst.clone();
-        Arrays.sort(tmp);
-        Log.d("dst1",dst[0] +"");
-        Log.d("dst2",dst[1] +"");
-        Log.d("dst3",dst[2] +"");
-        for(int i = 0; i < 3; i++){
-            for(int j = 0; j < 3; j++){
-                if(tmp[i] == dst[j]){
-                    if(triangle.get(j,0) != null){
-                        pts.add(new Point(triangle.get(j,0)));
-                    }
-
-
-                    Log.d("add",pts.toString());
-                }
-            }
-        }
-
-//        Log.d("devdst0 ", dst[0] + "" );
-//        Log.d("devtmp0 ", tmp[0] + "" );
-//        Log.d("devdst1 ", dst[1] + "" );
-//        Log.d("devtmp1 ", tmp[1] + "" );
-//        Log.d("devdst2 ", dst[2] + "" );
-//        Log.d("devtmp2 ", tmp[2] + "" );
-
-
-        ptsMat = Converters.vector_Point_to_Mat(pts);
-        Log.d("ptsMat",ptsMat.dump());
-
-        return ptsMat;
-
-
-    }
-
-    private double getDistanceFromOrigin(double[] pt) {
-        double tmp = 0;
-        if(pt != null){
-            if(pt.length == 2){
-                tmp = Math.sqrt((pt[0] * pt[0]) + (pt[1] * pt[1]));
-            }
-        }
-        else{
-            tmp = 0.0;
-        }
-        return tmp;
-    }
-
-    private Mat drawTriangle(Mat triangle) {
-        if((triangle.get(0,0) != null) && (triangle.get(1,0) != null) && (triangle.get(2,0) != null)){
-            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(0,0)[0],triangle.get(0,0)[1]),new Point(triangle.get(1,0)[0],triangle.get(1,0)[1]),new Scalar(255,0,0));
-            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(1,0)[0],triangle.get(1,0)[1]),new Point(triangle.get(2,0)[0],triangle.get(2,0)[1]),new Scalar(0,255,0));
-            Imgproc.line(mCurrentFrameContour,new Point(triangle.get(2,0)[0],triangle.get(2,0)[1]),new Point(triangle.get(0,0)[0],triangle.get(0,0)[1]),new Scalar(0,0,255));
-        }
-
-
-
-        return mCurrentFrameContour;
-    }
 
     private int findLargestContour(List<MatOfPoint> contours) {
         double largestArea = 0;
@@ -497,18 +416,6 @@ public class OverlayImageTransformationMapper {
 
     }
 
-    public Mat getCurrentFrameCorners(){
-        return  mCurrentFrameCorners;
-    }
 
-    public Mat draw(Mat src){
-
-        Imgproc.line(src,new Point(mCurrentFrameCorners.get(0,0)), new Point(mCurrentFrameCorners.get(1,0)), mLineColor, 4);
-        Imgproc.line(src,new Point(mCurrentFrameCorners.get(1,0)), new Point(mCurrentFrameCorners.get(2,0)), mLineColor, 4);
-        Imgproc.line(src,new Point(mCurrentFrameCorners.get(2,0)), new Point(mCurrentFrameCorners.get(3,0)), mLineColor, 4);
-        Imgproc.line(src,new Point(mCurrentFrameCorners.get(3,0)), new Point(mCurrentFrameCorners.get(0,0)), mLineColor, 4);
-
-        return src;
-    }
 
 }

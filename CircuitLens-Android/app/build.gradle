@@ -26,10 +26,10 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:support-v4:23.3.0'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:support-v4:23.4.0'
     compile 'ws.wamp.jawampa:jawampa-core:0.4.1'
     compile 'ws.wamp.jawampa:jawampa-netty:0.4.0'
-    compile 'org.rajawali3d:rajawali:1.0.186-SNAPSHOT@aar'
+    compile 'org.rajawali3d:rajawali:1.0.325@aar'
     compile project(':openCVLibrary310')
 }

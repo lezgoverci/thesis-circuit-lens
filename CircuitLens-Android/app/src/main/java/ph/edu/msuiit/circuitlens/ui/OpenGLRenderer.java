@@ -53,9 +53,9 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         circuitDiagram.setMaterial(material);
         circuitDiagram.setTransparent(true);
         circuitDiagram.setDoubleSided(true);
+
         getCurrentScene().addChild(circuitDiagram);
         getCurrentCamera().setZ(4.2f);
-
     }
 
 

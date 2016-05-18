@@ -1,6 +1,5 @@
 package ph.edu.msuiit.circuitlens.ui;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -9,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -18,7 +16,6 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
-import org.rajawali3d.surface.IRajawaliSurface;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import ph.edu.msuiit.circuitlens.CircuitLensController;
@@ -68,13 +65,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         }
         setContentView(R.layout.activity_ar);
 
-        final RajawaliSurfaceView surface = new RajawaliSurfaceView(this);
-        surface.setFrameRate(60.0);
-        surface.setRenderMode(IRajawaliSurface.RENDERMODE_WHEN_DIRTY);
-
-        // Add OpenGLRenderer to your root view
-        addContentView(surface, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT));
-
+        final RajawaliSurfaceView surface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         renderer = new OpenGLRenderer(this);
         surface.setTransparent(true);
         surface.setSurfaceRenderer(renderer);

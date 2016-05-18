@@ -30,5 +30,6 @@ dependencies {
     compile 'com.android.support:support-v4:23.3.0'
     compile 'ws.wamp.jawampa:jawampa-core:0.4.1'
     compile 'ws.wamp.jawampa:jawampa-netty:0.4.0'
+    compile 'org.rajawali3d:rajawali:1.0.186-SNAPSHOT@aar'
     compile project(':openCVLibrary310')
 }

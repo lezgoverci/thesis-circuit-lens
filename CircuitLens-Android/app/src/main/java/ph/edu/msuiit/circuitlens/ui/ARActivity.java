@@ -1,12 +1,16 @@
 package ph.edu.msuiit.circuitlens.ui;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -15,12 +19,11 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
+import org.rajawali3d.surface.IRajawaliSurface;
+import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import ph.edu.msuiit.circuitlens.CircuitLensController;
-import ph.edu.msuiit.circuitlens.RemoteNetlistGenerator;
 import ph.edu.msuiit.circuitlens.R;
-
-import static org.opencv.imgproc.Imgproc.cvtColor;
 
 public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, CircuitLensView {
     private static final String TAG = "CircuitLens::ARActivity";
@@ -29,11 +32,14 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
+
     // V: camera shutter
     private boolean mTakePhoto = false;
     private boolean isSetTrackingImage = false;
     private boolean isMapped;
     private boolean isDrawn;
+    private OpenGLRenderer renderer;
+
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -74,7 +80,22 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         }
         setContentView(R.layout.activity_ar);
 
-        mController = new CircuitLensController(this);
+        final RajawaliSurfaceView surface = new RajawaliSurfaceView(this);
+        surface.setFrameRate(60.0);
+        surface.setRenderMode(IRajawaliSurface.RENDERMODE_WHEN_DIRTY);
+
+        // Add OpenGLRenderer to your root view
+        addContentView(surface, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT));
+
+        renderer = new OpenGLRenderer(this);
+        surface.setSurfaceRenderer(renderer);
+        surface.setTransparent(true);
+        surface.setZOrderMediaOverlay(true);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String serverUri = preferences.getString("server_uri","ws://127.0.0.1:8080/ws");
+        Log.i(TAG,"ServerUri: "+serverUri);
+        mController = new CircuitLensController(this,serverUri);
         mController.onCreate();
         initializeViews();
 

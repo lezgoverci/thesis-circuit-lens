@@ -15,9 +15,9 @@ public class CircuitLensController{
     CircuitLensView mView;
     OverlayImageTransformationMapper mMapper;
 
-    public CircuitLensController(CircuitLensView view){
+    public CircuitLensController(CircuitLensView view, String serverUri){
         mView = view;
-        mNetlistGenerator = new RemoteNetlistGenerator();
+        mNetlistGenerator = new RemoteNetlistGenerator(serverUri);
     }
 
     public void onCreate(){

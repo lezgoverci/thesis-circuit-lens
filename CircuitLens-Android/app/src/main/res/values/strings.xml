@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Circuit Lens</string>
+    <string name="title_activity_settings">Circuit Lens Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_server">Server URI</string>
+    <string name="pref_default_server">ws://127.0.0.1:8080/ws</string>
+
 </resources>

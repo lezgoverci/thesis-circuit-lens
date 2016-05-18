@@ -76,8 +76,8 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         addContentView(surface, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT));
 
         renderer = new OpenGLRenderer(this);
-        surface.setSurfaceRenderer(renderer);
         surface.setTransparent(true);
+        surface.setSurfaceRenderer(renderer);
         surface.setZOrderMediaOverlay(true);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import org.opencv.calib3d.Calib3d;
+import org.opencv.core.Mat;
 import org.rajawali3d.lights.DirectionalLight;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
@@ -62,7 +64,7 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     @Override
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
-        circuitDiagram.rotate(Vector3.Axis.Y, 1.0);
+        //circuitDiagram.rotate(Vector3.Axis.Y, 1.0);
     }
 
 
@@ -72,6 +74,10 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
     public void onOffsetsChanged(float x, float y, float z, float w, int i, int j){
 
+    }
+
+    public void setProjectionValues(Mat f) {
+//        Calib3d.decomposeHomographyMat(f,);
     }
 }
 

@@ -151,6 +151,8 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         }
 
         Mat f = mController.map(frame,mTakePhoto);
+        Log.d("homography",f.dump());
+        setRendererProjection(f,renderer);
 
         if(mTakePhoto){
             mTakePhoto = false;
@@ -158,7 +160,11 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
 
 
-        return f;
+        return frame;
+    }
+
+    private void setRendererProjection(Mat f, OpenGLRenderer renderer) {
+        renderer.setProjectionValues(f);
     }
 
     @Override

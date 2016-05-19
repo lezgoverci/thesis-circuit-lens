@@ -117,7 +117,7 @@ public class OverlayImageTransformationMapper {
         contours.clear();
         hullList.clear();
 
-
+        Mat homography = new Mat();
         if(isTakePhoto){
             //setTrackingImage(mCurrentFrameContour);
             mTrackingImageApproxHullMatOfPoint2f = mCurrentFrameApproxHullMatOfPoint2f;
@@ -126,14 +126,14 @@ public class OverlayImageTransformationMapper {
 
         if(isSetTracking ){
             //find homography matrix
-            Mat homography = findHomographyTransformation();
+            homography = findHomographyTransformation();
             //Mat box = currentFrame.submat(new Rect(0,0,currentFrame.width() / 2,currentFrame.height() /2));
             //Mat box = mCurrentFrameContour.clone();
-            Mat box = currentFrame;
-            drawImage(box,homography);
+            //Mat box = currentFrame;
+            //drawImage(box,homography);
         }
 
-        return  mCurrentFrameContour;
+        return  homography;
 
     }
 

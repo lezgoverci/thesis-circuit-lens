@@ -10,6 +10,7 @@ import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Plane;
 import org.rajawali3d.primitives.Sphere;
 import org.rajawali3d.renderer.RajawaliRenderer;
 
@@ -20,7 +21,7 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     public Context context;
 
     private DirectionalLight directionalLight;
-    private Sphere earthSphere;
+    private Plane circuitDiagram;
 
 
     public OpenGLRenderer(Context context) {
@@ -31,7 +32,7 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
     public void initScene(){
 
-        directionalLight = new DirectionalLight(1f, .2f, -1.0f);
+        directionalLight = new DirectionalLight(1f, .2f, 1.0f);
         directionalLight.setColor(1.0f, 1.0f, 1.0f);
         directionalLight.setPower(2);
         getCurrentScene().addLight(directionalLight);
@@ -41,26 +42,27 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         material.setDiffuseMethod(new DiffuseMethod.Lambert());
         material.setColor(0);
 
-        Texture earthTexture = new Texture("Earth", R.drawable.earthtruecolor_nasa_big);
+        Texture earthTexture = new Texture("Circuit", R.drawable.circuit_a);
         try{
             material.addTexture(earthTexture);
-
         } catch (ATexture.TextureException error){
             Log.d("DEBUG", "TEXTURE ERROR");
         }
 
-        earthSphere = new Sphere(1, 24, 24);
-        earthSphere.setMaterial(material);
-        getCurrentScene().addChild(earthSphere);
-        getCurrentCamera().setZ(4.2f);
+        circuitDiagram = new Plane(3, 3, 1, 1);
+        circuitDiagram.setMaterial(material);
+        circuitDiagram.setTransparent(true);
+        circuitDiagram.setDoubleSided(true);
 
+        getCurrentScene().addChild(circuitDiagram);
+        getCurrentCamera().setZ(4.2f);
     }
 
 
     @Override
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
-        earthSphere.rotate(Vector3.Axis.Y, 1.0);
+        circuitDiagram.rotate(Vector3.Axis.Y, 1.0);
     }
 
 

@@ -177,7 +177,17 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         return ret;
     }
 
-    
+    private View.OnTouchListener touchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if(event.getAction() == MotionEvent.ACTION_DOWN)
+            {
+                // this needs to be defined on the renderer:
+                renderer.getObjectAt(event.getX(), event.getY());
+            }
+            return true;
+        }
+    };
 
 
 }

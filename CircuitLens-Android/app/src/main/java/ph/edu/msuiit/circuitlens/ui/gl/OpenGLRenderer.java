@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Mat;
+import org.rajawali3d.Object3D;
 import org.rajawali3d.lights.DirectionalLight;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
@@ -15,16 +16,18 @@ import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.Plane;
 import org.rajawali3d.primitives.Sphere;
 import org.rajawali3d.renderer.RajawaliRenderer;
+import org.rajawali3d.util.ObjectColorPicker;
+import org.rajawali3d.util.OnObjectPickedListener;
 
 import ph.edu.msuiit.circuitlens.R;
 
-public class OpenGLRenderer  extends RajawaliRenderer {
+public class OpenGLRenderer  extends RajawaliRenderer implements OnObjectPickedListener {
 
     public Context context;
 
     private DirectionalLight directionalLight;
     private Plane circuitDiagram;
-
+    private ObjectColorPicker mPicker;
 
     public OpenGLRenderer(Context context) {
         super(context);
@@ -33,6 +36,11 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     }
 
     public void initScene(){
+        // configure object picker
+        mPicker = new ObjectColorPicker(this);
+        mPicker.setOnObjectPickedListener(this);
+
+        //mPicker.registerObject(myObject);
 
         directionalLight = new DirectionalLight(1f, .2f, 1.0f);
         directionalLight.setColor(1.0f, 1.0f, 1.0f);
@@ -78,6 +86,15 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
     public void setProjectionValues(Mat f) {
 //        Calib3d.decomposeHomographyMat(f,);
+    }
+
+    @Override
+    public void onObjectPicked(Object3D object) {
+
+    }
+
+    public void getObjectAt(float x, float y) {
+        mPicker.getObjectAt(x, y);
     }
 }
 

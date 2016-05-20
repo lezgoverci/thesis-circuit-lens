@@ -21,6 +21,7 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import ph.edu.msuiit.circuitlens.CircuitLensController;
 import ph.edu.msuiit.circuitlens.R;
+import ph.edu.msuiit.circuitlens.ui.gl.OpenGLRenderer;
 
 public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, CircuitLensView {
     private static final String TAG = "CircuitLens::ARActivity";
@@ -89,10 +90,6 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         mController = new CircuitLensController(this,serverUri);
         mController.onCreate();
         initializeViews();
-
-
-
-
     }
 
     private void initializeViews(){
@@ -150,13 +147,14 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
             mController.onFocus(inputFrame);
         }
 
+        /*
         Mat f = mController.map(frame,mTakePhoto);
         Log.d("homography",f.dump());
         setRendererProjection(f,renderer);
 
         if(mTakePhoto){
             mTakePhoto = false;
-        }
+        }*/
 
 
 

@@ -31,13 +31,13 @@ import static org.junit.Assert.*;
 public class CircuitSimulatorTest {
     @Test
     public void testInit() throws Exception {
-        CircuitSimulator cirsim = new CircuitSimulator();
+        CircuitSimulator cirsim = new CircuitSimulator(true,512,512);
         cirsim.init();
     }
 
     @Test
     public void testDumpCircuit() throws Exception {
-        CircuitSimulator cirsim = new CircuitSimulator();
+        CircuitSimulator cirsim = new CircuitSimulator(true,512,512);
         cirsim.init();
         cirsim.register(ResistorElm.class);
         cirsim.register(InductorElm.class);
@@ -55,7 +55,7 @@ public class CircuitSimulatorTest {
 
     @Test
     public void testRunCircuit() throws Exception {
-        CircuitSimulator cirsim = new CircuitSimulator();
+        CircuitSimulator cirsim = new CircuitSimulator(true,512,512);
         cirsim.init();
         cirsim.register(ResistorElm.class);
         cirsim.register(InductorElm.class);

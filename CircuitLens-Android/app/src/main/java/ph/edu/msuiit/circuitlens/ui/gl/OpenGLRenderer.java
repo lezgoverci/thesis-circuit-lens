@@ -1,4 +1,4 @@
-package ph.edu.msuiit.circuitlens.ui;
+package ph.edu.msuiit.circuitlens.ui.gl;
 
 import android.content.Context;
 import android.util.Log;
@@ -44,9 +44,9 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         material.setDiffuseMethod(new DiffuseMethod.Lambert());
         material.setColor(0);
 
-        Texture earthTexture = new Texture("Circuit", R.drawable.circuit_a);
+        Texture circuitTexture = new Texture("Circuit", R.drawable.circuit_a);
         try{
-            material.addTexture(earthTexture);
+            material.addTexture(circuitTexture);
         } catch (ATexture.TextureException error){
             Log.d("DEBUG", "TEXTURE ERROR");
         }

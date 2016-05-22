@@ -1,5 +1,10 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
+import org.rajawali3d.Object3D;
+import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Line3D;
+
+import java.util.Stack;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
@@ -104,5 +109,24 @@ public class InductorElm extends CircuitElm {
 
     public double getInductance() {
         return inductance;
+    }
+
+    public Object3D generateObject3D() {
+        Object3D object3D = new Object3D();
+        double v1 = volts[0];
+        double v2 = volts[1];
+        int i;
+        int hs = 8;
+        setBbox(point1, point2, hs);
+        object3D.addChild(draw2Leads());
+//        setPowerColor(g, false);
+        object3D.addChild(drawCoil(8, lead1, lead2, v1, v2));
+//        if (sim.isShowingValues()) {
+//            String s = getShortUnitText(inductance, "H");
+//            drawValues(g, s, hs);
+//        }
+//        doDots(g);
+        object3D.addChild(drawPosts());
+        return object3D;
     }
 }

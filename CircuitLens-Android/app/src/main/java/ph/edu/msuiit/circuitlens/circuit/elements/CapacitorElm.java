@@ -1,5 +1,15 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
+import android.graphics.Color;
+import android.graphics.Point;
+
+import org.opencv.core.Mat;
+import org.rajawali3d.Object3D;
+import org.rajawali3d.materials.Material;
+import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Line3D;
+
+import java.util.Stack;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
@@ -8,7 +18,7 @@ public class CapacitorElm extends CircuitElm {
 
     double capacitance;
     double compResistance, voltdiff;
-//    Point plate1[], plate2[];
+    Point plate1[], plate2[];
     public static final int FLAG_BACK_EULER = 2;
 
     public CapacitorElm(int xx, int yy) {
@@ -50,18 +60,18 @@ public class CapacitorElm extends CircuitElm {
         return super.dump() + " " + capacitance + " " + voltdiff;
     }
 
-//    public void setPoints() {
-//        super.setPoints();
-//        double f = (dn / 2 - 4) / dn;
-//        // calc leads
-//        lead1 = interpPoint(point1, point2, f);
-//        lead2 = interpPoint(point1, point2, 1 - f);
-//        // calc plates
-//        plate1 = newPointArray(2);
-//        plate2 = newPointArray(2);
-//        interpPoint2(point1, point2, plate1[0], plate1[1], f, 12);
-//        interpPoint2(point1, point2, plate2[0], plate2[1], 1 - f, 12);
-//    }
+    public void setPoints() {
+        super.setPoints();
+        double f = (dn / 2 - 4) / dn;
+        // calc leads
+        lead1 = interpPoint(point1, point2, f);
+        lead2 = interpPoint(point1, point2, 1 - f);
+        // calc plates
+        plate1 = newPointArray(2);
+        plate2 = newPointArray(2);
+        interpPoint2(point1, point2, plate1[0], plate1[1], f, 12);
+        interpPoint2(point1, point2, plate2[0], plate2[1], 1 - f, 12);
+    }
 
 //    public void draw(Graphics g) {
 //        int hs = 12;
@@ -145,5 +155,43 @@ public class CapacitorElm extends CircuitElm {
 
     public int getShortcut() {
         return 'c';
+    }
+
+    public Object3D generateObject3D() {
+        int hs = 12;
+
+        Object3D object3D = new Object3D();
+
+
+        setBbox(point1, point2, hs);
+        // draw first lead and plate
+//        setVoltageColor(g, volts[0]);
+
+        object3D.addChild(drawThickLine(point1, lead1));
+//        setPowerColor(g, false);
+        object3D.addChild(drawThickLine(plate1[0], plate1[1]));
+//        if (sim.isShowingPowerDissipation()) {
+//            g.setColor(Color.gray);
+//        }
+//
+//        // draw second lead and plate
+//        setVoltageColor(g, volts[1]);
+        object3D.addChild(drawThickLine(point2, lead2));
+//        drawThickLine(g, point2, lead2);
+//        setPowerColor(g, false);
+        object3D.addChild(drawThickLine(plate2[0], plate2[1]));
+//
+//        updateDotCount();
+//        if (sim.getDragElm() != this) {
+//            drawDots(g, point1, lead1, curcount);
+//            drawDots(g, point2, lead2, -curcount);
+//        }
+        object3D.addChild(drawPosts());
+//        if (sim.isShowingValues()) {
+//            String s = getShortUnitText(capacitance, "F");
+//            drawValues(g, s, hs);
+//        }
+
+        return object3D;
     }
 }

@@ -1,5 +1,7 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
+import org.rajawali3d.Object3D;
+
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
@@ -103,5 +105,9 @@ public class WireElm extends CircuitElm {
 
     public int getShortcut() {
         return 'w';
+    }
+
+    public Object3D generateObject3D() {
+        return drawThickLine(point1,point2);
     }
 }

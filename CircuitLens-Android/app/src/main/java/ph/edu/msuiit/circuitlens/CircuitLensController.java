@@ -54,8 +54,13 @@ public class CircuitLensController{
         return "yehey";
     }
 
-    public Mat map(Mat src,boolean isTakePhoto){
-       return mMapper.map(src,isTakePhoto);
+    public void map(Mat src,boolean isTakePhoto){
+
+        mMapper.map(src,isTakePhoto);
+    }
+
+    public Mat getHomography(){
+        return mMapper.getHomography();
     }
 
 //    public void draw(Mat src, Mat dst){

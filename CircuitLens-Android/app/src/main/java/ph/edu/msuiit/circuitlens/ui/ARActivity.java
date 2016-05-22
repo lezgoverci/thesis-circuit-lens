@@ -33,7 +33,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
     // V: camera shutter
     private boolean mTakePhoto = false;
     private boolean isSetTrackingImage = false;
-    private boolean isMapped;
+    private boolean isMapped = false;
     private boolean isDrawn;
     private OpenGLRenderer renderer;
 
@@ -150,9 +150,16 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
             mController.onFocus(inputFrame);
         }
 
-        Mat f = mController.map(frame,mTakePhoto);
-        Log.d("homography",f.dump());
-        setRendererProjection(f,renderer);
+        mController.map(frame,mTakePhoto);
+        Log.d("homography",mController.getHomography().dump());
+
+
+        if(mController.getHomography().get(0,0) != null){
+            Log.d("howm","homography is not null");
+            setRendererProjection(mController.getHomography(),renderer);
+        }else{
+            Log.d("howm","homography is null");
+        }
 
         if(mTakePhoto){
             mTakePhoto = false;
@@ -160,9 +167,12 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
 
 
+
+
         return frame;
     }
 
+    //TODO change homography matrix to rotation and translation matrices
     private void setRendererProjection(Mat f, OpenGLRenderer renderer) {
         renderer.setProjectionValues(f);
     }

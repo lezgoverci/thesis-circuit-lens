@@ -71,7 +71,7 @@ public class CircuitSimulator {
     int hintType = -1, hintItem1, hintItem2;
     String stopMessage;
     double timeStep;
-    private Vector<CircuitElm> elmList;
+    public /* private*/ Vector<CircuitElm> elmList;
 
     CircuitElm dragElm, menuElm, mouseElm, stopElm;
     CircuitElm plotXElm, plotYElm;
@@ -107,7 +107,7 @@ public class CircuitSimulator {
     String startCircuit = null;
     String startLabel = null;
     public String startCircuitText = null;
-    public CircuitCanvas cv;
+    //public CircuitCanvas cv;
     Vector<CircuitNode> nodeList;
     CircuitElm voltageSources[];
     protected final PropertyChangeSupport support;
@@ -133,7 +133,7 @@ public class CircuitSimulator {
         dumpTypes[(int) '%'] = Scope.class;
         dumpTypes[(int) '?'] = Scope.class;
         dumpTypes[(int) 'B'] = Scope.class;
-        cv = new CircuitCanvas(this, width, height);
+        //cv = new CircuitCanvas(this, width, height);
     }
 
     public int getrand(int x) {
@@ -226,7 +226,7 @@ public class CircuitSimulator {
                 if (n == 0) {
                     ((SwitchElm) ce).toggle();
                     analyzeFlag = true;
-                    cv.repaintCanvas();
+                    //cv.repaintCanvas();
                     return;
                 }
             }
@@ -236,7 +236,7 @@ public class CircuitSimulator {
     public void needAnalyze() {
 //        unstable = true;
         analyzeFlag = true;
-        cv.repaintCanvas();
+        //cv.repaintCanvas();
     }
 
     public CircuitNode getCircuitNode(int n) {
@@ -783,9 +783,9 @@ public class CircuitSimulator {
         return useBufferedImage;
     }
 
-    public CircuitCanvas getCircuitCanvas() {
+    /*public CircuitCanvas getCircuitCanvas() {
         return cv;
-    }
+    }*/
 
     public boolean isStopped() {
         return stopped;
@@ -990,7 +990,7 @@ public class CircuitSimulator {
         stopElm = ce;
         stopped = true;
         analyzeFlag = false;
-        cv.repaintCanvas();
+        //cv.repaintCanvas();
     }
 
     // control voltage source vs with voltage from n1 to n2 (must

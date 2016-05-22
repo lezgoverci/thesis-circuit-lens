@@ -1,4 +1,4 @@
-package ph.edu.msuiit.circuitlens;
+package ph.edu.msuiit.circuitlens.render;
 
 import android.util.Log;
 
@@ -10,7 +10,9 @@ import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.MatOfPoint3f;
 import org.opencv.core.Point;
+import org.opencv.core.Point3;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -25,17 +27,13 @@ import java.util.List;
 public class OverlayImageTransformationMapper {
 
 
-
-    //*********  REFERENCE IMAGE VARIABLES  **********//
-
+    /** REFERENCE IMAGE VARIABLES **/
     private MatOfPoint2f        mTrackingImageApproxHull2D = new MatOfPoint2f();            // approximated Convex hull points of the tracking image
     private Mat                 mTrackingImageBoxCorners = new Mat(4,1,CvType.CV_32FC2);    // box corners of the tracking image in pixels
     private MatOfPoint2f        mTrackingImageBoxPoints2D = new MatOfPoint2f();             // box points enclosing the tracking image in pixels
+    private final MatOfPoint3f  mTrackingImageBoxCorners3D = new MatOfPoint3f();            // The reference image's corner coordinates, in 3D, in real units
 
-
-
-    //*********  CURRENT IMAGE VARIABLES  **********//
-
+    /** CURRENT IMAGE VARIABLES **/
     private Mat                 mCurrentFrameGray = new Mat();                              // A grayscale version of the current frame
     private MatOfPoint2f        mCurrentFrameApproxHull2D = new MatOfPoint2f();             // approximated Convex hull points of the current image
     private Mat                 mCurrentFrameBoxCorners = new Mat(4,1,CvType.CV_32FC2);     // box corners of the current image in pixels
@@ -47,32 +45,49 @@ public class OverlayImageTransformationMapper {
     private Mat                 mCurrentFrameHomography = new Mat();
 
 
-
-    //*********  FLAGS  **********//
+    /** FLAGS **/
     private boolean             isSetTracking = false;
 
 
-
-    //*********  VALUES  **********//
+    /** VALUES **/
     private Size                blurKernel = new Size(5,5);
     private Scalar              mLineColor = new Scalar(255);
     private Scalar              mLineColor2 = new Scalar(0.0,0.0,255.0);
     private Mat                 dilateKernel = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT,new Size(5.0,5.0));
     private final int           FROM_TRACKING_IMAGE = 0;
     private final int           FROM_CURRENT_FRAME = 1;
+    private double              mRealSize = 1.0;
 
 
-    //*********  OUTPUT VARIABLES  **********//
-
+    /**  OUTPUT VARIABLES  **/
     private final MatOfDouble   mRVec = new MatOfDouble();                                  // The Euler angles of the detected target.
     private final MatOfDouble   mTVec = new MatOfDouble();                                  // The XYZ coordinates of the detected target.
     private final MatOfDouble   mRotation = new MatOfDouble();                              // The rotation matrix of the detected target.
     private final float[]       mGLPose = new float[16];                                    // The OpenGL pose matrix of the detected target.
+    private final MatOfDouble   mDistCoeffs = new MatOfDouble(0.0, 0.0, 0.0, 0.0);          // Assume no distortion
+    private boolean             mIsHomographyFound;
 
 
+    /** CONSTRUCTOR **/
+    public OverlayImageTransformationMapper(){
 
-    //*********  CONSTRUCTOR  **********//
-    public OverlayImageTransformationMapper(){}
+        // set initial values of essential variables
+        initTrackingImageBoxCorners3D();
+
+    }
+
+    public float[] getmGLPose() {
+        return mGLPose;
+    }
+
+    public MatOfDouble getRotation(){
+        return mRotation;
+    }
+
+    private void initTrackingImageBoxCorners3D() {
+        //final double aspectRatio =
+        //mTrackingImageBoxCorners3D
+    }
 
 
     public void map(Mat currentFrame,boolean isTakePhoto) {
@@ -125,6 +140,7 @@ public class OverlayImageTransformationMapper {
         if(isTakePhoto){
             setTrackingImageHullPoints();
             setTrackingImageBoxCorners();
+            setTrackingImageBoxCorners3D(mRealSize);
             updateBoxPoints(FROM_TRACKING_IMAGE);
             isSetTracking = true;
         }
@@ -138,11 +154,92 @@ public class OverlayImageTransformationMapper {
 
             // projects the contour box points to new transformation matrix
             updateBoxPoints(FROM_CURRENT_FRAME);
-            //TODO set GL pose
+
+            // draw new points
+            drawPoints(mCurrentFrameBoxPoints2D, currentFrame);
+
 
         }
 
 
+    }
+
+    private void drawPoints(MatOfPoint2f mCurrentFrameBoxPoints2D, Mat currentFrame) {
+        List<Point> points = mCurrentFrameBoxPoints2D.toList();
+        Imgproc.line(currentFrame,points.get(0),points.get(1),mLineColor);
+        Imgproc.line(currentFrame,points.get(1),points.get(2),mLineColor);
+        Imgproc.line(currentFrame,points.get(2),points.get(3),mLineColor);
+        Imgproc.line(currentFrame,points.get(3),points.get(0),mLineColor);
+
+    }
+
+    public boolean isHomographyFound(){
+        if(mIsHomographyFound){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public void setTransformationMatrixValues(MatOfDouble projection) {
+        Calib3d.solvePnP(mTrackingImageBoxCorners3D,mCurrentFrameBoxPoints2D,projection,mDistCoeffs,mRVec,mTVec);
+
+        final double[] rVecArray = mRVec.toArray();
+        rVecArray[0] *= -1.0; // negate x angle
+        mRVec.fromArray(rVecArray);
+
+        // Convert the Euler angles to a 3x3 rotation matrix.
+        Calib3d.Rodrigues(mRVec, mRotation);
+
+        final double[] tVecArray = mTVec.toArray();
+
+        // OpenCV's matrix format is transposed, relative to
+        // OpenGL's matrix format.
+        mGLPose[0]  =  (float)mRotation.get(0, 0)[0];
+        mGLPose[1]  =  (float)mRotation.get(0, 1)[0];
+        mGLPose[2]  =  (float)mRotation.get(0, 2)[0];
+        mGLPose[3]  =  0f;
+        mGLPose[4]  =  (float)mRotation.get(1, 0)[0];
+        mGLPose[5]  =  (float)mRotation.get(1, 1)[0];
+        mGLPose[6]  =  (float)mRotation.get(1, 2)[0];
+        mGLPose[7]  =  0f;
+        mGLPose[8]  =  (float)mRotation.get(2, 0)[0];
+        mGLPose[9]  =  (float)mRotation.get(2, 1)[0];
+        mGLPose[10] =  (float)mRotation.get(2, 2)[0];
+        mGLPose[11] =  0f;
+        mGLPose[12] =  (float)tVecArray[0];
+        mGLPose[13] = -(float)tVecArray[1]; // negate y position
+        mGLPose[14] = -(float)tVecArray[2]; // negate z position
+        mGLPose[15] =  1f;
+    }
+
+    public MatOfDouble getRVec(){
+        return mRVec;
+    }
+
+    public MatOfDouble getTVec(){
+        return mTVec;
+    }
+
+    private void setTrackingImageBoxCorners3D(double size) {
+        final double aspectRatio = (double) mCurrentFrameGray.cols() / (double) mCurrentFrameGray.rows();
+        final double halfRealWidth;
+        final double halfRealHeight;
+
+        if(mCurrentFrameGray.cols() > mCurrentFrameGray.rows()){
+            halfRealHeight = 0.5f * size;
+            halfRealWidth = halfRealHeight * aspectRatio;
+        } else{
+            halfRealWidth = 0.5f * size;
+            halfRealHeight = halfRealWidth / aspectRatio;
+        }
+
+        mTrackingImageBoxCorners3D.fromArray(
+                new Point3(-halfRealWidth,-halfRealHeight, 0.0),
+                new Point3(halfRealWidth,-halfRealHeight, 0.0),
+                new Point3(halfRealWidth,halfRealHeight, 0.0),
+                new Point3(-halfRealWidth,halfRealHeight, 0.0)
+        );
     }
 
     private void updateBoxPoints(int tag) {
@@ -308,7 +405,7 @@ public class OverlayImageTransformationMapper {
     private void setHomographyTransformation() {
         // Else there are enough good points to find homography
 
-
+        mIsHomographyFound = false;
 
         // Convert the matched points to MatOfPoint2f format, as
         // required by the Calib3d.findHomography function
@@ -321,6 +418,7 @@ public class OverlayImageTransformationMapper {
         // find the homography
        if(trackingImageHullPoints.size() == currentFrameHullPoints.size()){
            mCurrentFrameHomography = Calib3d.findHomography(mTrackingImageApproxHull2D,mCurrentFrameApproxHull2D,Calib3d.RANSAC,1.0);
+           mIsHomographyFound = true;
        }
 
        // Log.d("homo",currentFrameHullPoints.size() +"");

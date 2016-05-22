@@ -21,6 +21,7 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import ph.edu.msuiit.circuitlens.CircuitLensController;
 import ph.edu.msuiit.circuitlens.R;
+import ph.edu.msuiit.circuitlens.render.OpenGLRenderer;
 
 public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, CircuitLensView {
     private static final String TAG = "CircuitLens::ARActivity";
@@ -46,8 +47,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
                 {
                     Log.d(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
-                    String str = mController.onResume();
-                    Toast.makeText(ARActivity.this, str, Toast.LENGTH_SHORT).show();
+                    mController.onResume();
 
 
                 } break;
@@ -75,23 +75,17 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
             int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
             decorView.setSystemUiVisibility(uiOptions);
         }
-        setContentView(R.layout.activity_ar);
 
-        final RajawaliSurfaceView surface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-        renderer = new OpenGLRenderer(this);
-        surface.setTransparent(true);
-        surface.setSurfaceRenderer(renderer);
-        surface.setZOrderMediaOverlay(true);
+        setContentView(R.layout.activity_ar);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String serverUri = preferences.getString("server_uri","ws://127.0.0.1:8080/ws");
         Log.i(TAG,"ServerUri: "+serverUri);
-        mController = new CircuitLensController(this,serverUri);
+
+        final RajawaliSurfaceView surface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
+        mController = new CircuitLensController(this,serverUri,surface);
         mController.onCreate();
         initializeViews();
-
-
-
 
     }
 
@@ -150,32 +144,17 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
             mController.onFocus(inputFrame);
         }
 
+        // Update renderer using the current frame
         mController.map(frame,mTakePhoto);
-        Log.d("homography",mController.getHomography().dump());
-
-
-        if(mController.getHomography().get(0,0) != null){
-            Log.d("howm","homography is not null");
-            setRendererProjection(mController.getHomography(),renderer);
-        }else{
-            Log.d("howm","homography is null");
-        }
 
         if(mTakePhoto){
             mTakePhoto = false;
         }
 
-
-
-
-
         return frame;
     }
 
-    //TODO change homography matrix to rotation and translation matrices
-    private void setRendererProjection(Mat f, OpenGLRenderer renderer) {
-        renderer.setProjectionValues(f);
-    }
+
 
     @Override
     public void showMessage(String message) {

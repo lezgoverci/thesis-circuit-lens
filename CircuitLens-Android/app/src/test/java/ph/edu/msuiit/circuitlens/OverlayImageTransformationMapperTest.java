@@ -1,11 +1,9 @@
 package ph.edu.msuiit.circuitlens;
 
-import android.hardware.Camera;
-
-import org.junit.Before;
 import org.junit.Test;
-import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Mat;
+
+import ph.edu.msuiit.circuitlens.render.OverlayImageTransformationMapper;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

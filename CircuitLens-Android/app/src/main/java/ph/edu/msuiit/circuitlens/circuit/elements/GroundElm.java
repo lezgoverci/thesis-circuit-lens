@@ -77,21 +77,22 @@ public class GroundElm extends CircuitElm {
     }
 
     public Object3D generateObject3D() {
-        Object3D object3D = new Object3D();
+        Object3D ground3d = new Object3D();
 
 //        setVoltageColor(g, 0);
-        object3D.addChild(drawThickLine(point1, point2));
+        drawThickLine(ground3d, point1, point2);
         int i;
         for (i = 0; i != 3; i++) {
             int a = 10 - i * 4;
             int b = i * 5; // -10;
             interpPoint2(point1, point2, ps1, ps2, 1 + b / dn, a);
-            object3D.addChild(drawThickLine(ps1, ps2));
+            drawThickLine(ground3d, ps1, ps2);
         }
 //        doDots(g);
         interpPoint(point1, point2, ps2, 1 + 11. / dn);
         setBbox(point1, ps2, 11);
-        object3D.addChild(drawPost(x, y, nodes[0]));
-        return object3D;
+        drawPost(ground3d, x, y, nodes[0]);
+
+        return ground3d;
     }
 }

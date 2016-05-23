@@ -159,39 +159,36 @@ public class CapacitorElm extends CircuitElm {
 
     public Object3D generateObject3D() {
         int hs = 12;
-
-        Object3D object3D = new Object3D();
-
+        Object3D capacitor3d = new Object3D();
 
         setBbox(point1, point2, hs);
         // draw first lead and plate
 //        setVoltageColor(g, volts[0]);
 
-        object3D.addChild(drawThickLine(point1, lead1));
+        drawThickLine(capacitor3d, point1, lead1);
 //        setPowerColor(g, false);
-        object3D.addChild(drawThickLine(plate1[0], plate1[1]));
+        drawThickLine(capacitor3d,plate1[0], plate1[1]);
 //        if (sim.isShowingPowerDissipation()) {
 //            g.setColor(Color.gray);
 //        }
 //
 //        // draw second lead and plate
 //        setVoltageColor(g, volts[1]);
-        object3D.addChild(drawThickLine(point2, lead2));
-//        drawThickLine(g, point2, lead2);
+        drawThickLine(capacitor3d, point2, lead2);
 //        setPowerColor(g, false);
-        object3D.addChild(drawThickLine(plate2[0], plate2[1]));
+        drawThickLine(capacitor3d, plate2[0], plate2[1]);
 //
 //        updateDotCount();
 //        if (sim.getDragElm() != this) {
 //            drawDots(g, point1, lead1, curcount);
 //            drawDots(g, point2, lead2, -curcount);
 //        }
-        object3D.addChild(drawPosts());
+        drawPosts(capacitor3d);
 //        if (sim.isShowingValues()) {
 //            String s = getShortUnitText(capacitance, "F");
 //            drawValues(g, s, hs);
 //        }
 
-        return object3D;
+        return capacitor3d;
     }
 }

@@ -112,21 +112,22 @@ public class InductorElm extends CircuitElm {
     }
 
     public Object3D generateObject3D() {
-        Object3D object3D = new Object3D();
+        Object3D inductor3d = new Object3D();
         double v1 = volts[0];
         double v2 = volts[1];
         int i;
         int hs = 8;
         setBbox(point1, point2, hs);
-        object3D.addChild(draw2Leads());
+        draw2Leads(inductor3d);
 //        setPowerColor(g, false);
-        object3D.addChild(drawCoil(8, lead1, lead2, v1, v2));
+        drawCoil(inductor3d, 8, lead1, lead2, v1, v2);
 //        if (sim.isShowingValues()) {
 //            String s = getShortUnitText(inductance, "H");
 //            drawValues(g, s, hs);
 //        }
 //        doDots(g);
-        object3D.addChild(drawPosts());
-        return object3D;
+        drawPosts(inductor3d);
+
+        return inductor3d;
     }
 }

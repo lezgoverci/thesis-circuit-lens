@@ -108,6 +108,20 @@ public class WireElm extends CircuitElm {
     }
 
     public Object3D generateObject3D() {
-        return drawThickLine(point1,point2);
+        Object3D wire3d = new Object3D();
+//        setVoltageColor(g, volts[0]);
+        drawThickLine(wire3d, point1, point2);
+//        doDots(g);
+        setBbox(point1, point2, 3);
+//        if (mustShowCurrent()) {
+//            String s = getShortUnitText(Math.abs(getCurrent()), "A");
+//            drawValues(g, s, 4);
+//        } else if (mustShowVoltage()) {
+//            String s = getShortUnitText(volts[0], "V");
+//            drawValues(g, s, 4);
+//        }
+        drawPosts(wire3d);
+
+        return wire3d;
     }
 }

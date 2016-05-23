@@ -224,18 +224,13 @@ public abstract class CircuitElm {
         d.y = (int) Math.floor(a.y * (1 - f) + b.y * f - g * gy + .48);
     }
 
-    public Object3D draw2Leads() {
+    public void draw2Leads(Object3D object3D) {
         Material material = new Material();
         material.setColor(Color.WHITE);
-        Object3D leads = new Object3D();
         // draw first lead
         //setVoltageColor(g, volts[0]);
-        Stack<Vector3> ptsLead1 = new Stack<>();
-        ptsLead1.add(new Vector3(point1.x,point1.y,0));
-        ptsLead1.add(new Vector3(lead1.x,lead1.y,0));
-        Line3D line1 = new Line3D(ptsLead1,10);
-        line1.setMaterial(material);
-        leads.addChild(line1);
+
+        drawThickLine(object3D, point1, lead1);
 
         // draw second lead
         // setVoltageColor(g, volts[1]);
@@ -244,8 +239,7 @@ public abstract class CircuitElm {
         ptsLead2.add(new Vector3(lead2.x,lead2.y,0));
         Line3D line2 = new Line3D(ptsLead2,10);
         line2.setMaterial(material);
-        leads.addChild(line2);
-        return leads;
+        object3D.addChild(line2);
     }
 
 
@@ -376,14 +370,12 @@ public abstract class CircuitElm {
     }
 
 
-    public Object3D drawPosts() {
-        Object3D posts = new Object3D();
+    public void drawPosts(Object3D object3D) {
         int i;
         for (i = 0; i != getPostCount(); i++) {
             Point p = getPost(i);
-            posts.addChild(drawPost(p.x, p.y, nodes[i]));
+            drawPost(object3D, p.x, p.y, nodes[i]);
         }
-        return posts;
     }
 
     public void stamp() {
@@ -429,7 +421,7 @@ public abstract class CircuitElm {
         return (n == 0) ? point1 : (n == 1) ? point2 : null;
     }
 
-    public Object3D drawPost(int x0, int y0, int n) {
+    public void drawPost(Object3D object3D, int x0, int y0, int n) {
         /*
         if (sim.getDragElm() == null && !needsHighlight()
                 && sim.getCircuitNode(n) != null && sim.getCircuitNode(n).links.size() == 2) {
@@ -439,15 +431,15 @@ public abstract class CircuitElm {
                 || sim.mouseMode == CircuitController.MODE_DRAG_COLUMN) {
             return;
         }*/
-        return drawPost(x0, y0);
+        drawPost(object3D, x0, y0);
     }
 
-    public Object3D drawPost(int x0, int y0) {
+    public void drawPost(Object3D object3D, int x0, int y0) {
         Material material = new Material();
         material.setColor(Color.WHITE);
         Circle3D circle = new Circle3D(new Vector3(x0,y0,0),3, 1, true);
         circle.setMaterial(material);
-        return circle;
+        object3D.addChild(circle);
     }
 
     public void setBbox(int x1, int y1, int x2, int y2) {
@@ -540,9 +532,8 @@ public abstract class CircuitElm {
         }
     }*/
 
-    public Object3D drawCoil(int hs, Point p1, Point p2,
+    public void drawCoil(Object3D object3D, int hs, Point p1, Point p2,
             double v1, double v2) {
-        Object3D object3D = new Object3D();
         double len = distance(p1, p2);
         int segments = 30; // 10*(int) (len/10);
         int i;
@@ -558,36 +549,35 @@ public abstract class CircuitElm {
             interpPoint(p1, p2, ps2, i * segf, hsx * hs);
             double v = v1 + (v2 - v1) * i / segments;
 //            setVoltageColor(g, v);
-            object3D.addChild(drawThickLine(ps1, ps2));
+            drawThickLine(object3D, ps1, ps2);
             ps1.set(ps2.x,ps2.y);
         }
-        return object3D;
     }
 
-    public static Object3D drawThickLine(int x, int y, int x2, int y2) {
+    public static void drawThickLine(Object3D object3D, int x, int y, int x2, int y2) {
         Material material = new Material();
         material.setColor(Color.WHITE);
 
         Stack<Vector3> points = new Stack<>();
         points.add(new Vector3(x,y,0));
         points.add(new Vector3(x2,y2,0));
-        Line3D line = new Line3D(points,10);
-        line.setMaterial(material);
+        Line3D thickLine = new Line3D(points,10);
+        thickLine.setMaterial(material);
 
-        return line;
+        object3D.addChild(thickLine);
     }
 
-    public static Object3D drawThickLine(Point pa, Point pb) {
+    public static void drawThickLine(Object3D object3D, Point pa, Point pb) {
         Material material = new Material();
         material.setColor(Color.WHITE);
 
         Stack<Vector3> points = new Stack<>();
         points.add(new Vector3(pa.x,pa.y,0));
         points.add(new Vector3(pb.x,pb.y,0));
-        Line3D line = new Line3D(points,10);
-        line.setMaterial(material);
+        Line3D thickLine = new Line3D(points,10);
+        thickLine.setMaterial(material);
 
-        return line;
+        object3D.addChild(thickLine);
     }
 
     /*

@@ -136,8 +136,8 @@ public class ResistorElm extends CircuitElm {
     public Object3D generateObject3D() {
         Material resistorMaterial = new Material();
         resistorMaterial.setColor(Color.WHITE);
-        Object3D object3d = new Object3D();
-        object3d.setMaterial(resistorMaterial);
+        Object3D resistor3d = new Object3D();
+        resistor3d.setMaterial(resistorMaterial);
         int segments = 16;
         int i;
         int ox = 0;
@@ -145,8 +145,7 @@ public class ResistorElm extends CircuitElm {
         double v1 = volts[0];
         double v2 = volts[1];
         setBbox(point1, point2, hs);
-        Object3D leads = draw2Leads();
-        object3d.addChild(leads);
+        draw2Leads(resistor3d);
 
         //setPowerColor(g, true);
         double segf = 1. / segments;
@@ -169,12 +168,7 @@ public class ResistorElm extends CircuitElm {
 //                setVoltageColor(g, v);
                 interpPoint(lead1, lead2, ps1, i * segf, hs * ox);
                 interpPoint(lead1, lead2, ps2, (i + 1) * segf, hs * nx);
-                Stack<Vector3> points = new Stack<>();
-                points.add(new Vector3(ps1.x,ps1.y,0));
-                points.add(new Vector3(ps2.x,ps2.y,0));
-                Line3D line = new Line3D(points,10);
-                line.setMaterial(resistorMaterial);
-                object3d.addChild(line);
+                drawThickLine(resistor3d, ps1, ps2);
                 ox = nx;
             }
         } else {
@@ -198,8 +192,9 @@ public class ResistorElm extends CircuitElm {
 //            drawValues(g, s, hs);
 //        }
 //        doDots(g);
-        object3d.addChild(drawPosts());
-        return object3d;
+        drawPosts(resistor3d);
+
+        return resistor3d;
     }
 
     /*

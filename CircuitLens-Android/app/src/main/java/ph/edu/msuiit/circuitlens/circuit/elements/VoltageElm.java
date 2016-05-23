@@ -272,19 +272,19 @@ public class VoltageElm extends CircuitElm {
     }
 
     public Object3D generateObject3D() {
-        Object3D object3D = new Object3D();
+        Object3D voltage3d = new Object3D();
         setBbox(x, y, x2, y2);
-        object3D.addChild(draw2Leads());
+        draw2Leads(voltage3d);
         if (waveform == WF_DC) {
 //            setPowerColor(g, false);
 //            setVoltageColor(g, volts[0]);
             interpPoint2(lead1, lead2, ps1, ps2, 0, 10);
-            object3D.addChild(drawThickLine(ps1, ps2));
+            drawThickLine(voltage3d, ps1, ps2);
 //            setVoltageColor(g, volts[1]);
             int hs = 16;
             setBbox(point1, point2, hs);
             interpPoint2(lead1, lead2, ps1, ps2, 1, hs);
-            object3D.addChild(drawThickLine(ps1, ps2));
+            drawThickLine(voltage3d, ps1, ps2);
         } else {
             setBbox(point1, point2, circleSize);
             interpPoint(lead1, lead2, ps1, .5);
@@ -299,7 +299,8 @@ public class VoltageElm extends CircuitElm {
 //                drawDots(g, point2, lead2, -curcount);
 //            }
 //        }
-        object3D.addChild(drawPosts());
-        return object3D;
+        drawPosts(voltage3d);
+
+        return voltage3d;
     }
 }

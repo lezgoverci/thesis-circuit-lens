@@ -169,13 +169,13 @@ public class SwitchElm extends CircuitElm {
     }
 
     public Object3D generateObject3D() {
-        Object3D object3D = new Object3D();
+        Object3D switch3d = new Object3D();
         int openhs = 16;
         int hs1 = (position == 1) ? 0 : 2;
         int hs2 = (position == 1) ? openhs : 2;
         setBbox(point1, point2, openhs);
 
-        object3D.addChild(draw2Leads());
+        draw2Leads(switch3d);
 
         if (position == 0) {
 //            doDots(g);
@@ -187,8 +187,9 @@ public class SwitchElm extends CircuitElm {
         interpPoint(lead1, lead2, ps, 0, hs1);
         interpPoint(lead1, lead2, ps2, 1, hs2);
 //
-        object3D.addChild(drawThickLine(ps, ps2));
-        object3D.addChild(drawPosts());
-        return object3D;
+        drawThickLine(switch3d,ps, ps2);
+        drawPosts(switch3d);
+
+        return switch3d;
     }
 }

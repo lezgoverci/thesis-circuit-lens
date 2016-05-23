@@ -108,8 +108,8 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         if(isSetProjectionValues){
             useTransformationValues();
         } else{
-            circuitDiagram.rotate(Vector3.Axis.X, 5);
-            circuitDiagram.rotate(Vector3.Axis.Y, 1);
+            //circuitDiagram.rotate(Vector3.Axis.X, 5);
+            //circuitDiagram.rotate(Vector3.Axis.Y, 1);
         }
 
     }

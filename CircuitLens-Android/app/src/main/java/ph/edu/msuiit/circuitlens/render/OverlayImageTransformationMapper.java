@@ -106,7 +106,13 @@ public class OverlayImageTransformationMapper {
 
         // find convex hull of largest contour
         MatOfInt hull = new MatOfInt();
-        Imgproc.convexHull(mCurrentFrameLargestContour,hull,true);
+        if(mCurrentFrameLargestContour.toArray().length > 3){
+            Imgproc.convexHull(mCurrentFrameLargestContour,hull,true);
+        }
+        else{
+            return;
+        }
+
 
         // Convert hull to MatOfPoint from MatOfInt
        // mCurrentFrameHull = convertHullToMatOfPoint(sortHullPoints(hull));

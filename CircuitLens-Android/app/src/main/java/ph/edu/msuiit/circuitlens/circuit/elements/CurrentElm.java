@@ -1,5 +1,10 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
+import org.rajawali3d.Object3D;
+import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Line3D;
+
+import java.util.Stack;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
@@ -77,5 +82,13 @@ public class CurrentElm extends CircuitElm {
 
     public double getVoltageDiff() {
         return volts[1] - volts[0];
+    }
+
+    public Object3D generateObject3D() {
+        Stack<Vector3> points = new Stack<>();
+        points.add(new Vector3(point1.x,point1.y,0));
+        points.add(new Vector3(point2.x,point2.y,0));
+        Line3D line = new Line3D(points,10);
+        return line;
     }
 }

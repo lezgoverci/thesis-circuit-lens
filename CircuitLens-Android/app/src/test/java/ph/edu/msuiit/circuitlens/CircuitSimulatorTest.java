@@ -5,9 +5,12 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
+import ph.edu.msuiit.circuitlens.circuit.Scope;
 import ph.edu.msuiit.circuitlens.circuit.elements.CapacitorElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.DCVoltageElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.InductorElm;
+import ph.edu.msuiit.circuitlens.circuit.elements.OutputElm;
+import ph.edu.msuiit.circuitlens.circuit.elements.ProbeElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.ResistorElm;
 import rx.Observable;
 import rx.Observer;
@@ -61,6 +64,8 @@ public class CircuitSimulatorTest {
         cirsim.register(InductorElm.class);
         cirsim.register(CapacitorElm.class);
         cirsim.register(DCVoltageElm.class);
+        cirsim.register(OutputElm.class);
+        cirsim.register(ProbeElm.class);
         final String expectedNetlist = "$ 1 5.0E-6 14.841315910257661 48.0 5.0 50.0\n" +
                 "v 112 240 112 160 0 1 35.0 5.0 0.0 0.0 0.5\n" +
                 "r 112 160 464 160 0 10.0\n" +

@@ -3,6 +3,13 @@ package ph.edu.msuiit.circuitlens.circuit.elements;
 //import java.awt.Checkbox;
 //import java.awt.Graphics;
 //import java.awt.Point;
+import android.graphics.Point;
+
+import org.rajawali3d.Object3D;
+import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Line3D;
+
+import java.util.Stack;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
@@ -57,14 +64,14 @@ public class SwitchElm extends CircuitElm {
         return super.dump() + " " + position + " " + momentary;
     }
 
-//    Point ps, ps2;
-//
-//    public void setPoints() {
-//        super.setPoints();
-//        calcLeads(32);
-//        ps = new Point();
-//        ps2 = new Point();
-//    }
+   Point ps, ps2;
+
+    public void setPoints() {
+        super.setPoints();
+        calcLeads(32);
+        ps = new Point();
+        ps2 = new Point();
+    }
 
 //    public void draw(Graphics g) {
 //        int openhs = 16;
@@ -117,10 +124,6 @@ public class SwitchElm extends CircuitElm {
         }
     }
 
-    public int getPosition() {
-        return position;
-    }
-
     public void setPosition(int i) {
         position = i;
         getCS().needAnalyze();
@@ -163,5 +166,30 @@ public class SwitchElm extends CircuitElm {
 
     public int getShortcut() {
         return 's';
+    }
+
+    public Object3D generateObject3D() {
+        Object3D switch3d = new Object3D();
+        int openhs = 16;
+        int hs1 = (position == 1) ? 0 : 2;
+        int hs2 = (position == 1) ? openhs : 2;
+        setBbox(point1, point2, openhs);
+
+        draw2Leads(switch3d);
+
+        if (position == 0) {
+//            doDots(g);
+        }
+
+//        if (!needsHighlight()) {
+//            g.setColor(whiteColor);
+//        }
+        interpPoint(lead1, lead2, ps, 0, hs1);
+        interpPoint(lead1, lead2, ps2, 1, hs2);
+//
+        drawThickLine(switch3d,ps, ps2);
+        drawPosts(switch3d);
+
+        return switch3d;
     }
 }

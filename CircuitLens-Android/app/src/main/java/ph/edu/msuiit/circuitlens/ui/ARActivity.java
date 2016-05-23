@@ -21,7 +21,9 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import ph.edu.msuiit.circuitlens.CircuitLensController;
 import ph.edu.msuiit.circuitlens.R;
+
 import ph.edu.msuiit.circuitlens.render.OpenGLRenderer;
+
 
 public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, CircuitLensView {
     private static final String TAG = "CircuitLens::ARActivity";
@@ -76,7 +78,9 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
             decorView.setSystemUiVisibility(uiOptions);
         }
 
+
         setContentView(R.layout.activity_ar);
+
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String serverUri = preferences.getString("server_uri","ws://127.0.0.1:8080/ws");
@@ -144,12 +148,10 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
             mController.onFocus(inputFrame);
         }
 
+
         // Update renderer using the current frame
         mController.map(frame,mTakePhoto);
 
-        if(mTakePhoto){
-            mTakePhoto = false;
-        }
 
         return frame;
     }
@@ -168,7 +170,18 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         return ret;
     }
 
-    
+    private View.OnTouchListener touchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if(event.getAction() == MotionEvent.ACTION_DOWN)
+            {
+                // this needs to be defined on the renderer:
+                Log.d(this.getClass().getSimpleName(),": " + event.getX()+ "," + event.getY());
+                renderer.onTouchEvent(event);
+            }
+            return true;
+        }
+    };
 
 
 }

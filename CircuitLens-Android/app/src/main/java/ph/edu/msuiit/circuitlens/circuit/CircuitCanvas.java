@@ -1,10 +1,8 @@
 package ph.edu.msuiit.circuitlens.circuit;
 
 public class CircuitCanvas {
-    private CircuitSimulator cs;
+    public void kill() {
 
-    CircuitCanvas(CircuitSimulator p, int width, int height) {
-        cs = p;
     }
 
     public void init() {
@@ -14,4 +12,8 @@ public class CircuitCanvas {
     public void repaintCanvas() {
 
     }
-};
+
+    public void repaintCanvas(int pause) {
+
+    }
+}

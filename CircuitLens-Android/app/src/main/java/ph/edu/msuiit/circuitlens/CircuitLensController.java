@@ -11,7 +11,7 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 import ph.edu.msuiit.circuitlens.render.CameraProjectionAdapter;
 import ph.edu.msuiit.circuitlens.render.OverlayImageTransformationMapper;
 import ph.edu.msuiit.circuitlens.ui.CircuitLensView;
-import ph.edu.msuiit.circuitlens.render.OpenGLRenderer;
+import ph.edu.msuiit.circuitlens.ui.gl.OpenGLRenderer;
 
 public class CircuitLensController{
     private static final String TAG = "CircuitLens::CLC";

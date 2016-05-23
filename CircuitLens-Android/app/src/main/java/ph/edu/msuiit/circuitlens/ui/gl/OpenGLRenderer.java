@@ -6,9 +6,12 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfDouble;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.lights.DirectionalLight;
 import org.rajawali3d.materials.Material;
+import org.rajawali3d.math.MathUtil;
+import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.renderer.RajawaliRenderer;
 import org.rajawali3d.util.ObjectColorPicker;
@@ -30,6 +33,14 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     public Context context;
 
     private Object3D circuitDiagram;
+    private double mRotX;
+    private double mRotY;
+    private double mRotZ;
+    private double mPosX;
+    private double mPosY;
+    private double mPosZ;
+    private float[] mGLpose;
+    private boolean isSetProjectionValues = false;
 
     public OpenGLRenderer(Context context) {
         super(context);
@@ -81,8 +92,9 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
         getCurrentCamera().setX(120);
         getCurrentCamera().setY(-140);
-        getCurrentCamera().setZ(500);
+        getCurrentCamera().setZ(1000);
         getCurrentCamera().setFarPlane(5000);
+
 
         getCurrentScene().addChild(circuitDiagram);
     }
@@ -90,9 +102,35 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     @Override
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
-        circuitDiagram.rotate(Vector3.Axis.X, 5);
-        circuitDiagram.rotate(Vector3.Axis.Y, 1);
+
+
+        // Use transformation values
+        if(isSetProjectionValues){
+            useTransformationValues();
+        } else{
+            circuitDiagram.rotate(Vector3.Axis.X, 5);
+            circuitDiagram.rotate(Vector3.Axis.Y, 1);
+        }
+
     }
+
+    private void useTransformationValues() {
+
+        // Orientation
+        Quaternion orient = new Quaternion();
+        // Yaw, Pitch, Roll
+        double yaw = mRotX;
+        double pitch = mRotY;
+        double roll = mRotZ;
+        orient.fromEuler(yaw,pitch,roll);
+        getCurrentCamera().setOrientation(orient);
+
+        // Translation
+        getCurrentCamera().setX(mPosX);
+        getCurrentCamera().setY(mPosY);
+        getCurrentCamera().setZ(mPosZ);
+    }
+
 
     public void onOffsetsChanged(float x, float y, float z, float w, int i, int j){
 
@@ -106,8 +144,22 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         }
     }
 
-    public void setProjectionValues(Mat f) {
-//        Calib3d.decomposeHomographyMat(f,);
+    public void setProjectionValues(MatOfDouble rVec, MatOfDouble tVec, float[] pose) {
+        // Rotation values in radians
+        mRotX = MathUtil.radiansToDegrees(rVec.toArray()[0]);
+        mRotY = MathUtil.radiansToDegrees(rVec.toArray()[1]);
+        mRotZ = MathUtil.radiansToDegrees(rVec.toArray()[2]);
+
+        // Position values
+        mPosX = tVec.toArray()[0];
+        mPosY = tVec.toArray()[1];
+        mPosZ = tVec.toArray()[2];
+
+        // OpenGL pose
+        mGLpose = pose;
+
+        // Projection values are set
+        isSetProjectionValues = true;
     }
 }
 

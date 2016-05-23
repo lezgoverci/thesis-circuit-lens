@@ -21,8 +21,7 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import ph.edu.msuiit.circuitlens.CircuitLensController;
 import ph.edu.msuiit.circuitlens.R;
-
-import ph.edu.msuiit.circuitlens.render.OpenGLRenderer;
+import ph.edu.msuiit.circuitlens.ui.gl.OpenGLRenderer;
 
 
 public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, CircuitLensView {

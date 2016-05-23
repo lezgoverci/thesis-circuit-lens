@@ -25,12 +25,6 @@ public abstract class CircuitElm {
     protected Point ps1 = new Point();
     protected Point ps2 = new Point();
 
-    protected CircuitSimulator sim = null;
-
-    public void setSim(CircuitSimulator sim){
-        this.sim = sim;
-    }
-
     public static final NumberFormat showFormat, shortFormat, noCommaFormat;
     public static final double pi = 3.14159265358979323846;
 
@@ -71,6 +65,7 @@ public abstract class CircuitElm {
     protected Rect boundingBox;
     protected boolean noDiagonal;
     public boolean selected;
+    protected CircuitSimulator sim;
 
     public CircuitSimulator getCS() {
         return sim;
@@ -849,7 +844,8 @@ public abstract class CircuitElm {
     }
 
     public boolean needsHighlight() {
-        return sim.mouseElm == this || selected;
+        //return sim.mouseElm == this || selected;
+        return false;
     }
 
     public boolean isSelected() {
@@ -895,4 +891,45 @@ public abstract class CircuitElm {
     }
 
     public abstract Object3D generateObject3D();
+
+    public synchronized static String getUnitText(double v, String u) {
+        double va = Math.abs(v);
+        if (va < 1e-14) {
+            return "0 " + u;
+        }
+        if (va < 1e-9) {
+            return showFormat.format(v * 1e12) + " p" + u;
+        }
+        if (va < 1e-6) {
+            return showFormat.format(v * 1e9) + " n" + u;
+        }
+        if (va < 1e-3) {
+            return showFormat.format(v * 1e6) + " " + CircuitSimulator.muString + u;
+        }
+        if (va < 1) {
+            return showFormat.format(v * 1e3) + " m" + u;
+        }
+        if (va < 1e3) {
+            return showFormat.format(v) + " " + u;
+        }
+        if (va < 1e6) {
+            return showFormat.format(v * 1e-3) + " k" + u;
+        }
+        if (va < 1e9) {
+            return showFormat.format(v * 1e-6) + " M" + u;
+        }
+        return showFormat.format(v * 1e-9) + " G" + u;
+    }
+
+    public void setSim(CircuitSimulator sim) {
+        this.sim = sim;
+    }
+
+    public void move(int dx, int dy) {
+
+    }
+
+    public void selectRect(Rect r) {
+        selected = r.intersect(boundingBox);
+    }
 }

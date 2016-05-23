@@ -40,6 +40,7 @@ class Inductor {
         // The oscillation is a real problem in circuits with switches.
         nodes[0] = n0;
         nodes[1] = n1;
+
         if (isTrapezoidal()) {
             compResistance = 2 * inductance / sim.getTimeStep();
         } else // backward euler

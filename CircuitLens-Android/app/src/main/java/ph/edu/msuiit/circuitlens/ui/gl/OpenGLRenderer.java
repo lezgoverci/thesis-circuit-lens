@@ -18,6 +18,7 @@ import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
 import ph.edu.msuiit.circuitlens.circuit.elements.CapacitorElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.DCVoltageElm;
+import ph.edu.msuiit.circuitlens.circuit.elements.DiodeElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.GroundElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.InductorElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.ResistorElm;
@@ -50,17 +51,25 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         cirsim.register(SwitchElm.class);
         cirsim.register(DCVoltageElm.class);
         cirsim.register(GroundElm.class);
-        final String expectedNetlist =
-                "r 176 64 384 64 0 10\n" +
-                "s 384 64 448 64 0 1 false\n" +
-                "w 176 64 176 336 0\n" +
-                "c 384 336 176 336 0 0.000014999999999999998 -0.0000020730346837365553\n" +
-                "l 384 64 384 336 0 1 -2.4257677603955542e-8\n" +
-                "v 448 336 448 64 0 0 40 5 0 0 0.5\n" +
-                "r 384 336 448 336 0 100\n";
+        cirsim.register(DiodeElm.class);
+        final String expectedNetlist = "$ 1 0.000005 10.20027730826997 50 5 43\n" +
+                        "r 0 0 208 0 0 10\n" +
+                        "s 208 0 272 0 0 1 false\n" +
+                        "c 208 272 0 272 0 0.000014999999999999998 0.3433733821905817\n" +
+                        "l 208 0 208 272 0 1 -9.225810542827757e-9\n" +
+                        "v 272 272 272 0 0 0 40 5 0 0 0.5\n" +
+                        "r 208 272 272 272 0 100\n" +
+                        "d 0 0 0 272 1 0.805904783\n" +
+                        "g 272 272 272 304 0\n" +
+                        "o 3 64 0 35 0.0000762939453125 0.00009765625 0 -1\n" +
+                        "o 2 64 0 35 2.5 0.00009765625 1 -1\n" +
+                        "o 0 64 0 35 0.0000762939453125 0.00009765625 2 -1\n\n";
 
         circuitDiagram = new Object3D();
         cirsim.readSetup(expectedNetlist);
+        //cirsim.analyzeCircuit();
+        //cirsim.runCircuit();
+        //cirsim.setStopped(false);
         for(CircuitElm elm : cirsim.elmList){
             Object3D circuitElm3d = elm.generateObject3D();
             circuitElm3d.setMaterial(material);
@@ -68,20 +77,21 @@ public class OpenGLRenderer  extends RajawaliRenderer {
             Log.d(this.getClass().getSimpleName(),"CircuitElm: " + circuitElm3d.getX() + "," + circuitElm3d.getY());
         }
         // invert y-axis
-        circuitDiagram.setScaleY(-1);
+        circuitDiagram.setScale(1,-1,1);
+
+        getCurrentCamera().setX(120);
+        getCurrentCamera().setY(-140);
+        getCurrentCamera().setZ(500);
+        getCurrentCamera().setFarPlane(5000);
 
         getCurrentScene().addChild(circuitDiagram);
-        getCurrentCamera().setZ(100);
-        getCurrentCamera().setX(300);
-        getCurrentCamera().setFarPlane(500);
-        getCurrentCamera().setY(-200);
-        getCurrentCamera().setFieldOfView(130);
     }
 
     @Override
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
-        circuitDiagram.rotate(Vector3.Axis.X, 3);
+        circuitDiagram.rotate(Vector3.Axis.X, 5);
+        circuitDiagram.rotate(Vector3.Axis.Y, 1);
     }
 
     public void onOffsetsChanged(float x, float y, float z, float w, int i, int j){

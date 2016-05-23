@@ -80,6 +80,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
         final RajawaliSurfaceView surface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         renderer = new OpenGLRenderer(this);
+        surface.setOnTouchListener(touchListener);
         surface.setTransparent(true);
         surface.setSurfaceRenderer(renderer);
         surface.setZOrderMediaOverlay(true);
@@ -183,7 +184,8 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
             if(event.getAction() == MotionEvent.ACTION_DOWN)
             {
                 // this needs to be defined on the renderer:
-                renderer.getObjectAt(event.getX(), event.getY());
+                Log.d(this.getClass().getSimpleName(),": " + event.getX()+ "," + event.getY());
+                renderer.onTouchEvent(event);
             }
             return true;
         }

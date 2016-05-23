@@ -255,7 +255,7 @@ public class OverlayImageTransformationMapper {
     private void applyHomographyTransformation() {
         // Use current homography to project tracking image
         // corner coordinates into current frame corner coordinates
-        if(mCurrentFrameHomography.size() != null){
+        if(mIsHomographyFound){
             Core.perspectiveTransform(mTrackingImageBoxCorners,mCurrentFrameBoxCorners,mCurrentFrameHomography);
         }
 

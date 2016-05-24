@@ -72,7 +72,7 @@ public class OverlayImageTransformationMapper {
     public OverlayImageTransformationMapper(){
 
         // set initial values of essential variables
-        initTrackingImageBoxCorners3D();
+        setTrackingImageBoxCorners3D(mRealSize);
 
     }
 
@@ -84,10 +84,6 @@ public class OverlayImageTransformationMapper {
         return mRotation;
     }
 
-    private void initTrackingImageBoxCorners3D() {
-        //final double aspectRatio =
-        //mTrackingImageBoxCorners3D
-    }
 
 
     public void map(Mat currentFrame,boolean isTakePhoto) {

@@ -158,6 +158,10 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         // OpenGL pose
         mGLpose = pose;
 
+        Log.d("setValRot",mRotX + " " + mRotY + " " + mRotZ + " ");
+        Log.d("setValTrans",mPosX + " " + mPosY + " " + mPosX + " ");
+        Log.d("setValPose",pose.toString());
+
         // Projection values are set
         isSetProjectionValues = true;
     }

@@ -35,7 +35,7 @@ public class CameraProjectionAdapter {
     final float[] mProjectionGL = new float[16];
     boolean mProjectionDirtyGL = true;
 
-    MatOfDouble mProjectionCV = null;
+    MatOfDouble mProjectionCV;
     boolean mProjectionDirtyCV = true;
 
     public CameraProjectionAdapter(){

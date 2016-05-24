@@ -37,6 +37,7 @@ public class CircuitLensController{
 
     public void onCreate(){
         mNetlistGenerator.connect();
+        mCameraAdapter= new CameraProjectionAdapter();
     }
 
     public void onFocus(CvCameraViewFrame frame){
@@ -65,8 +66,9 @@ public class CircuitLensController{
 
 
     public void onResume(){
-        mCameraAdapter= new CameraProjectionAdapter();
+
         mMapper = new OverlayImageTransformationMapper();
+        mMapper.setProjection(mCameraAdapter.getProjectionCV());
     }
 
 
@@ -94,9 +96,9 @@ public class CircuitLensController{
     }
 
     private void updateRendererCameraPose() {
-        //TODO change homography matrix to rotation and translation matrices
-        final MatOfDouble projection = mCameraAdapter.getProjectionCV();
-        mMapper.setTransformationMatrixValues(projection);
+        //compute rotation and translation values
+        //mMapper.setTransformationMatrixValues();
+        // set the computed values to renderer
         mRenderer.setProjectionValues(mMapper.getRVec(),mMapper.getTVec(),mMapper.getmGLPose());
     }
 

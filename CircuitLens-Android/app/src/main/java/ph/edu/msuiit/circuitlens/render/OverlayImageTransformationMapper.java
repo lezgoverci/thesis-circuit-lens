@@ -66,13 +66,15 @@ public class OverlayImageTransformationMapper {
     private final float[]       mGLPose = new float[16];                                    // The OpenGL pose matrix of the detected target.
     private final MatOfDouble   mDistCoeffs = new MatOfDouble(0.0, 0.0, 0.0, 0.0);          // Assume no distortion
     private boolean             mIsHomographyFound;
+    private boolean             mIsTransformed;
+    private MatOfDouble         mProjection;
 
 
     /** CONSTRUCTOR **/
     public OverlayImageTransformationMapper(){
 
         // set initial values of essential variables
-        setTrackingImageBoxCorners3D(mRealSize);
+
 
     }
 
@@ -143,6 +145,7 @@ public class OverlayImageTransformationMapper {
         if(isTakePhoto){
             setTrackingImageHullPoints();
             setTrackingImageBoxCorners();
+            setTrackingImageBoxCorners3D(mRealSize);
             isSetTracking = true;
         }
 
@@ -155,8 +158,12 @@ public class OverlayImageTransformationMapper {
                 // apply the current homography to the corners of the contour box
                 applyHomographyTransformation();
 
+
+
                 // projects the contour box points to new transformation matrix
                 updateCurrentFrameBoxPoints();
+
+                setTransformationMatrixValues();
 
                 // draw new points
                 drawPoints(mCurrentFrameBoxPoints2D, currentFrame);
@@ -187,8 +194,12 @@ public class OverlayImageTransformationMapper {
         }
     }
 
-    public void setTransformationMatrixValues(MatOfDouble projection) {
-        Calib3d.solvePnP(mTrackingImageBoxCorners3D,mCurrentFrameBoxPoints2D,projection,mDistCoeffs,mRVec,mTVec);
+    private void setTransformationMatrixValues() {
+
+        Log.d("projection",mProjection.dump());
+        Log.d("projection3D",mTrackingImageBoxCorners3D.dump());
+        Log.d("projection2D",mCurrentFrameBoxPoints2D.dump());
+        mIsTransformed = Calib3d.solvePnP(mTrackingImageBoxCorners3D,mCurrentFrameBoxPoints2D,mProjection,mDistCoeffs,mRVec,mTVec);
 
         final double[] rVecArray = mRVec.toArray();
         rVecArray[0] *= -1.0; // negate x angle
@@ -196,6 +207,9 @@ public class OverlayImageTransformationMapper {
 
         // Convert the Euler angles to a 3x3 rotation matrix.
         Calib3d.Rodrigues(mRVec, mRotation);
+
+        Log.d("setValTrue",mIsTransformed +"");
+
 
         final double[] tVecArray = mTVec.toArray();
 
@@ -228,9 +242,10 @@ public class OverlayImageTransformationMapper {
     }
 
     private void setTrackingImageBoxCorners3D(double size) {
-        final double aspectRatio = (double) mCurrentFrameGray.cols() / (double) mCurrentFrameGray.rows();
-        final double halfRealWidth;
-        final double halfRealHeight;
+        double aspectRatio = (double) mCurrentFrameGray.cols() / (double) mCurrentFrameGray.rows();
+        Log.d("projectionAspect",aspectRatio+"");
+        double halfRealWidth;
+        double halfRealHeight;
 
         if(mCurrentFrameGray.cols() > mCurrentFrameGray.rows()){
             halfRealHeight = 0.5f * size;
@@ -425,6 +440,7 @@ public class OverlayImageTransformationMapper {
         currentFrameHullPoints = mCurrentFrameApproxHull2D.toList();
 
         // find the homography
+        //TODO check correspondence
        if(trackingImageHullPoints.size() == currentFrameHullPoints.size()){
            mCurrentFrameHomography = Calib3d.findHomography(mTrackingImageApproxHull2D,mCurrentFrameApproxHull2D,Calib3d.RANSAC,1.0);
            mIsHomographyFound = true;
@@ -438,5 +454,9 @@ public class OverlayImageTransformationMapper {
 
     public Mat getHomography() {
         return mCurrentFrameHomography;
+    }
+
+    public void setProjection(MatOfDouble projection) {
+        mProjection = projection;
     }
 }

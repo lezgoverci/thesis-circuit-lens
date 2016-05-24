@@ -92,7 +92,7 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
         getCurrentCamera().setX(120);
         getCurrentCamera().setY(-140);
-        getCurrentCamera().setZ(1000);
+        getCurrentCamera().setZ(500);
         getCurrentCamera().setFarPlane(5000);
 
 

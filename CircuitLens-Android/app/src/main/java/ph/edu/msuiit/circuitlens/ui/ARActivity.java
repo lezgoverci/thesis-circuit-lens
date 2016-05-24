@@ -150,6 +150,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
         // Update renderer using the current frame
         mController.map(frame,mTakePhoto);
+        mTakePhoto = false;
 
 
         return frame;

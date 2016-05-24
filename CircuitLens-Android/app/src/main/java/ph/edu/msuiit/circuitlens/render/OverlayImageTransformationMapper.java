@@ -86,6 +86,7 @@ public class OverlayImageTransformationMapper {
 
 
 
+
     public void map(Mat currentFrame,boolean isTakePhoto) {
 
         // Enhance features
@@ -142,8 +143,6 @@ public class OverlayImageTransformationMapper {
         if(isTakePhoto){
             setTrackingImageHullPoints();
             setTrackingImageBoxCorners();
-            setTrackingImageBoxCorners3D(mRealSize);
-            updateBoxPoints(FROM_TRACKING_IMAGE);
             isSetTracking = true;
         }
 
@@ -151,14 +150,19 @@ public class OverlayImageTransformationMapper {
             //finds homography matrix
             setHomographyTransformation();
 
-            // apply the current homography to the corners of the contour box
-            applyHomographyTransformation();
 
-            // projects the contour box points to new transformation matrix
-            updateBoxPoints(FROM_CURRENT_FRAME);
+            if(isHomographyFound()){
+                // apply the current homography to the corners of the contour box
+                applyHomographyTransformation();
 
-            // draw new points
-            drawPoints(mCurrentFrameBoxPoints2D, currentFrame);
+                // projects the contour box points to new transformation matrix
+                updateCurrentFrameBoxPoints();
+
+                // draw new points
+                drawPoints(mCurrentFrameBoxPoints2D, currentFrame);
+            }
+
+
 
 
         }
@@ -244,22 +248,25 @@ public class OverlayImageTransformationMapper {
         );
     }
 
-    private void updateBoxPoints(int tag) {
-        if (tag == FROM_CURRENT_FRAME){
+    private void updateCurrentFrameBoxPoints() {
             mCurrentFrameBoxPoints2D = getBoxPoints(mCurrentFrameBoxCorners);
-        }
-        else if(tag == FROM_TRACKING_IMAGE){
-            mTrackingImageBoxPoints2D = getBoxPoints(mTrackingImageBoxCorners);
-        }
+
+
 
     }
 
     private void applyHomographyTransformation() {
         // Use current homography to project tracking image
         // corner coordinates into current frame corner coordinates
+        Log.d("boxCornersT",mTrackingImageBoxCorners.dump());
+        Log.d("boxCornersC",mCurrentFrameBoxCorners.dump());
+       // Log.d("boxCornersH",mCurrentFrameHomography.dump());
+
         if(mIsHomographyFound){
             Core.perspectiveTransform(mTrackingImageBoxCorners,mCurrentFrameBoxCorners,mCurrentFrameHomography);
         }
+
+        Log.d("boxCornersC2",mCurrentFrameBoxCorners.dump());
 
     }
 

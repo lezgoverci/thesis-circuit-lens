@@ -1,38 +1,23 @@
 package ph.edu.msuiit.circuitlens.ui.gl;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import org.opencv.core.Mat;
 import org.opencv.core.MatOfDouble;
 import org.rajawali3d.Object3D;
-import org.rajawali3d.lights.DirectionalLight;
-import org.rajawali3d.materials.Material;
 import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.Quaternion;
-import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.renderer.RajawaliRenderer;
-import org.rajawali3d.util.ObjectColorPicker;
-import org.rajawali3d.util.OnObjectPickedListener;
 
-import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
+import ph.edu.msuiit.circuitlens.circuit.CircuitCanvas3D;
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
-import ph.edu.msuiit.circuitlens.circuit.elements.CapacitorElm;
-import ph.edu.msuiit.circuitlens.circuit.elements.DCVoltageElm;
-import ph.edu.msuiit.circuitlens.circuit.elements.DiodeElm;
-import ph.edu.msuiit.circuitlens.circuit.elements.GroundElm;
-import ph.edu.msuiit.circuitlens.circuit.elements.InductorElm;
-import ph.edu.msuiit.circuitlens.circuit.elements.ResistorElm;
-import ph.edu.msuiit.circuitlens.circuit.elements.SwitchElm;
-import ph.edu.msuiit.circuitlens.circuit.elements.WireElm;
 
 public class OpenGLRenderer  extends RajawaliRenderer {
 
     public Context context;
 
-    private Object3D circuitDiagram;
+    private CircuitCanvas3D circuit3D;
     private double mRotX;
     private double mRotY;
     private double mRotZ;
@@ -49,54 +34,56 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     }
 
     public void initScene(){
-        Material material = new Material();
-        material.setColor(Color.WHITE);
-
         CircuitSimulator cirsim = new CircuitSimulator();
         cirsim.init();
-        cirsim.register(ResistorElm.class);
-        cirsim.register(InductorElm.class);
-        cirsim.register(CapacitorElm.class);
-        cirsim.register(DCVoltageElm.class);
-        cirsim.register(WireElm.class);
-        cirsim.register(SwitchElm.class);
-        cirsim.register(DCVoltageElm.class);
-        cirsim.register(GroundElm.class);
-        cirsim.register(DiodeElm.class);
-        final String expectedNetlist = "$ 1 0.000005 10.20027730826997 50 5 43\n" +
-                        "r 0 0 208 0 0 10\n" +
-                        "s 208 0 272 0 0 1 false\n" +
-                        "c 208 272 0 272 0 0.000014999999999999998 0.3433733821905817\n" +
-                        "l 208 0 208 272 0 1 -9.225810542827757e-9\n" +
-                        "v 272 272 272 0 0 0 40 5 0 0 0.5\n" +
-                        "r 208 272 272 272 0 100\n" +
-                        "d 0 0 0 272 1 0.805904783\n" +
-                        "g 272 272 272 304 0\n" +
-                        "o 3 64 0 35 0.0000762939453125 0.00009765625 0 -1\n" +
-                        "o 2 64 0 35 2.5 0.00009765625 1 -1\n" +
-                        "o 0 64 0 35 0.0000762939453125 0.00009765625 2 -1\n\n";
+        final String expectedNetlist =
+                "$ 1 0.000005 10.20027730826997 50 5 50\n" +
+                        "v 160 368 160 48 0 0 40 5 0 0 0.5\n" +
+                        "w 160 48 256 48 1\n" +
+                        "w 256 48 352 48 0\n" +
+                        "w 352 48 448 48 0\n" +
+                        "s 256 48 256 128 0 0 false\n" +
+                        "s 352 48 352 128 0 1 false\n" +
+                        "s 448 48 448 128 0 0 false\n" +
+                        "r 256 128 256 192 0 100\n" +
+                        "r 352 128 352 192 0 400\n" +
+                        "r 448 128 448 192 0 800\n" +
+                        "w 256 192 352 192 0\n" +
+                        "w 352 192 448 192 0\n" +
+                        "w 352 224 352 192 0\n" +
+                        "w 352 224 448 224 0\n" +
+                        "w 352 224 256 224 0\n" +
+                        "s 352 224 352 304 0 0 false\n" +
+                        "s 256 224 256 304 0 1 false\n" +
+                        "r 256 304 256 368 0 600\n" +
+                        "r 352 304 352 368 0 200\n" +
+                        "s 448 224 448 368 0 1 false\n" +
+                        "w 160 368 256 368 0\n" +
+                        "w 256 368 352 368 0\n" +
+                        "w 352 368 448 368 0\n";
 
-        circuitDiagram = new Object3D();
         cirsim.readSetup(expectedNetlist);
-        //cirsim.analyzeCircuit();
-        //cirsim.runCircuit();
-        //cirsim.setStopped(false);
-        for(CircuitElm elm : cirsim.elmList){
-            Object3D circuitElm3d = elm.generateObject3D();
-            circuitElm3d.setMaterial(material);
-            circuitDiagram.addChild(circuitElm3d);
-            Log.d(this.getClass().getSimpleName(),"CircuitElm: " + circuitElm3d.getX() + "," + circuitElm3d.getY());
-        }
-        // invert y-axis
-        circuitDiagram.setScale(1,-1,1);
+        cirsim.analyzeCircuit();
+        cirsim.runCircuit();
+        cirsim.setStopped(false);
+        cirsim.draw();
+        circuit3D = cirsim.getCircuitCanvas();
+        circuit3D.setScale(1,-1,1);
 
-        getCurrentCamera().setX(120);
-        getCurrentCamera().setY(-140);
+        // show bounds of circuitcanvas for debugging
+        //Object3D bounds3D = new Object3D();
+        //circuit3D.drawBounds(bounds3D);
+        //bounds3D.setScale(1,-1,1);
+        //getCurrentScene().addChild(bounds3D);
+
+        // point camera to the center of the circuit
+        getCurrentCamera().setX(circuit3D.getCircuitCenterX());
+        getCurrentCamera().setY(-circuit3D.getCircuitCenterY());
+
         getCurrentCamera().setZ(500);
         getCurrentCamera().setFarPlane(5000);
 
-
-        getCurrentScene().addChild(circuitDiagram);
+        getCurrentScene().addChild(circuit3D);
     }
 
     @Override

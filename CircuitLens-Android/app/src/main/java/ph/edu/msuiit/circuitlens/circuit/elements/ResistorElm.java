@@ -165,10 +165,10 @@ public class ResistorElm extends CircuitElm {
                         break;
                 }
                 double v = v1 + (v2 - v1) * i / segments;
-//                setVoltageColor(g, v);
+                int color = getVoltageColor(v);
                 interpPoint(lead1, lead2, ps1, i * segf, hs * ox);
                 interpPoint(lead1, lead2, ps2, (i + 1) * segf, hs * nx);
-                drawThickLine(resistor3d, ps1, ps2);
+                drawThickLine(resistor3d, ps1, ps2, color);
                 ox = nx;
             }
         } else {

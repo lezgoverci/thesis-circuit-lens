@@ -1,13 +1,11 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
 import org.rajawali3d.Object3D;
-import org.rajawali3d.math.vector.Vector3;
-import org.rajawali3d.primitives.Line3D;
 
-import java.util.Stack;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
+import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
 
 public class InductorElm extends CircuitElm {
 
@@ -16,17 +14,20 @@ public class InductorElm extends CircuitElm {
 
     public InductorElm(int xx, int yy) {
         super(xx, yy);
-        ind = new Inductor(sim);
         inductance = 1;
-        ind.setup(inductance, current, flags);
     }
 
     public InductorElm(int xa, int ya, int xb, int yb, int f,
             StringTokenizer st) {
         super(xa, ya, xb, yb, f);
-        ind = new Inductor(sim);
         inductance = new Double(st.nextToken()).doubleValue();
         current = new Double(st.nextToken()).doubleValue();
+    }
+
+    @Override
+    public void setSim(CircuitSimulator sim) {
+        super.setSim(sim);
+        ind = new Inductor(sim);
         ind.setup(inductance, current, flags);
     }
 

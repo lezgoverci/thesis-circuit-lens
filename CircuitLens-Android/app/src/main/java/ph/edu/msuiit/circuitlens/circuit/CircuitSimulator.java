@@ -6,6 +6,8 @@ package ph.edu.msuiit.circuitlens.circuit;
 import android.graphics.Point;
 import android.graphics.Rect;
 
+import org.rajawali3d.Object3D;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.ByteArrayOutputStream;
@@ -20,6 +22,8 @@ import java.util.Vector;
 
 import ph.edu.msuiit.circuitlens.circuit.elements.CapacitorElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.CurrentElm;
+import ph.edu.msuiit.circuitlens.circuit.elements.DCVoltageElm;
+import ph.edu.msuiit.circuitlens.circuit.elements.DiodeElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.GroundElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.InductorElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.RailElm;
@@ -28,14 +32,16 @@ import ph.edu.msuiit.circuitlens.circuit.elements.SwitchElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.VoltageElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.WireElm;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 public class CircuitSimulator {
 
     Rect winSize;
     /* static */
     public static final String PROPERTY_CIRCUIT_CHANGE = "undo";
     public static final int sourceRadius = 7;
-    public static final double freqMult = 3.14159265 * 2 * 4;
-    static final double pi = 3.14159265358979323846;
+    public static final double freqMult = Math.PI * 2 * 4;
     static final int infoWidth = 120;
     static final int HINT_LC = 1;
     static final int HINT_RC = 2;
@@ -114,7 +120,7 @@ public class CircuitSimulator {
     String startLabel = null;
     public String startCircuitText = null;
     String baseURL = "http://www.falstad.com/circuit/";
-    public CircuitCanvas cv;
+    public CircuitCanvas3D cv;
     Vector<CircuitNode> nodeList;
     CircuitElm voltageSources[];
     protected final PropertyChangeSupport support;
@@ -141,7 +147,7 @@ public class CircuitSimulator {
         dumpTypes[(int) '%'] = Scope.class;
         dumpTypes[(int) '?'] = Scope.class;
         dumpTypes[(int) 'B'] = Scope.class;
-        //cv = new CircuitCanvas(this, canvas);
+        cv = new CircuitCanvas3D(this);
     }
 
     public int getrand(int x) {
@@ -156,13 +162,24 @@ public class CircuitSimulator {
         return whiteBackground;
     }
 
-
-
-    public void kill() {
-        cv.kill();
+    public void draw(){
+        for(CircuitElm elm : elmList){
+            Object3D circuitElm3d = elm.generateObject3D();
+            cv.addChild(circuitElm3d);
+        }
     }
 
     public void init() {
+        register(ResistorElm.class);
+        register(InductorElm.class);
+        register(CapacitorElm.class);
+        register(DCVoltageElm.class);
+        register(WireElm.class);
+        register(SwitchElm.class);
+        register(DCVoltageElm.class);
+        register(GroundElm.class);
+        register(DiodeElm.class);
+
         String euroResistor = null;
         String useFrameStr = null;
         boolean printable = false;
@@ -277,9 +294,11 @@ public class CircuitSimulator {
 //        }
         //requestFocus();
         if (!disabled) {
-            cv.init();
+            //cv.init();
         }
     }
+
+
 
     public double getT() {
         return t;
@@ -431,7 +450,7 @@ public class CircuitSimulator {
             }
             InductorElm ie = (InductorElm) c1;
             CapacitorElm ce = (CapacitorElm) c2;
-            return "res.f = " + CircuitElm.getUnitText(1 / (2 * pi * Math.sqrt(ie.getInductance()
+            return "res.f = " + CircuitElm.getUnitText(1 / (2 * Math.PI * Math.sqrt(ie.getInductance()
                     * ce.getCapacitance())), "Hz");
         }
         if (hintType == HINT_RC) {
@@ -456,7 +475,7 @@ public class CircuitSimulator {
             ResistorElm re = (ResistorElm) c1;
             CapacitorElm ce = (CapacitorElm) c2;
             return "f.3db = "
-                    + CircuitElm.getUnitText(1 / (2 * pi * re.getResistance() * ce.getCapacitance()), "Hz");
+                    + CircuitElm.getUnitText(1 / (2 * Math.PI * re.getResistance() * ce.getCapacitance()), "Hz");
         }
         if (hintType == HINT_3DB_L) {
             if (!(c1 instanceof ResistorElm)) {
@@ -468,7 +487,7 @@ public class CircuitSimulator {
             ResistorElm re = (ResistorElm) c1;
             InductorElm ie = (InductorElm) c2;
             return "f.3db = "
-                    + CircuitElm.getUnitText(re.getResistance() / (2 * pi * ie.getInductance()), "Hz");
+                    + CircuitElm.getUnitText(re.getResistance() / (2 * Math.PI * ie.getInductance()), "Hz");
         }
         if (hintType == HINT_TWINT) {
             if (!(c1 instanceof ResistorElm)) {
@@ -480,7 +499,7 @@ public class CircuitSimulator {
             ResistorElm re = (ResistorElm) c1;
             CapacitorElm ce = (CapacitorElm) c2;
             return "fc = "
-                    + CircuitElm.getUnitText(1 / (2 * pi * re.getResistance() * ce.getCapacitance()), "Hz");
+                    + CircuitElm.getUnitText(1 / (2 * Math.PI * re.getResistance() * ce.getCapacitance()), "Hz");
         }
         return null;
     }
@@ -494,7 +513,7 @@ public class CircuitSimulator {
                 if (n == 0) {
                     ((SwitchElm) ce).toggle();
                     analyzeFlag = true;
-                    cv.repaintCanvas();
+                    //cv.repaintCanvas();
                     return;
                 }
             }
@@ -1049,7 +1068,7 @@ public class CircuitSimulator {
         return useBufferedImage;
     }
 
-    public CircuitCanvas getCircuitCanvas() {
+    public CircuitCanvas3D getCircuitCanvas() {
         return cv;
     }
 
@@ -1525,17 +1544,9 @@ public class CircuitSimulator {
         //System.out.println((System.currentTimeMillis()-lastFrameTime)/(double) iter);
     }
 
-    public int min(int a, int b) {
-        return (a < b) ? a : b;
-    }
-
-    public int max(int a, int b) {
-        return (a > b) ? a : b;
-    }
-
     public void editFuncPoint(int x, int y) {
         // XXX
-        cv.repaintCanvas(pause);
+        //cv.repaintCanvas(pause);
     }
 
     void stackScope(int s) {
@@ -1774,7 +1785,6 @@ public class CircuitSimulator {
                     oarr[4] = new Integer(f);
                     oarr[5] = st;
                     ce = (CircuitElm) cstr.newInstance(oarr);
-                    System.out.println("setSim()");
                     ce.setSim(this);
                     ce.setPoints();
                     elmList.addElement(ce);
@@ -1790,10 +1800,10 @@ public class CircuitSimulator {
             p += l;
 
         }
-        enableItems();
-        if (!retain) {
-            handleResize(); // for scopes
-        }
+        //enableItems();
+        //enableItems();
+            handleResize();
+        //}
         needAnalyze();
     }
 
@@ -2087,6 +2097,7 @@ public class CircuitSimulator {
         try {
             CircuitElm elm = (CircuitElm) cstr.newInstance(oarr);
             elm.setSim(this);
+            elm.getSim();
             return elm;
         } catch (Exception ee) {
             ee.printStackTrace();
@@ -2307,47 +2318,15 @@ public class CircuitSimulator {
     }
 
     public void handleResize() {
-        //winSize = cv.getCanvasSize();
-        /*
-        if (winSize.width == 0) {
-            return;
-        }
-        dbimage = new BufferedImage(winSize.width, winSize.height, BufferedImage.TYPE_4BYTE_ABGR);
-        int h = winSize.height / 5;
-        */
-        /*if (h < 128 && winSize.height > 300)
-         h = 128;*/
-        //circuitArea = new Rectangle(0, 0, winSize.width, winSize.height - h);
-        int i;
-        int minx = 1000, maxx = 0, miny = 1000, maxy = 0;
-        for (i = 0; i != elmList.size(); i++) {
+        int minx = 10000, maxx = -10000, miny = 10000, maxy = -10000;
+        for (int i = 0; i != elmList.size(); i++) {
             CircuitElm ce = getElm(i);
-            // centered text causes problems when trying to center the circuit,
-            // so we special-case it here
-            /*
-            if (!ce.isCenteredText()) {
-                minx = min(ce.x, min(ce.x2, minx));
-                maxx = max(ce.x, max(ce.x2, maxx));
-            }
             miny = min(ce.y, min(ce.y2, miny));
             maxy = max(ce.y, max(ce.y2, maxy));
-            */
+            minx = min(ce.x, min(ce.x2, minx));
+            maxx = max(ce.x, max(ce.x2, maxx));
         }
-        // center circuit; we don't use snapGrid() because that rounds
-        /*
-        int dx = gridMask & ((circuitArea.width - (maxx - minx)) / 2 - minx);
-        int dy = gridMask & ((circuitArea.height - (maxy - miny)) / 2 - miny);
-        if (dx + minx < 0) {
-            dx = gridMask & (-minx);
-        }
-        if (dy + miny < 0) {
-            dy = gridMask & (-miny);
-        }
-        for (i = 0; i != elmList.size(); i++) {
-            CircuitElm ce = getElm(i);
-            ce.move(dx, dy);
-        }*/
-        // after moving elements, need this to avoid singular matrix probs
+        cv.setCircuitBounds(minx, miny, maxx, maxy);
         needAnalyze();
         circuitBottom = 0;
     }

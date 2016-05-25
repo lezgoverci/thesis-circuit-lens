@@ -149,13 +149,13 @@ public class DiodeElm extends CircuitElm {
         draw2Leads(diode3d);
 
         // draw arrow thingy
-//        setPowerColor(true);
-//        setVoltageColor(v1);
-//
-//        drawTriangle(diode3d,points);
-//
-//        // draw thing arrow is pointing to
-//        setVoltageColor(v2);
+        //setPowerColor(true);
+        //setVoltageColor(v1);
+
+        drawTriangle(diode3d,points);
+
+        // draw thing arrow is pointing to
+        //setVoltageColor(v2);
         drawThickLine(diode3d, cathode[0], cathode[1]);
         return diode3d;
     }

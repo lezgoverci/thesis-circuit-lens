@@ -1,10 +1,6 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
 import org.rajawali3d.Object3D;
-import org.rajawali3d.math.vector.Vector3;
-import org.rajawali3d.primitives.Line3D;
-
-import java.util.Stack;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
@@ -277,14 +273,14 @@ public class VoltageElm extends CircuitElm {
         draw2Leads(voltage3d);
         if (waveform == WF_DC) {
 //            setPowerColor(g, false);
-//            setVoltageColor(g, volts[0]);
+            int color1 = getVoltageColor(volts[0]);
             interpPoint2(lead1, lead2, ps1, ps2, 0, 10);
-            drawThickLine(voltage3d, ps1, ps2);
-//            setVoltageColor(g, volts[1]);
+            drawThickLine(voltage3d, ps1, ps2, color1);
+            int color2 =  getVoltageColor(volts[1]);
             int hs = 16;
             setBbox(point1, point2, hs);
             interpPoint2(lead1, lead2, ps1, ps2, 1, hs);
-            drawThickLine(voltage3d, ps1, ps2);
+            drawThickLine(voltage3d, ps1, ps2, color2);
         } else {
             setBbox(point1, point2, circleSize);
             interpPoint(lead1, lead2, ps1, .5);

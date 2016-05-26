@@ -1,6 +1,7 @@
 package ph.edu.msuiit.circuitlens.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfDouble;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import ph.edu.msuiit.circuitlens.CircuitLensController;
@@ -28,17 +30,15 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
     private static final String TAG = "CircuitLens::ARActivity";
     private long startTime;
     private CircuitLensController mController;
-
+    private OpenGLRenderer mRenderer;
+    private RajawaliSurfaceView mSurface;
     private CameraBridgeViewBase mOpenCvCameraView;
-
 
     // V: camera shutter
     private boolean mTakePhoto = false;
     private boolean isSetTrackingImage = false;
     private boolean isMapped = false;
     private boolean isDrawn;
-    private OpenGLRenderer renderer;
-
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -49,8 +49,6 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
                     Log.d(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
                     mController.onResume();
-
-
                 } break;
                 default:
                 {
@@ -77,19 +75,25 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
             decorView.setSystemUiVisibility(uiOptions);
         }
 
-
         setContentView(R.layout.activity_ar);
-
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String serverUri = preferences.getString("server_uri","ws://127.0.0.1:8080/ws");
-        Log.i(TAG,"ServerUri: "+serverUri);
+        boolean rotate = preferences.getBoolean("rotate",false);
 
-        final RajawaliSurfaceView surface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-        mController = new CircuitLensController(this,serverUri,surface);
+        mSurface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
+        mSurface.setOnTouchListener(touchListener);
+        mController = new CircuitLensController(this,serverUri);
         mController.onCreate();
         initializeViews();
+        initializeRenderer();
+    }
 
+    private void initializeRenderer() {
+        mRenderer = new OpenGLRenderer(this);
+        mSurface.setTransparent(true);
+        mSurface.setSurfaceRenderer(mRenderer);
+        mSurface.setZOrderMediaOverlay(true);
     }
 
     private void initializeViews(){
@@ -152,11 +156,8 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         mController.map(frame,mTakePhoto);
         mTakePhoto = false;
 
-
         return frame;
     }
-
-
 
     @Override
     public void showMessage(String message) {
@@ -177,11 +178,16 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
             {
                 // this needs to be defined on the renderer:
                 Log.d(this.getClass().getSimpleName(),": " + event.getX()+ "," + event.getY());
-                renderer.onTouchEvent(event);
+                mRenderer.onTouchEvent(event);
             }
             return true;
         }
     };
 
-
+    public void updateRendererCameraPose(MatOfDouble rVec, MatOfDouble tVec, float[] floats) {
+        //compute rotation and translation values
+        //mMapper.setTransformationMatrixValues();
+        // set the computed values to renderer
+        mRenderer.setProjectionValues(rVec,tVec,floats);
+    }
 }

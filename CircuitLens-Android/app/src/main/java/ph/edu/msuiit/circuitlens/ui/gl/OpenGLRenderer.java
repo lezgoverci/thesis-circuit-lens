@@ -112,35 +112,7 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
 
-
-
-        double inputW = MathUtil.degreesToRadians(0);
-        double inputX = 45;
-        double inputY = MathUtil.degreesToRadians(0);
-        double inputZ = MathUtil.degreesToRadians(0);
-
-        Quaternion quat = new Quaternion();
-        quat.fromEuler(inputY,inputX,inputZ);
-
-        double x00 = circuit3D.getRotX();
-        double y00 = circuit3D.getRotY();
-        double z00 = circuit3D.getRotZ();
-
-        circuit3D.setOrientation(quat);
-
-        double x0 = circuit3D.getRotX();
-        double y0 = circuit3D.getRotY();
-        double z0 = circuit3D.getRotZ();
-
-        double x = MathUtil.radiansToDegrees(circuit3D.getRotX());
-        double y = MathUtil.radiansToDegrees(circuit3D.getRotY());
-        double z = MathUtil.radiansToDegrees(circuit3D.getRotZ());
-
-        circuit3D.setOrientation(quat);
-
-        double x1 = MathUtil.radiansToDegrees(circuit3D.getRotX());
-        double y1 = MathUtil.radiansToDegrees(circuit3D.getRotY());
-        double z1 = MathUtil.radiansToDegrees(circuit3D.getRotZ());
+        runRotationTest();
 
 
         if(!isSetInitCameraValues && isSetProjectionValues){
@@ -164,6 +136,37 @@ public class OpenGLRenderer  extends RajawaliRenderer {
             //circuitDiagram.rotate(Vector3.Axis.Y, 1);
         }
 
+    }
+
+    private void runRotationTest() {
+
+        double inputW = MathUtil.degreesToRadians(0);
+        double inputX = MathUtil.degreesToRadians(0);
+        double inputY = MathUtil.degreesToRadians(0);
+        double inputZ = 45;
+
+        Quaternion quat = new Quaternion();
+        quat.fromEuler(inputY,inputX,inputZ);
+
+        double x00 = circuit3D.getRotX();
+        double y00 = circuit3D.getRotY();
+        double z00 = circuit3D.getRotZ();
+
+        circuit3D.setOrientation(quat);
+
+        double x0 = circuit3D.getRotX();
+        double y0 = circuit3D.getRotY();
+        double z0 = circuit3D.getRotZ();
+
+        double x = MathUtil.radiansToDegrees(circuit3D.getRotX());
+        double y = MathUtil.radiansToDegrees(circuit3D.getRotY());
+        double z = MathUtil.radiansToDegrees(circuit3D.getRotZ());
+
+        circuit3D.setOrientation(quat);
+
+        double x1 = MathUtil.radiansToDegrees(circuit3D.getRotX());
+        double y1 = MathUtil.radiansToDegrees(circuit3D.getRotY());
+        double z1 = MathUtil.radiansToDegrees(circuit3D.getRotZ());
     }
 
     private void useTransformationValues() {

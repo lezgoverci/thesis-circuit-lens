@@ -8,6 +8,7 @@ import org.opencv.core.MatOfDouble;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.Quaternion;
+import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.renderer.RajawaliRenderer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitCanvas3D;
@@ -26,6 +27,20 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     private double mPosZ;
     private float[] mGLpose;
     private boolean isSetProjectionValues = false;
+    private boolean isSetInitCameraValues = false;
+    private double mInitPosX;
+    private double mInitPosY;
+    private double mInitPosZ;
+    private double mInitRotX;
+    private double mInitRotY;
+    private double mInitRotZ;
+    private double mInitGlPosX;
+    private double mInitGlPosY;
+    private double mInitGlPosZ;
+
+    private double testValue = 0.0;
+
+
 
     public OpenGLRenderer(Context context) {
         super(context);
@@ -80,10 +95,17 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         getCurrentCamera().setX(circuit3D.getCircuitCenterX());
         getCurrentCamera().setY(-circuit3D.getCircuitCenterY());
 
+
         getCurrentCamera().setZ(500);
         getCurrentCamera().setFarPlane(5000);
 
         getCurrentScene().addChild(circuit3D);
+
+
+        //TODO rotate the object not the camera
+        mInitGlPosX = getCurrentCamera().getX();
+        mInitGlPosY = getCurrentCamera().getY();
+        mInitGlPosZ = getCurrentCamera().getZ();
     }
 
     @Override
@@ -91,8 +113,51 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         super.onRender(elapsedTime, deltaTime);
 
 
+
+        double inputW = MathUtil.degreesToRadians(0);
+        double inputX = 45;
+        double inputY = MathUtil.degreesToRadians(0);
+        double inputZ = MathUtil.degreesToRadians(0);
+
+        Quaternion quat = new Quaternion();
+        quat.fromEuler(inputY,inputX,inputZ);
+
+        double x00 = circuit3D.getRotX();
+        double y00 = circuit3D.getRotY();
+        double z00 = circuit3D.getRotZ();
+
+        circuit3D.setOrientation(quat);
+
+        double x0 = circuit3D.getRotX();
+        double y0 = circuit3D.getRotY();
+        double z0 = circuit3D.getRotZ();
+
+        double x = MathUtil.radiansToDegrees(circuit3D.getRotX());
+        double y = MathUtil.radiansToDegrees(circuit3D.getRotY());
+        double z = MathUtil.radiansToDegrees(circuit3D.getRotZ());
+
+        circuit3D.setOrientation(quat);
+
+        double x1 = MathUtil.radiansToDegrees(circuit3D.getRotX());
+        double y1 = MathUtil.radiansToDegrees(circuit3D.getRotY());
+        double z1 = MathUtil.radiansToDegrees(circuit3D.getRotZ());
+
+
+        if(!isSetInitCameraValues && isSetProjectionValues){
+            mInitPosX = mPosX;
+            mInitPosY = mPosY;
+            mInitPosZ = mPosZ;
+
+            mInitRotX = mRotX;
+            mInitRotY = mRotY;
+            mInitRotZ = mRotZ;
+
+            isSetInitCameraValues = true;
+        }
+
+
         // Use transformation values
-        if(isSetProjectionValues){
+        if(isSetProjectionValues && isSetInitCameraValues){
             useTransformationValues();
         } else{
             //circuitDiagram.rotate(Vector3.Axis.X, 5);
@@ -138,9 +203,17 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         mRotZ = MathUtil.radiansToDegrees(rVec.toArray()[2]);
 
         // Position values
-        mPosX = tVec.toArray()[0];
-        mPosY = tVec.toArray()[1];
-        mPosZ = tVec.toArray()[2];
+        if(!isSetInitCameraValues){
+            mPosX = mInitPosX;
+            mPosY = mInitPosY;
+            mPosZ = mInitPosZ;
+        }
+        else{
+            mPosX = mInitGlPosX + (tVec.toArray()[0] - mInitPosX);
+            mPosY = mInitGlPosY + (tVec.toArray()[1] - mInitPosY);
+            mPosZ = mInitGlPosZ + (tVec.toArray()[2] - mInitPosZ);
+        }
+
 
         // OpenGL pose
         mGLpose = pose;

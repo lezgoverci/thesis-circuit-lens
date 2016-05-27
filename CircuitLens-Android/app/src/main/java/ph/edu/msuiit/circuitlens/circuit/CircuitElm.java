@@ -3,12 +3,12 @@ package ph.edu.msuiit.circuitlens.circuit;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.Log;
 
 import org.opencv.core.Mat;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Cube;
 import org.rajawali3d.primitives.Line3D;
 
 import java.text.DecimalFormat;
@@ -23,6 +23,7 @@ import static java.lang.Math.min;
 
 public abstract class CircuitElm {
 
+    protected Object3D circuitElm3D;
     private static final int colorScaleCount = 32;
     private static final int colorScale[] = new int[colorScaleCount];
     public static int whiteColor, selectColor, lightGrayColor;
@@ -32,7 +33,6 @@ public abstract class CircuitElm {
     protected Point ps2 = new Point();
 
     public static final NumberFormat showFormat, shortFormat, noCommaFormat;
-    public static final double pi = 3.14159265358979323846;
 
     static {
         int i;
@@ -90,7 +90,6 @@ public abstract class CircuitElm {
     }
 
     public CircuitElm(int xx, int yy) {
-        Log.d(getClass().getSimpleName(),"constructor1()");
         x = x2 = xx;
         y = y2 = yy;
         flags = getDefaultFlags();
@@ -99,7 +98,6 @@ public abstract class CircuitElm {
     }
 
     public CircuitElm(int xa, int ya, int xb, int yb, int f) {
-        Log.d(getClass().getSimpleName(),"constructor2()");
         x = xa;
         y = ya;
         x2 = xb;
@@ -232,31 +230,26 @@ public abstract class CircuitElm {
         d.y = (int) Math.floor(a.y * (1 - f) + b.y * f - g * gy + .48);
     }
 
+    Material lead1Material, lead2Material;
     public void draw2Leads(Object3D object3D) {
         // draw first lead
-        int color1 = getVoltageColor(volts[0]);
-
-        drawThickLine(object3D, point1, lead1, color1);
+        lead1Material = new Material();
+        drawThickLine(object3D, point1, lead1, lead1Material);
 
         // draw second lead
+        lead2Material = new Material();
+        drawThickLine(object3D, lead2, point2, lead2Material);
+    }
+
+    public void update2Leads() {
+        // update first lead
+        int color1 = getVoltageColor(volts[0]);
+        lead1Material.setColor(color1);
+
+        // update second lead
         int color2 = getVoltageColor(volts[1]);
-
-        drawThickLine(object3D, lead2, point2, color2);
+        lead2Material.setColor(color2);
     }
-
-    protected void drawThickLine(Object3D object3D, Point pa, Point pb, int color) {
-        Material material = new Material();
-        material.setColor(color);
-
-        Stack<Vector3> points = new Stack<>();
-        points.add(new Vector3(pa.x,pa.y,0));
-        points.add(new Vector3(pb.x,pb.y,0));
-        Line3D thickLine = new Line3D(points,10);
-        thickLine.setMaterial(material);
-
-        object3D.addChild(thickLine);
-    }
-
 
     public Point[] newPointArray(int n) {
         Point a[] = new Point[n];
@@ -266,14 +259,15 @@ public abstract class CircuitElm {
         return a;
     }
 
-    public void drawTriangle(Object3D diode3D, Stack<Vector3> points) {
-        Material material = new Material();
-        material.setColor(Color.WHITE);
-        Triangle3D triangle = new Triangle3D(points,1);
-        triangle.setMaterial(material);
-        diode3D.addChild(triangle);
-    }
+    public void drawTriangle(Object3D object3D, Point[] points, Material material) {
+        Stack<Vector3> points3D = new Stack<>();
+        for(int i=0;i<3;i++)
+            points3D.add(new Vector3(points[i].x,points[i].y,0));
 
+        Triangle3D triangle = new Triangle3D(points3D,1);
+        triangle.setMaterial(material);
+        object3D.addChild(triangle);
+    }
 
     public void drawDots(Object3D object3D, Point pa, Point pb, double pos) {
         if (sim.isStopped() || pos == 0 || !sim.isShowingCurrent()) {
@@ -291,16 +285,19 @@ public abstract class CircuitElm {
         for (di = pos; di < dn; di += ds) {
             int x0 = (int) (pa.x + di * dx / dn);
             int y0 = (int) (pa.y + di * dy / dn);
-            drawCircle(object3D, x0, y0, 5, Color.YELLOW);
+            drawSquare(object3D, x0, y0, 5, Color.YELLOW);
         }
     }
 
-    private void drawCircle(Object3D object3D, int x0, int y0, int radius, int color) {
+    private void drawSquare(Object3D object3D, int x0, int y0, int side, int color) {
         Material material = new Material();
         material.setColor(color);
-        Circle3D circle3D = new Circle3D(new Vector3(x0,y0,0), radius, 1, true);
-        circle3D.setMaterial(material);
-        object3D.addChild(object3D);
+        Cube cube = new Cube(side);
+        cube.setX(x0);
+        cube.setY(y0);
+        cube.setZ(3);
+        cube.setMaterial(material);
+        object3D.addChild(cube);
     }
 
     /*
@@ -452,22 +449,23 @@ public abstract class CircuitElm {
     }
 
     public void drawPost(Object3D object3D, int x0, int y0, int n) {
-        /*
         if (sim.getDragElm() == null && !needsHighlight()
                 && sim.getCircuitNode(n) != null && sim.getCircuitNode(n).links.size() == 2) {
             return;
         }
+        /*
         if (sim.mouseMode == CircuitController.MODE_DRAG_ROW
                 || sim.mouseMode == CircuitController.MODE_DRAG_COLUMN) {
             return;
-        }*/
+}*/
+
         drawPost(object3D, x0, y0);
-    }
+        }
 
     public void drawPost(Object3D object3D, int x0, int y0) {
         Material material = new Material();
         material.setColor(Color.WHITE);
-        Circle3D circle = new Circle3D(new Vector3(x0,y0,0),3, 1, true);
+        Circle3D circle = new Circle3D(new Vector3(x0,y0,1),3, 1, true);
         circle.setMaterial(material);
         object3D.addChild(circle);
     }
@@ -488,8 +486,8 @@ public abstract class CircuitElm {
 
     public void setBbox(Point p1, Point p2, double w) {
         setBbox(p1.x, p1.y, p2.x, p2.y);
-        int gx = p2.y - p1.y;
-        int gy = p1.x - p2.x;
+        //int gx = p2.y - p1.y;
+        //int gy = p1.x - p2.x;
         int dpx = (int) (dpx1 * w);
         int dpy = (int) (dpy1 * w);
         adjustBbox(p1.x + dpx, p1.y + dpy, p1.x - dpx, p1.y - dpy);
@@ -560,54 +558,63 @@ public abstract class CircuitElm {
             }
             g.drawString(s, xx, yc + dpy + ya);
         }
+    }
     }*/
 
     public void drawCoil(Object3D object3D, int hs, Point p1, Point p2,
-            double v1, double v2) {
+                         Material[] coilMaterials) {
         double len = distance(p1, p2);
         int segments = 30; // 10*(int) (len/10);
         int i;
         double segf = 1. / segments;
 
-        ps1.set(p1.x,p1.y);
+        ps1.set(p1.x, p1.y);
         for (i = 0; i != segments; i++) {
             double cx = (((i + 1) * 6. * segf) % 2) - 1;
             double hsx = Math.sqrt(1 - cx * cx);
-            if (hsx < 0) {
+            if (hsx < 0)
                 hsx = -hsx;
-            }
             interpPoint(p1, p2, ps2, i * segf, hsx * hs);
-            double v = v1 + (v2 - v1) * i / segments;
-//            setVoltageColor(g, v);
-            drawThickLine(object3D, ps1, ps2);
+            coilMaterials[i] = new Material();
+            drawThickLine(object3D, ps1, ps2, coilMaterials[i]);
             ps1.set(ps2.x,ps2.y);
         }
+    }
+
+    public void updateCoil(double v1, double v2, Material[] materials) {
+        int segments = 30; // 10*(int) (len/10);
+        int i;
+        double segf = 1. / segments;
+
+        for (i = 0; i != segments; i++) {
+            double v = v1 + (v2 - v1) * i / segments;
+            int color = getVoltageColor(v);
+            materials[i].setColor(color);
+        }
+    }
+
+    protected void drawThickLine(Object3D object3D, Point pa, Point pb, Material material) {
+        drawThickLine(object3D, pa.x, pa.y, pb.x, pb.y, material);
     }
 
     public static void drawThickLine(Object3D object3D, int x, int y, int x2, int y2) {
         Material material = new Material();
         material.setColor(Color.WHITE);
+        drawThickLine(object3D, x, y, x2, y2, material);
+    }
 
+    public static void drawThickLine(Object3D object3D, int x, int y, int x2, int y2, Material material) {
         Stack<Vector3> points = new Stack<>();
         points.add(new Vector3(x,y,0));
         points.add(new Vector3(x2,y2,0));
-        Line3D thickLine = new Line3D(points,10);
+        Line3D thickLine = new Line3D(points,6);
         thickLine.setMaterial(material);
 
         object3D.addChild(thickLine);
     }
 
     public static void drawThickLine(Object3D object3D, Point pa, Point pb) {
-        Material material = new Material();
-        material.setColor(Color.WHITE);
-
-        Stack<Vector3> points = new Stack<>();
-        points.add(new Vector3(pa.x,pa.y,0));
-        points.add(new Vector3(pb.x,pb.y,0));
-        Line3D thickLine = new Line3D(points,10);
-        thickLine.setMaterial(material);
-
-        object3D.addChild(thickLine);
+        drawThickLine(object3D, pa.x, pa.y, pb.x, pb.y);
     }
 
     /*
@@ -621,21 +628,23 @@ public abstract class CircuitElm {
 
     public static void drawThickPolygon(Graphics g, Polygon p) {
         drawThickPolygon(g, p.xpoints, p.ypoints, p.npoints);
+    }*/
+
+    public static Material drawThickCircle(Object3D object3D, int cx, int cy, int ri) {
+        Material material = new Material();
+        material.setColor(Color.WHITE);
+        drawThickCircle(object3D, cx, cy, ri, material);
+        return material;
     }
 
-    public static void drawThickCircle(Graphics g, int cx, int cy, int ri) {
-        int a;
-        double m = pi / 180;
-        double r = ri * .98;
-        for (a = 0; a != 360; a += 20) {
-            double ax = Math.cos(a * m) * r + cx;
-            double ay = Math.sin(a * m) * r + cy;
-            double bx = Math.cos((a + 20) * m) * r + cx;
-            double by = Math.sin((a + 20) * m) * r + cy;
-            drawThickLine(g, (int) ax, (int) ay, (int) bx, (int) by);
-        }
+    public static void drawThickCircle(Object3D object3D, int cx, int cy, int ri, Material material) {
+        Circle3D circle = new Circle3D(new Vector3(cx,cy,1),ri, 5);
+        circle.setMaterial(material);
+        object3D.addChild(circle);
     }
 
+
+    /*
     public static String getVoltageDText(double v) {
         return getUnitText(Math.abs(v), "V");
     }
@@ -725,9 +734,9 @@ public abstract class CircuitElm {
 
     public void doDots(Object3D object3D) {
         updateDotCount();
-        if (sim.getDragElm() != this) {
+        //if (sim.getDragElm() != this) {
             drawDots(object3D, point1, point2, curcount);
-        }
+        //}
     }
 
     public void doAdjust() {
@@ -895,6 +904,8 @@ public abstract class CircuitElm {
     public boolean isGraphicElmt() {
         return false;
     }
+
+    public abstract void updateObject3D();
 
     public abstract Object3D generateObject3D();
 

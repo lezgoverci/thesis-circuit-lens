@@ -3,9 +3,11 @@ package ph.edu.msuiit.circuitlens.circuit.elements;
 //import java.awt.Checkbox;
 //import java.awt.Graphics;
 //import java.awt.Point;
+import android.graphics.Color;
 import android.graphics.Point;
 
 import org.rajawali3d.Object3D;
+import org.rajawali3d.materials.Material;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.Line3D;
 
@@ -168,6 +170,20 @@ public class SwitchElm extends CircuitElm {
         return 's';
     }
 
+    Line3D thickLine;
+
+    @Override
+    public void updateObject3D() {
+        if(circuitElm3D == null) {
+            circuitElm3D = generateObject3D();
+        }
+        update2Leads();
+
+        if (position == 0) {
+            //doDots(circuitElm3D);
+        }
+    }
+
     public Object3D generateObject3D() {
         Object3D switch3d = new Object3D();
         int openhs = 16;
@@ -177,18 +193,13 @@ public class SwitchElm extends CircuitElm {
 
         draw2Leads(switch3d);
 
-        if (position == 0) {
-//            doDots(g);
-        }
-
 //        if (!needsHighlight()) {
 //            g.setColor(whiteColor);
 //        }
         interpPoint(lead1, lead2, ps, 0, hs1);
         interpPoint(lead1, lead2, ps2, 1, hs2);
 //
-        drawThickLine(switch3d,ps, ps2);
-        drawPosts(switch3d);
+        drawThickLine(switch3d, ps, ps2);
 
         return switch3d;
     }

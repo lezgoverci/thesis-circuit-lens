@@ -1,9 +1,17 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
+import android.graphics.Point;
+
 import org.rajawali3d.Object3D;
+import org.rajawali3d.materials.Material;
+
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
+
+import static java.lang.Math.PI;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class VoltageElm extends CircuitElm {
 
@@ -47,7 +55,7 @@ public class VoltageElm extends CircuitElm {
         }
         if ((flags & FLAG_COS) != 0) {
             flags &= ~FLAG_COS;
-            phaseShift = pi / 2;
+            phaseShift = PI / 2;
         }
         reset();
     }
@@ -72,10 +80,10 @@ public class VoltageElm extends CircuitElm {
     }
 
     public double triangleFunc(double x) {
-        if (x < pi) {
-            return x * (2 / pi) - 1;
+        if (x < PI) {
+            return x * (2 / PI) - 1;
         }
-        return 1 - (x - pi) * (2 / pi);
+        return 1 - (x - PI) * (2 / PI);
     }
 
     public void stamp() {
@@ -95,21 +103,21 @@ public class VoltageElm extends CircuitElm {
     }
 
     public double getVoltage() {
-        double w = 2 * pi * (sim.getT() - freqTimeZero) * frequency + phaseShift;
+        double w = 2 * PI * (sim.getT() - freqTimeZero) * frequency + phaseShift;
         switch (waveform) {
             case WF_DC:
                 return maxVoltage + bias;
             case WF_AC:
                 return Math.sin(w) * maxVoltage + bias;
             case WF_SQUARE:
-                return bias + ((w % (2 * pi) > (2 * pi * dutyCycle))
+                return bias + ((w % (2 * PI) > (2 * PI * dutyCycle))
                         ? -maxVoltage : maxVoltage);
             case WF_TRIANGLE:
-                return bias + triangleFunc(w % (2 * pi)) * maxVoltage;
+                return bias + triangleFunc(w % (2 * PI)) * maxVoltage;
             case WF_SAWTOOTH:
-                return bias + (w % (2 * pi)) * (maxVoltage / pi) - maxVoltage;
+                return bias + (w % (2 * PI)) * (maxVoltage / PI) - maxVoltage;
             case WF_PULSE:
-                return ((w % (2 * pi)) < 1) ? maxVoltage + bias : bias;
+                return ((w % (2 * PI)) < 1) ? maxVoltage + bias : bias;
             default:
                 return 0;
         }
@@ -150,71 +158,73 @@ public class VoltageElm extends CircuitElm {
 //        drawPosts(g);
 //    }
 
-//    public void drawWaveform(Graphics g, Point center) {
-//        g.setColor(needsHighlight() ? selectColor : Color.gray);
-//        setPowerColor(g, false);
-//        int xc = center.x;
-//        int yc = center.y;
-//        drawThickCircle(g, xc, yc, circleSize);
-//        int wl = 8;
-//        adjustBbox(xc - circleSize, yc - circleSize,
-//                xc + circleSize, yc + circleSize);
-//        int xc2;
-//        switch (waveform) {
-//            case WF_DC: {
-//                break;
-//            }
-//            case WF_SQUARE:
-//                xc2 = (int) (wl * 2 * dutyCycle - wl + xc);
-//                xc2 = max(xc - wl + 3, min(xc + wl - 3, xc2));
-//                drawThickLine(g, xc - wl, yc - wl, xc - wl, yc);
-//                drawThickLine(g, xc - wl, yc - wl, xc2, yc - wl);
-//                drawThickLine(g, xc2, yc - wl, xc2, yc + wl);
-//                drawThickLine(g, xc + wl, yc + wl, xc2, yc + wl);
-//                drawThickLine(g, xc + wl, yc, xc + wl, yc + wl);
-//                break;
-//            case WF_PULSE:
-//                yc += wl / 2;
-//                drawThickLine(g, xc - wl, yc - wl, xc - wl, yc);
-//                drawThickLine(g, xc - wl, yc - wl, xc - wl / 2, yc - wl);
-//                drawThickLine(g, xc - wl / 2, yc - wl, xc - wl / 2, yc);
-//                drawThickLine(g, xc - wl / 2, yc, xc + wl, yc);
-//                break;
-//            case WF_SAWTOOTH:
-//                drawThickLine(g, xc, yc - wl, xc - wl, yc);
-//                drawThickLine(g, xc, yc - wl, xc, yc + wl);
-//                drawThickLine(g, xc, yc + wl, xc + wl, yc);
-//                break;
-//            case WF_TRIANGLE: {
-//                int xl = 5;
-//                drawThickLine(g, xc - xl * 2, yc, xc - xl, yc - wl);
-//                drawThickLine(g, xc - xl, yc - wl, xc, yc);
-//                drawThickLine(g, xc, yc, xc + xl, yc + wl);
-//                drawThickLine(g, xc + xl, yc + wl, xc + xl * 2, yc);
-//                break;
-//            }
-//            case WF_AC: {
-//                int i;
-//                int xl = 10;
-//                int ox = -1, oy = -1;
-//                for (i = -xl; i <= xl; i++) {
-//                    int yy = yc + (int) (.95 * Math.sin(i * pi / xl) * wl);
-//                    if (ox != -1) {
-//                        drawThickLine(g, ox, oy, xc + i, yy);
-//                    }
-//                    ox = xc + i;
-//                    oy = yy;
-//                }
-//                break;
-//            }
-//        }
-//        if (sim.isShowingValues()) {
-//            String s = getShortUnitText(frequency, "Hz");
-//            if (dx == 0 || dy == 0) {
-//                drawValues(g, s, circleSize);
-//            }
-//        }
-//    }
+    public void drawWaveform(Object3D object3D, Point center) {
+        //g.setColor(needsHighlight() ? selectColor : Color.gray);
+        //setPowerColor(g, false);
+        int xc = center.x;
+        int yc = center.y;
+        drawThickCircle(object3D, xc, yc, circleSize);
+        int wl = 8;
+        adjustBbox(xc - circleSize, yc - circleSize,
+                xc + circleSize, yc + circleSize);
+        int xc2;
+        switch (waveform) {
+            case WF_DC: {
+                break;
+            }
+           case WF_SQUARE:
+                xc2 = (int) (wl * 2 * dutyCycle - wl + xc);
+                xc2 = max(xc - wl + 3, min(xc + wl - 3, xc2));
+               drawThickLine(object3D, xc - wl, yc - wl, xc - wl, yc);
+               drawThickLine(object3D, xc - wl, yc - wl, xc2, yc - wl);
+               drawThickLine(object3D, xc2, yc - wl, xc2, yc + wl);
+               drawThickLine(object3D, xc + wl, yc + wl, xc2, yc + wl);
+               drawThickLine(object3D, xc + wl, yc, xc + wl, yc + wl);
+               break;
+           case WF_PULSE:
+               yc += wl / 2;
+               drawThickLine(object3D, xc - wl, yc - wl, xc - wl, yc);
+               drawThickLine(object3D, xc - wl, yc - wl, xc - wl / 2, yc - wl);
+               drawThickLine(object3D, xc - wl / 2, yc - wl, xc - wl / 2, yc);
+               drawThickLine(object3D, xc - wl / 2, yc, xc + wl, yc);
+               break;
+           case WF_SAWTOOTH:
+               drawThickLine(object3D, xc, yc - wl, xc - wl, yc);
+               drawThickLine(object3D, xc, yc - wl, xc, yc + wl);
+               drawThickLine(object3D, xc, yc + wl, xc + wl, yc);
+               break;
+           case WF_TRIANGLE: {
+               int xl = 5;
+               drawThickLine(object3D, xc - xl * 2, yc, xc - xl, yc - wl);
+               drawThickLine(object3D, xc - xl, yc - wl, xc, yc);
+               drawThickLine(object3D, xc, yc, xc + xl, yc + wl);
+               drawThickLine(object3D, xc + xl, yc + wl, xc + xl * 2, yc);
+               break;
+            }
+            case WF_AC: {
+                int i;
+                int xl = 10;
+                int ox = -1, oy = -1;
+                for (i = -xl; i <= xl; i++) {
+                    int yy = yc + (int) (.95 * Math.sin(i * PI / xl) * wl);
+                    if (ox != -1) {
+                        drawThickLine(object3D, ox, oy, xc + i, yy);
+                    }
+                    ox = xc + i;
+                    oy = yy;
+                }
+               break;
+            }
+        }
+        /*
+        if (sim.isShowingValues()) {
+            String s = getShortUnitText(frequency, "Hz");
+            if (dx == 0 || dy == 0) {
+                drawValues(g, s, circleSize);
+            }
+        }
+        */
+    }
 
     public int getVoltageSourceCount() {
         return 1;
@@ -267,36 +277,54 @@ public class VoltageElm extends CircuitElm {
 //        }
     }
 
+    Material color1Material, color2Material;
+
     public Object3D generateObject3D() {
-        Object3D voltage3d = new Object3D();
+        Object3D voltage3D = new Object3D();
         setBbox(x, y, x2, y2);
-        draw2Leads(voltage3d);
+        draw2Leads(voltage3D);
+        color1Material = new Material();
+        color2Material = new Material();
         if (waveform == WF_DC) {
 //            setPowerColor(g, false);
-            int color1 = getVoltageColor(volts[0]);
+
             interpPoint2(lead1, lead2, ps1, ps2, 0, 10);
-            drawThickLine(voltage3d, ps1, ps2, color1);
-            int color2 =  getVoltageColor(volts[1]);
+            drawThickLine(voltage3D, ps1, ps2, color1Material);
+
             int hs = 16;
             setBbox(point1, point2, hs);
+
             interpPoint2(lead1, lead2, ps1, ps2, 1, hs);
-            drawThickLine(voltage3d, ps1, ps2, color2);
+            drawThickLine(voltage3D, ps1, ps2, color2Material);
         } else {
             setBbox(point1, point2, circleSize);
             interpPoint(lead1, lead2, ps1, .5);
-//            drawWaveform(g, ps1);
+            drawWaveform(voltage3D, ps1);
         }
-//        updateDotCount();
-//        if (sim.getDragElm() != this) {
-//            if (waveform == WF_DC) {
-//                drawDots(g, point1, point2, curcount);
-//            } else {
-//                drawDots(g, point1, lead1, curcount);
-//                drawDots(g, point2, lead2, -curcount);
-//            }
-//        }
-        drawPosts(voltage3d);
+        updateDotCount();
+        if (sim.getDragElm() != this) {
+            if (waveform == WF_DC) {
+                drawDots(voltage3D, point1, point2, curcount);
+            } else {
+                drawDots(voltage3D, point1, lead1, curcount);
+                drawDots(voltage3D, point2, lead2, -curcount);
+            }
+        }
+        drawPosts(voltage3D);
 
-        return voltage3d;
+        return voltage3D;
     }
+
+    @Override
+    public void updateObject3D() {
+        if(circuitElm3D == null) {
+            circuitElm3D = generateObject3D();
+        }
+        update2Leads();
+        int color1 =  getVoltageColor(volts[0]);
+        color1Material.setColor(color1);
+        int color2 =  getVoltageColor(volts[1]);
+        color2Material.setColor(color2);
+    }
+
 }

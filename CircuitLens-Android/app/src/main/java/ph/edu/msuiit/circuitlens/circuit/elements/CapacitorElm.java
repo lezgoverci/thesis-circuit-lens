@@ -157,38 +157,50 @@ public class CapacitorElm extends CircuitElm {
         return 'c';
     }
 
+    @Override
+    public void updateObject3D() {
+        if(circuitElm3D == null) {
+            circuitElm3D = generateObject3D();
+        }
+        int color1 = getVoltageColor(volts[0]);
+        color1Material.setColor(color1);
+        int color2 = getVoltageColor(volts[1]);
+        color2Material.setColor(color2);
+    }
+
+    Material color1Material, color2Material;
+
     public Object3D generateObject3D() {
         int hs = 12;
-        Object3D capacitor3d = new Object3D();
+        Object3D capacitor3D = new Object3D();
 
         setBbox(point1, point2, hs);
         // draw first lead and plate
-//        setVoltageColor(g, volts[0]);
-
-        drawThickLine(capacitor3d, point1, lead1);
+        color1Material = new Material();
+        drawThickLine(capacitor3D, point1, lead1, color1Material);
 //        setPowerColor(g, false);
-        drawThickLine(capacitor3d,plate1[0], plate1[1]);
+        drawThickLine(capacitor3D,plate1[0], plate1[1], color1Material);
 //        if (sim.isShowingPowerDissipation()) {
 //            g.setColor(Color.gray);
 //        }
 //
 //        // draw second lead and plate
-//        setVoltageColor(g, volts[1]);
-        drawThickLine(capacitor3d, point2, lead2);
-//        setPowerColor(g, false);
-        drawThickLine(capacitor3d, plate2[0], plate2[1]);
+        color2Material = new Material();
+        drawThickLine(capacitor3D, point2, lead2, color2Material);
+        //int color2 = getPowerColor(false);
+        drawThickLine(capacitor3D, plate2[0], plate2[1], color2Material);
 //
-//        updateDotCount();
-//        if (sim.getDragElm() != this) {
-//            drawDots(g, point1, lead1, curcount);
-//            drawDots(g, point2, lead2, -curcount);
-//        }
-        drawPosts(capacitor3d);
+        updateDotCount();
+        if (sim.getDragElm() != this) {
+            drawDots(capacitor3D, point1, lead1, curcount);
+            drawDots(capacitor3D, point2, lead2, -curcount);
+        }
+        drawPosts(capacitor3D);
 //        if (sim.isShowingValues()) {
 //            String s = getShortUnitText(capacitance, "F");
 //            drawValues(g, s, hs);
 //        }
 
-        return capacitor3d;
+        return capacitor3D;
     }
 }

@@ -2,6 +2,10 @@ package ph.edu.msuiit.circuitlens.circuit.elements;
 
 //import java.awt.Font;
 //import java.awt.Graphics;
+import org.opencv.core.Mat;
+import org.rajawali3d.Object3D;
+import org.rajawali3d.materials.Material;
+
 import java.util.StringTokenizer;
 
 public class RailElm extends VoltageElm {
@@ -30,12 +34,12 @@ public class RailElm extends VoltageElm {
         return 1;
     }
 
-//    @Override
-//    public void setPoints() {
-//        super.setPoints();
-//        lead1 = interpPoint(point1, point2, 1 - circleSize / dn);
-//    }
-//
+    @Override
+    public void setPoints() {
+        super.setPoints();
+        lead1 = interpPoint(point1, point2, 1 - circleSize / dn);
+    }
+
 //    @Override
 //    public void draw(Graphics g) {
 //        setBbox(point1, point2, circleSize);
@@ -71,6 +75,55 @@ public class RailElm extends VoltageElm {
 //            drawDots(g, point1, lead1, curcount);
 //        }
 //    }
+
+    @Override
+    public void updateObject3D() {
+        if(circuitElm3D == null) {
+            circuitElm3D = generateObject3D();
+        }
+        int color = getVoltageColor(volts[0]);
+        wireMaterial.setColor(color);
+    }
+
+    Material wireMaterial;
+   @Override
+    public Object3D generateObject3D() {
+       Object3D rail3D = new Object3D();
+        setBbox(point1, point2, circleSize);
+
+        wireMaterial = new Material();
+        drawThickLine(rail3D, point1, lead1, wireMaterial);
+        boolean clock = waveform == WF_SQUARE && (flags & FLAG_CLOCK) != 0;
+        if (waveform == WF_DC || waveform == WF_VAR || clock) {
+            //Font f = new Font("SansSerif", 0, 12);
+            //g.setFont(f);
+            //g.setColor(needsHighlight() ? selectColor : whiteColor);
+            //setPowerColor(g, false);
+            double v = getVoltage();
+            //String s = getShortUnitText(v, "V");
+            //if (Math.abs(v) < 1) {
+            //    s = showFormat.format(v) + "V";
+            //}
+            //if (getVoltage() > 0) {
+            //    s = "+" + s;
+            //}
+            //if (this instanceof AntennaElm) {
+            //    s = "Ant";
+            //}
+            //if (clock) {
+            //    s = "CLK";
+            //}
+            //drawCenteredText(g, s, x2, y2, true);
+        } else {
+            drawWaveform(rail3D, point2);
+        }
+        drawPosts(rail3D);
+        curcount = updateDotCount(-current, curcount);
+        if (sim.getDragElm() != this) {
+            drawDots(rail3D, point1, lead1, curcount);
+        }
+       return rail3D;
+    }
 
     @Override
     public double getVoltageDiff() {

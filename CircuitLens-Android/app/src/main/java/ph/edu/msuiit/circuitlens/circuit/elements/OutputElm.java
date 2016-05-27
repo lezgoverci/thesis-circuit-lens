@@ -29,6 +29,13 @@ public class OutputElm extends CircuitElm {
         return 1;
     }
 
+    @Override
+    public void updateObject3D() {
+        if(circuitElm3D == null) {
+            circuitElm3D = generateObject3D();
+        }
+    }
+
     public void setPoints() {
         super.setPoints();
         lead1 = new Point();

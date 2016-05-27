@@ -112,7 +112,7 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
 
-        runRotationTest();
+        //runRotationTest();
 
 
         if(!isSetInitCameraValues && isSetProjectionValues){
@@ -140,9 +140,9 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
     private void runRotationTest() {
 
-        double inputW = MathUtil.degreesToRadians(0);
-        double inputX = MathUtil.degreesToRadians(0);
-        double inputY = MathUtil.degreesToRadians(0);
+        double inputW = 0;
+        double inputX = 0;
+        double inputY = 0;
         double inputZ = 45;
 
         Quaternion quat = new Quaternion();
@@ -174,16 +174,16 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         // Orientation
         Quaternion orient = new Quaternion();
         // Yaw, Pitch, Roll
-        double yaw = mRotX;
-        double pitch = mRotY;
-        double roll = mRotZ;
+        double yaw = 0;
+        double pitch = 0;
+        double roll = mRotZ * -1.0;
         orient.fromEuler(yaw,pitch,roll);
-        getCurrentCamera().setOrientation(orient);
+        circuit3D.setOrientation(orient);
 
         // Translation
-        getCurrentCamera().setX(mPosX);
-        getCurrentCamera().setY(mPosY);
-        getCurrentCamera().setZ(mPosZ);
+        //getCurrentCamera().setX(mPosX);
+       // getCurrentCamera().setY(mPosY);
+        //getCurrentCamera().setZ(mPosZ);
     }
 
 

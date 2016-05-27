@@ -1,0 +1,24 @@
+from abc import ABCMeta, abstractmethod
+
+class Iterable:
+    __metaclass__ = ABCMeta
+    
+    #-----------------------------------------
+    # Getters
+    #-----------------------------------------
+     
+    @abstractmethod
+    def getData(self, n):
+        pass
+    
+    @abstractmethod
+    def size(self):
+        pass
+    
+    #-----------------------------------------
+    # Other Functions
+    #----------------------------------------- 
+    
+    @abstractmethod
+    def accessible(self, n):
+        pass

@@ -1,4 +1,3 @@
-from app.comon.circuit_elements.class_circuit_element import CircuitElement
 from class_queue import Queue
 
 class Circuit:
@@ -16,19 +15,28 @@ class Circuit:
     # Other Functions
     #-----------------------------------------
     
+    def connect(self, circuitElementOne, portOne, circuitElementTwo, portTwo):
+        #use the same coordinates here
+        
+        circuitElementOne.connectToElement(portOne, circuitElementTwo)
+        circuitElementTwo.connectToElement(portTwo, circuitElementOne)
+    
     def generateNetlist(self):
-        if CircuitElement != type(self.__root):
+        import circuit_elements.class_circuit_element as ce
+        import circuit_elements.class_null_circuit_element as nce
+        
+        if not isinstance(self.__root, ce.CircuitElement):
             return ''
         
         queue = Queue()
         queue.enqueue(self.__root)
         
-        netlist = ''
+        netlist = []
         
         while not queue.isEmpty():
             current_node = queue.dequeue()
             current_node.visited = True
-            netlist += current_node.dump()
+            netlist.append(current_node.dump())
             
             iterator = current_node.getIterator()
             iterator.reset()
@@ -39,10 +47,12 @@ class Circuit:
                 try:
                     neighbour.visited
                 except AttributeError:
-                    queue.enqueue(neighbour)
+                    neighbour.visited = True
+                    if not isinstance(neighbour, nce.NullCircuitElement):
+                        queue.enqueue(neighbour)
                 
                 iterator.next()
         
-        return netlist
+        return '\n'.join(netlist)
         
         

@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
-from class_ports import Ports
-from app.common.class_iterator import Iterator
+import class_ports as p
+import common.class_circuit_element_iterator as cei
 
 class CircuitElement(object):
     __metaclass__ = ABCMeta
@@ -10,13 +10,13 @@ class CircuitElement(object):
         self._capacitance = 0
         self._inductance = 0
         self._voltage = 0
-        self._current: 0
+        self._current = 0
         self._frequency = 0
         
         self._fromPoint = (0, 0)
         self._ToPoint = (0, 0)
         
-        self._ports = Ports(numPorts)
+        self._ports = p.Ports(numPorts)
         self.setMainProperty(value)
     
     #-----------------------------------------
@@ -39,9 +39,17 @@ class CircuitElement(object):
         self._toPoint = toPoint
         return self
     
+    def setBoundaries(self, fromPoint, toPoint):
+        self.setFromPoint(fromPoint)
+        self.setToPoint(toPoint)
+        return self
+    
     @abstractmethod
     def setMainProperty(self, value):
         pass
+    
+    def _setAdditionalDumpables(self):
+        self._dumpables.append(str(self.getMainProperty()))
     
     #-----------------------------------------
     # Getters
@@ -57,7 +65,7 @@ class CircuitElement(object):
         return self._current
     
     def getIterator(self):
-        return Iterator(self._ports)
+        return cei.CircuitElementIterator(self._ports)
     
     def getFrequency(self):
         return self._frequency
@@ -67,9 +75,6 @@ class CircuitElement(object):
     
     def getToPoint(self):
         return self._toPoint
-    
-    def getAdditionalDump(self):
-        return ""
     
     @abstractmethod
     def getMainProperty(self):
@@ -88,12 +93,13 @@ class CircuitElement(object):
         return self
     
     def dump(self):
-        dumpables = [
+        self._dumpables = [
                         self.getDumpType(),
                         str(self._fromPoint[0]), str(self._fromPoint[1]),
                         str(self._toPoint[0]), str(self._toPoint[1]),
-                        str(self._frequency),
-                        str(self.getMainProperty())
+                        str(self._frequency)
                     ]
         
-        return " ".join(dumpables) + self.__getAdditionalDump()
+        self._setAdditionalDumpables()
+        
+        return ' '.join(self._dumpables)

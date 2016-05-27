@@ -1,7 +1,7 @@
-from app.common.class_iterable import Iterable
-from class_circuit_elements_factory import CircuitElementsFactory
+import common.class_iterable as i
+import class_circuit_element_factory as cef
 
-class Ports(Iterable):
+class Ports(i.Iterable):
     def __init__(self, size):
         self.__size = size
         self.__circuitElements = {}
@@ -14,7 +14,7 @@ class Ports(Iterable):
         if not self.accessible(portNum):
             raise LookupError
         
-        return self.__circuitElements.get(portNum, CircuitElementFactory.create('null'))
+        return self.__circuitElements.get(portNum, cef.CircuitElementFactory.create('null'))
     
     def size(self):
         return self.__size
@@ -31,4 +31,4 @@ class Ports(Iterable):
         return self
     
     def accessible(self, portNum):
-        return portNum >= 0 and portNum < size
+        return portNum >= 0 and portNum < self.__size

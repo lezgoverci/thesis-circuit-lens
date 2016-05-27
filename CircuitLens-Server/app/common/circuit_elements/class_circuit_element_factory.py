@@ -1,29 +1,29 @@
-from class_capacitor import Capacitor
-from class_resistor import Resistor
-from class_inductor import Inductor
-from class_toggle_switch import ToggleSwitch
-from class_wire import Wire
-from class_current_source import CurrentSource
-from class_voltage_source import VoltageSource
-from class_null_circuit_element import NullCircuitElement
+import class_capacitor as c
+import class_resistor as r
+import class_inductor as i
+import class_toggle_switch as ts
+import class_wire as w
+import class_current_source as cs
+import class_voltage_source as vs
+import class_null_circuit_element as nce
 
 class CircuitElementFactory:
     @staticmethod
     def create(elemType, value=0):
         if 'voltage_source' == elemType:
-            return VoltageSource(value)
+            return vs.VoltageSource(value)
         elif 'current_source' == elemType:
-            return CurrentSource(value)
+            return cs.CurrentSource(value)
         elif 'capacitor' == elemType:
-            return Capacitor(value)
+            return c.Capacitor(value)
         elif 'resistor' == elemType:
-            return Resistor(value)
+            return r.Resistor(value)
         elif 'inductor' == elemType:
-            return Inductor(value)
+            return i.Inductor(value)
         elif 'toggle_switch' == elemType:
-            return ToggleSwitch(value)
+            return ts.ToggleSwitch(value)
         elif 'wire' == elemType:
-            return Wire(value)
+            return w.Wire(value)
         else:
-            return NullCircuitElement(value)
+            return nce.NullCircuitElement(value)
             

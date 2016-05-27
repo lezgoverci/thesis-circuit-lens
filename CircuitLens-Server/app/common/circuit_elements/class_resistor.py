@@ -1,6 +1,6 @@
-from class_circuit_element import CircuitElement
+import class_circuit_element as ce
 
-class Resistor(CircuitElement):
+class Resistor(ce.CircuitElement):
     def __init__(self, value=0):
         super(Resistor, self).__init__(value, 2)
         self._frequency = 0

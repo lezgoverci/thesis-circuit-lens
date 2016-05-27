@@ -1,9 +1,9 @@
-from class_circuit_element import CircuitElement
+import class_circuit_element as ce
 
-class Switch(CircuitElement):
-    def __init__(self, value=False):
-        self._state = False
-        super(Resistor, self).__init__(value, 2)
+class Switch(ce.CircuitElement):
+    def __init__(self, value=0):
+        self._state = 0
+        super(Switch, self).__init__(value, 2)
         self._frequency = 0
     
     #-----------------------------------------
@@ -13,7 +13,7 @@ class Switch(CircuitElement):
     def setMainProperty(self, value):
         self._state = value
         return self
-    
+
     #-----------------------------------------
     # Getters
     #-----------------------------------------

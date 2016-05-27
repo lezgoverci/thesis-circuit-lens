@@ -1,6 +1,6 @@
-from class_circuit_element import CircuitElement
+import class_circuit_element as ce
 
-class NullCircuitElement(CircuitElement):
+class NullCircuitElement(ce.CircuitElement):
     def __init__(self, value=0):
         super(NullCircuitElement, self).__init__(value, 0)
         self._frequency = 0

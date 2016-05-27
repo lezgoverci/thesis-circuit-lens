@@ -15,12 +15,14 @@ class Circuit:
     # Other Functions
     #-----------------------------------------
     
-    def connect(self, circuitElementOne, portOne, circuitElementTwo, portTwo):
-        #use the same coordinates here
+    def connect(self, connections):
+        if not connections:
+            return
         
-        circuitElementOne.connectToElement(portOne, circuitElementTwo)
-        circuitElementTwo.connectToElement(portTwo, circuitElementOne)
-    
+        for node, connectibles in connections.iteritems():
+            for portNum, circuitElement in connectibles:
+                node.connect(portNum, circuitElement)
+        
     def generateNetlist(self):
         import circuit_elements.class_circuit_element as ce
         import circuit_elements.class_null_circuit_element as nce
@@ -38,20 +40,29 @@ class Circuit:
             current_node.visited = True
             netlist.append(current_node.dump())
             
-            iterator = current_node.getIterator()
-            iterator.reset()
+            ports_iterator = current_node.getIterator()
+            ports_iterator.reset()
             
-            while iterator.valid():
-                neighbour = iterator.getData()
+            while ports_iterator.valid():
+                current_node = ports_iterator.getData().getNode()
                 
-                try:
-                    neighbour.visited
-                except AttributeError:
-                    neighbour.visited = True
-                    if not isinstance(neighbour, nce.NullCircuitElement):
-                        queue.enqueue(neighbour)
+                if current_node:
+                    ce_iterator = current_node.getIterator()
+                    ce_iterator.reset()
+                    
+                    while ce_iterator.valid():
+                        _, ce = ce_iterator.getData()
+                        
+                        try:
+                            ce.visited
+                        except AttributeError:
+                            ce.visited = True
+                            if not isinstance(ce, nce.NullCircuitElement):
+                                queue.enqueue(ce)
+                        
+                        ce_iterator.next()
                 
-                iterator.next()
+                ports_iterator.next()
         
         return '\n'.join(netlist)
         

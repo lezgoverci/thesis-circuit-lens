@@ -1,6 +1,6 @@
 import class_iterator as i
 
-class CircuitElementIterator(i.Iterator):
+class ListIterableIterator(i.Iterator):
     def __init__(self, iterable=None):
         self.__iterable = iterable
         self.__currentIndex = 0

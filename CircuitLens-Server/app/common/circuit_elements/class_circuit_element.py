@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
-import class_ports as p
-import common.class_circuit_element_iterator as cei
+import common.class_ports as p
+import common.class_list_iterable_iterator as lii
 
 class CircuitElement(object):
     __metaclass__ = ABCMeta
@@ -12,9 +12,6 @@ class CircuitElement(object):
         self._voltage = 0
         self._current = 0
         self._frequency = 0
-        
-        self._fromPoint = (0, 0)
-        self._ToPoint = (0, 0)
         
         self._ports = p.Ports(numPorts)
         self.setMainProperty(value)
@@ -29,19 +26,6 @@ class CircuitElement(object):
     
     def setCurrent(self, current):
         self._current = current
-        return self
-    
-    def setFromPoint(self, fromPoint):
-        self._fromPoint = fromPoint
-        return self
-    
-    def setToPoint(self, toPoint):
-        self._toPoint = toPoint
-        return self
-    
-    def setBoundaries(self, fromPoint, toPoint):
-        self.setFromPoint(fromPoint)
-        self.setToPoint(toPoint)
         return self
     
     @abstractmethod
@@ -65,16 +49,13 @@ class CircuitElement(object):
         return self._current
     
     def getIterator(self):
-        return cei.CircuitElementIterator(self._ports)
+        return lii.ListIterableIterator(self._ports)
     
     def getFrequency(self):
         return self._frequency
     
-    def getFromPoint(self):
-        return self._fromPoint
-    
-    def getToPoint(self):
-        return self._toPoint
+    def getPort(self, portNum):
+        return self._ports.getData(portNum)
     
     @abstractmethod
     def getMainProperty(self):
@@ -87,18 +68,23 @@ class CircuitElement(object):
     #-----------------------------------------
     # Other Functions
     #-----------------------------------------
-    
-    def connectToElement(self, portNum, circuitElement):
-        self._ports.connect(portNum, circuitElement)
-        return self
-    
+
     def dump(self):
-        self._dumpables = [
-                        self.getDumpType(),
-                        str(self._fromPoint[0]), str(self._fromPoint[1]),
-                        str(self._toPoint[0]), str(self._toPoint[1]),
-                        str(self._frequency)
-                    ]
+        self._dumpables = [self.getDumpType()]
+        
+        ports_iterator = self.getIterator()
+        ports_iterator.reset()
+        
+        while ports_iterator.valid():
+            location = ports_iterator.getData().getNode().getLocation()
+            
+            if location:
+                self._dumpables.append(str(location[0]))
+                self._dumpables.append(str(location[1]))
+            
+            ports_iterator.next()
+        
+        self._dumpables.append(str(self._frequency))
         
         self._setAdditionalDumpables()
         

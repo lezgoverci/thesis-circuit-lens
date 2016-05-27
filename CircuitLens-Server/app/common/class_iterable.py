@@ -12,6 +12,10 @@ class Iterable:
         pass
     
     @abstractmethod
+    def getIterator(self):
+        pass
+    
+    @abstractmethod
     def size(self):
         pass
     

@@ -1,6 +1,5 @@
 from abc import ABCMeta, abstractmethod
 import common.class_ports as p
-import common.class_list_iterable_iterator as lii
 
 class CircuitElement(object):
     __metaclass__ = ABCMeta
@@ -47,15 +46,15 @@ class CircuitElement(object):
     
     def getCurrent(self):
         return self._current
-    
-    def getIterator(self):
-        return lii.ListIterableIterator(self._ports)
-    
+
     def getFrequency(self):
         return self._frequency
     
     def getPort(self, portNum):
         return self._ports.getData(portNum)
+    
+    def getIterator(self):
+        return self._ports.getIterator()
     
     @abstractmethod
     def getMainProperty(self):
@@ -72,7 +71,7 @@ class CircuitElement(object):
     def dump(self):
         self._dumpables = [self.getDumpType()]
         
-        ports_iterator = self.getIterator()
+        ports_iterator = self._ports.getIterator()
         ports_iterator.reset()
         
         while ports_iterator.valid():

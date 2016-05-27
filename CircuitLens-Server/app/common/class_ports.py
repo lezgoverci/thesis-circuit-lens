@@ -1,5 +1,6 @@
 import common.class_iterable as i
 import class_port as p
+import class_list_iterable_iterator as lii
 
 class Ports(i.Iterable):
     def __init__(self, size):
@@ -18,6 +19,9 @@ class Ports(i.Iterable):
             raise LookupError
         
         return self.__ports[portNum]
+    
+    def getIterator(self):
+        return lii.ListIterableIterator(self)
     
     def size(self):
         return self.__size

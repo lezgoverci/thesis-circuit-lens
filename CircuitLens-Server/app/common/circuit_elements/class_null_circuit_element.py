@@ -2,7 +2,7 @@ from class_circuit_element import CircuitElement
 
 class NullCircuitElement(CircuitElement):
     def __init__(self, value=0):
-        super(NullCircuitElement, self).__init__(value, 2)
+        super(NullCircuitElement, self).__init__(value, 0)
         self._frequency = 0
     
     #-----------------------------------------

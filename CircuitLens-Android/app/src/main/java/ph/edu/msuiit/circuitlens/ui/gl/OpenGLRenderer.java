@@ -219,6 +219,7 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
     private void useTransformationValues() {
 
+
         circuit3D.setX(mPosX * 100.0);
         circuit3D.setY(mPosY * -100.0);
         circuit3D.setZ(mPosZ * -100.0);
@@ -227,9 +228,9 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         Quaternion orient = new Quaternion();
 
         // Yaw, Pitch, Roll
-        double yaw = circuit3D.getOrientation().getYaw() + (mRotY - mInitRotY);
-        double pitch = circuit3D.getOrientation().getPitch() + (mRotX - mInitRotX);
-        double roll = circuit3D.getOrientation().getRoll() + ((mRotZ * -1.0) - mInitRotZ);
+        double yaw = (mRotY - mInitRotY);
+        double pitch = ((mRotX* -1.0) - mInitRotX);
+        double roll = ((mRotZ * -1.0) - mInitRotZ);
         orient.fromEuler(yaw,pitch,roll);
         circuit3D.setOrientation(orient);
     }

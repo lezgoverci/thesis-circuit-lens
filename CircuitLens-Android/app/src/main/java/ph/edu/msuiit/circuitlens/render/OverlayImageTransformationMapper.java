@@ -453,7 +453,7 @@ public class OverlayImageTransformationMapper {
         // find the homography
         //TODO check correspondence
        if(trackingImageHullPoints.size() == currentFrameHullPoints.size()){
-           mCurrentFrameHomography = Calib3d.findHomography(mTrackingImageApproxHull2D,mCurrentFrameApproxHull2D,Calib3d.RANSAC,1.0);
+           mCurrentFrameHomography = Calib3d.findHomography(mTrackingImageApproxHull2D,mCurrentFrameApproxHull2D,Calib3d.RANSAC,50.0);
            mIsHomographyFound = true;
        }
 

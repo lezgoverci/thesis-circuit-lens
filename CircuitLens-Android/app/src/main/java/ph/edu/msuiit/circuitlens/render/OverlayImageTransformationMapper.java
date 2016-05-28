@@ -476,7 +476,7 @@ public class OverlayImageTransformationMapper {
     }
 
     public int[] getDimens() {
-        return new int[]{mCircuitX,mCircuitY,mCircuitWidth,mCircuitHeight,mCameraWidth,mCameraHeight};
+        return new int[]{mCircuitX,mCircuitY,mCircuitWidth,mCircuitHeight};
     }
 
     public double getAspectRatio(){

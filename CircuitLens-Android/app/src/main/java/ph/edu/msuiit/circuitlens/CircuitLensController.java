@@ -76,6 +76,7 @@ public class CircuitLensController{
         MatOfDouble projection = mCameraAdapter.getProjectionCV();
 
         mMapper.setProjection(projection,aspectRatio,width,height);
+        mRenderer.setCameraValues(width,height);
     }
 
 
@@ -100,6 +101,7 @@ public class CircuitLensController{
         mSurface.setTransparent(true);
         mSurface.setSurfaceRenderer(mRenderer);
         mSurface.setZOrderMediaOverlay(true);
+
     }
 
     private void updateRendererCameraPose() {

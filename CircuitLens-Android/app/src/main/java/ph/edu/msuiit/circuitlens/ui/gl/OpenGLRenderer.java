@@ -50,6 +50,7 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     private double mSize;
     private int mCameraWidth;
     private int mCameraHeight;
+    private double mScaleInit;
 
 
     public OpenGLRenderer(Context context) {
@@ -90,9 +91,11 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         cirsim.readSetup(expectedNetlist);
         cirsim.analyzeCircuit();
         cirsim.runCircuit();
-        cirsim.setStopped(true);
+        cirsim.setStopped(false);
         cirsim.draw();
         circuit3D = cirsim.getCircuitCanvas();
+        //circuit3D.drawBounds(circuit3D);
+        getCurrentScene().addChild(circuit3D);
 
 
 
@@ -108,45 +111,21 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         // Set Viewport transformation
         setInitViewportTransformation();
 
-        getCurrentScene().addChild(circuit3D);
 
 
-
-
-        // show bounds of circuitcanvas for debugging
-        //Object3D bounds3D = new Object3D();
-        //circuit3D.drawBounds(bounds3D);
-        //bounds3D.setScale(1,-1,1);
-        //getCurrentScene().addChild(bounds3D);
-        //circuit3D.setZ(-500);
-        // point camera to the center of the circuit
-
-
-//        getCurrentCamera().setX(circuit3D.getCircuitCenterX());
-//        getCurrentCamera().setY(-circuit3D.getCircuitCenterY());
-//
-//
-      // getCurrentCamera().getFarPlane();
-//        getCurrentCamera().setFarPlane(5000);
-
-
-
-
-
-
-
-        //TODO rotate the object not the camera
-//        mInitGlPosX = getCurrentCamera().getX();
-//        mInitGlPosY = getCurrentCamera().getY();
-//        mInitGlPosZ = getCurrentCamera().getZ();
 
     }
 
     private void setInitViewportTransformation() {
 
-        circuit3D.setScale(1,-1,1);
+        //double scale = mCameraHeight / (((circuit3D.getCircuitHeight() / 2) + circuit3D.getCircuitTopLeftY()) * 2);
+        //double scale = mTargetCircuitHeight / circuit3D.getCircuitHeight();
+
+        mScaleInit = 1.0;
+
+        circuit3D.setScale(mScaleInit,-mScaleInit,mScaleInit);
         //TODO fix Z-axis scaling
-        circuit3D.setZ(-500.0);
+        //circuit3D.setZ(-70.0);
 
     }
 
@@ -159,10 +138,20 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
     private void setInitModellingTransformation() {
         // default scene and circuit z = 0.0;
-        double initX = circuit3D.getX() - circuit3D.getCircuitCenterX();
-        double initY = circuit3D.getY() + circuit3D.getCircuitCenterY();
-        circuit3D.setX(initX);
+//        //double initX = circuit3D.getX() - circuit3D.getCircuitCenterX();
+//        double initX = (circuit3D.getCircuitWidth() / 2.0);
+//        //double initY = circuit3D.getY() + circuit3D.getCircuitCenterY();
+//        double initY = (circuit3D.getCircuitHeight() / 2.0);
+//        circuit3D.moveRight(initX - 500);
+//        circuit3D.moveUp(initY + 500);
+
+        int initX = (int) ((circuit3D.getCircuitWidth() / 2) + circuit3D.getCircuitTopLeftX());
+        int initY = (int) ((circuit3D.getCircuitHeight()/ 2) + circuit3D.getCircuitTopLeftY());
+
+        circuit3D.setX(initX * -1);
         circuit3D.setY(initY);
+
+
 
     }
 
@@ -271,13 +260,15 @@ public class OpenGLRenderer  extends RajawaliRenderer {
             mTargetCircuitWidth = dimens[2];
             mTargetCircuitHeight = dimens[3];
 
-            mInitPosX = mTargetCircuitX - (mTargetCircuitWidth / 2.0);
-            mInitPosY = mTargetCircuitY + (mTargetCircuitHeight / 2.0);
+            //mInitPosX = mTargetCircuitX - (mTargetCircuitWidth / 2.0);
+           // mInitPosY = mTargetCircuitY + (mTargetCircuitHeight / 2.0);
+            mInitPosX = (circuit3D.getCircuitWidth() / 2.0) * -1.0;
+            mInitPosY = (circuit3D.getCircuitHeight() / 2.0);
             mInitPosZ = 0;
 
             // Camera height and width
-            mCameraWidth = dimens[4];
-            mCameraHeight = dimens[5];
+           // mCameraWidth = dimens[4];
+           // mCameraHeight = dimens[5];
 
             // initial rotation
             mInitRotX = rotXraw;
@@ -302,6 +293,11 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
         // Projection values are set
         isSetProjectionValues = true;
+    }
+
+    public void setCameraValues(int width, int height) {
+        mCameraHeight = height;
+        mCameraWidth = width;
     }
 }
 

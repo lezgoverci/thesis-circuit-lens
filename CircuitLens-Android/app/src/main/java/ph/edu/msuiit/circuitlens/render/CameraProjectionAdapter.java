@@ -120,4 +120,11 @@ public class CameraProjectionAdapter {
         return mProjectionCV;
     }
 
+    public int getCameraWidth() {
+        return mWidthPx;
+    }
+
+    public int getCameraHeight() {
+        return mHeightPx;
+    }
 }

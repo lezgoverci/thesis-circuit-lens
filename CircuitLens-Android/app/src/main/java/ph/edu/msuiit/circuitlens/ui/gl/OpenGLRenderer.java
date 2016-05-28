@@ -5,11 +5,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import org.opencv.core.MatOfDouble;
+import org.rajawali3d.ATransformable3D;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.renderer.RajawaliRenderer;
+import org.rajawali3d.scene.RajawaliScene;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitCanvas3D;
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
@@ -39,7 +41,15 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     private double mInitGlPosZ;
 
     private double testValue = 0.0;
-
+    private boolean isSetInitialValues = false;
+    private int mTargetCircuitWidth = 0;
+    private int mTargetCircuitHeight = 0;
+    private int mTargetCircuitX;
+    private int mTargetCircuitY;
+    private int mInitZ = 10;
+    private double mSize;
+    private int mCameraWidth;
+    private int mCameraHeight;
 
 
     public OpenGLRenderer(Context context) {
@@ -83,29 +93,83 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         cirsim.setStopped(false);
         cirsim.draw();
         circuit3D = cirsim.getCircuitCanvas();
-        circuit3D.setScale(1,-1,1);
+
+
+
+        // Set viewing transformation
+        setInitViewingTransformation();
+
+        // Set modelling transformation
+        setInitModellingTransformation();
+
+        // Set Projection transformation
+        setInitProjectionTransformation();
+
+        // Set Viewport transformation
+        setInitViewportTransformation();
+
+        getCurrentScene().addChild(circuit3D);
+
+
+
 
         // show bounds of circuitcanvas for debugging
         //Object3D bounds3D = new Object3D();
         //circuit3D.drawBounds(bounds3D);
         //bounds3D.setScale(1,-1,1);
         //getCurrentScene().addChild(bounds3D);
-
+        //circuit3D.setZ(-500);
         // point camera to the center of the circuit
-        getCurrentCamera().setX(circuit3D.getCircuitCenterX());
-        getCurrentCamera().setY(-circuit3D.getCircuitCenterY());
 
 
-        getCurrentCamera().setZ(500);
-        getCurrentCamera().setFarPlane(5000);
+//        getCurrentCamera().setX(circuit3D.getCircuitCenterX());
+//        getCurrentCamera().setY(-circuit3D.getCircuitCenterY());
+//
+//
+      // getCurrentCamera().getFarPlane();
+//        getCurrentCamera().setFarPlane(5000);
 
-        getCurrentScene().addChild(circuit3D);
+
+
+
+
 
 
         //TODO rotate the object not the camera
-        mInitGlPosX = getCurrentCamera().getX();
-        mInitGlPosY = getCurrentCamera().getY();
-        mInitGlPosZ = getCurrentCamera().getZ();
+//        mInitGlPosX = getCurrentCamera().getX();
+//        mInitGlPosY = getCurrentCamera().getY();
+//        mInitGlPosZ = getCurrentCamera().getZ();
+
+    }
+
+    private void setInitViewportTransformation() {
+
+        circuit3D.setScale(1,-1,1);
+        double ratio = mTargetCircuitWidth / circuit3D.getCircuitWidth();
+        //circuit3D.setZ(circuit3D.getZ() * ratio);
+        mSize = ratio;
+
+    }
+
+    private void setInitProjectionTransformation() {
+        // default near plane z = 1.0
+        // default far plane z = 120.0
+        // default FOV = 45.0
+        getCurrentCamera().setFarPlane(5000);
+    }
+
+    private void setInitModellingTransformation() {
+        // default scene and circuit z = 0.0;
+        double initX = circuit3D.getX() - circuit3D.getCircuitCenterX();
+        double initY = circuit3D.getY() + circuit3D.getCircuitCenterY();
+        circuit3D.setX(initX);
+        circuit3D.setY(initY);
+        double xx =circuit3D.getX();
+        double yy = circuit3D.getY();
+    }
+
+    private void setInitViewingTransformation() {
+        // Default camera z = 4.0
     }
 
     @Override
@@ -114,22 +178,8 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
         //runRotationTest();
 
-
-        if(!isSetInitCameraValues && isSetProjectionValues){
-            mInitPosX = mPosX;
-            mInitPosY = mPosY;
-            mInitPosZ = mPosZ;
-
-            mInitRotX = mRotX;
-            mInitRotY = mRotY;
-            mInitRotZ = mRotZ;
-
-            isSetInitCameraValues = true;
-        }
-
-
         // Use transformation values
-        if(isSetProjectionValues && isSetInitCameraValues){
+        if(isSetProjectionValues && isSetInitialValues){
             useTransformationValues();
         } else{
             //circuitDiagram.rotate(Vector3.Axis.X, 5);
@@ -171,19 +221,24 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
     private void useTransformationValues() {
 
+        circuit3D.setX(mPosX / mSize);
+        circuit3D.setY(mPosY / mSize);
+        //circuit3D.setZ(mPosZ);
+
         // Orientation
         Quaternion orient = new Quaternion();
         // Yaw, Pitch, Roll
-        double yaw = 0;
-        double pitch = 0;
-        double roll = mRotZ * -1.0;
+        double yaw = mRotY;
+        double pitch = mRotX;
+        double roll = mRotZ;
         orient.fromEuler(yaw,pitch,roll);
-        circuit3D.setOrientation(orient);
+        //circuit3D.setOrientation(orient);
 
         // Translation
         //getCurrentCamera().setX(mPosX);
        // getCurrentCamera().setY(mPosY);
         //getCurrentCamera().setZ(mPosZ);
+
     }
 
 
@@ -199,31 +254,58 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         }
     }
 
-    public void setProjectionValues(MatOfDouble rVec, MatOfDouble tVec, float[] pose) {
-        // Rotation values in radians
-        mRotX = MathUtil.radiansToDegrees(rVec.toArray()[0]);
-        mRotY = MathUtil.radiansToDegrees(rVec.toArray()[1]);
-        mRotZ = MathUtil.radiansToDegrees(rVec.toArray()[2]);
 
-        // Position values
-        if(!isSetInitCameraValues){
-            mPosX = mInitPosX;
-            mPosY = mInitPosY;
-            mPosZ = mInitPosZ;
+    // After homography is found
+    public void setProjectionValues(MatOfDouble rVec, MatOfDouble tVec, int[] dimens) {
+        // Raw rotation values in radians
+        double rotXraw = MathUtil.radiansToDegrees(rVec.toArray()[0]);
+        double rotYraw = MathUtil.radiansToDegrees(rVec.toArray()[1]);
+        double rotZraw = MathUtil.radiansToDegrees(rVec.toArray()[2]);
+        
+        // Raw translation values
+        double posXraw = tVec.toArray()[0];
+        double posYraw = tVec.toArray()[1];
+        double posZraw = tVec.toArray()[2];
+
+        // If target circuit dimension is not set
+        if(!isSetInitialValues){
+            // initial position
+            mTargetCircuitX = dimens[0];
+            mTargetCircuitY = dimens[1];
+
+            // target dimension
+            mTargetCircuitWidth = dimens[2];
+            mTargetCircuitHeight = dimens[3];
+
+            mInitPosX = mTargetCircuitX - (mTargetCircuitWidth / 2.0);
+            mInitPosY = mTargetCircuitY + (mTargetCircuitHeight / 2.0);
+            //mInitPosZ = posZraw;
+
+            // Camera height and width
+            mCameraWidth = dimens[4];
+            mCameraHeight = dimens[5];
+
+            // initial rotation
+            mInitRotX = rotXraw;
+            mInitRotY = rotYraw;
+            mInitRotZ = rotZraw;
+
+                        
+            isSetInitialValues = true;
         }
-        else{
-            mPosX = mInitGlPosX + (tVec.toArray()[0] - mInitPosX);
-            mPosY = mInitGlPosY + (tVec.toArray()[1] - mInitPosY);
-            mPosZ = mInitGlPosZ + (tVec.toArray()[2] - mInitPosZ);
-        }
+
+        mPosX = posXraw;
+        mPosY = posYraw;
+        mPosZ = posZraw;
+
+        mRotX = rotXraw;
+        mRotY = rotYraw;
+        mRotZ = rotZraw;
+
 
 
         // OpenGL pose
-        mGLpose = pose;
-
-        Log.d("setValRot",mRotX + " " + mRotY + " " + mRotZ + " ");
-        Log.d("setValTrans",mPosX + " " + mPosY + " " + mPosX + " ");
-        Log.d("setValPose",pose.toString());
+        //mGLpose = pose;
 
         // Projection values are set
         isSetProjectionValues = true;

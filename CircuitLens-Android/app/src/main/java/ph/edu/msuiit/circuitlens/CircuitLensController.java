@@ -68,7 +68,14 @@ public class CircuitLensController{
     public void onResume(){
 
         mMapper = new OverlayImageTransformationMapper();
-        mMapper.setProjection(mCameraAdapter.getProjectionCV());
+
+
+        double aspectRatio = mCameraAdapter.getAspectRatio();
+        int width = mCameraAdapter.getCameraWidth();
+        int height = mCameraAdapter.getCameraHeight();
+        MatOfDouble projection = mCameraAdapter.getProjectionCV();
+
+        mMapper.setProjection(projection,aspectRatio,width,height);
     }
 
 
@@ -99,7 +106,7 @@ public class CircuitLensController{
         //compute rotation and translation values
         //mMapper.setTransformationMatrixValues();
         // set the computed values to renderer
-        mRenderer.setProjectionValues(mMapper.getRVec(),mMapper.getTVec(),mMapper.getmGLPose());
+        mRenderer.setProjectionValues(mMapper.getRVec(),mMapper.getTVec(),mMapper.getDimens());
     }
 
 //    public void draw(Mat src, Mat dst){

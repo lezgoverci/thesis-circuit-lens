@@ -68,6 +68,13 @@ public class OverlayImageTransformationMapper {
     private boolean             mIsHomographyFound;
     private boolean             mIsTransformed;
     private MatOfDouble         mProjection;
+    private int                 mCircuitWidth;
+    private int                 mCircuitHeight;
+    private int mCircuitX;
+    private int mCircuitY;
+    private double mCameraAspectRatio;
+    private int mCameraWidth;
+    private int mCameraHeight;
 
 
     /** CONSTRUCTOR **/
@@ -184,6 +191,7 @@ public class OverlayImageTransformationMapper {
         Imgproc.line(currentFrame,points.get(2),points.get(3),mLineColor);
         Imgproc.line(currentFrame,points.get(3),points.get(0),mLineColor);
 
+
     }
 
     public boolean isHomographyFound(){
@@ -201,36 +209,36 @@ public class OverlayImageTransformationMapper {
         Log.d("projection2D",mCurrentFrameBoxPoints2D.dump());
         mIsTransformed = Calib3d.solvePnP(mTrackingImageBoxCorners3D,mCurrentFrameBoxPoints2D,mProjection,mDistCoeffs,mRVec,mTVec);
 
-        final double[] rVecArray = mRVec.toArray();
-        rVecArray[0] *= -1.0; // negate x angle
-        mRVec.fromArray(rVecArray);
-
-        // Convert the Euler angles to a 3x3 rotation matrix.
-        Calib3d.Rodrigues(mRVec, mRotation);
-
-        Log.d("setValTrue",mIsTransformed +"");
-
-
-        final double[] tVecArray = mTVec.toArray();
-
-        // OpenCV's matrix format is transposed, relative to
-        // OpenGL's matrix format.
-        mGLPose[0]  =  (float)mRotation.get(0, 0)[0];
-        mGLPose[1]  =  (float)mRotation.get(0, 1)[0];
-        mGLPose[2]  =  (float)mRotation.get(0, 2)[0];
-        mGLPose[3]  =  0f;
-        mGLPose[4]  =  (float)mRotation.get(1, 0)[0];
-        mGLPose[5]  =  (float)mRotation.get(1, 1)[0];
-        mGLPose[6]  =  (float)mRotation.get(1, 2)[0];
-        mGLPose[7]  =  0f;
-        mGLPose[8]  =  (float)mRotation.get(2, 0)[0];
-        mGLPose[9]  =  (float)mRotation.get(2, 1)[0];
-        mGLPose[10] =  (float)mRotation.get(2, 2)[0];
-        mGLPose[11] =  0f;
-        mGLPose[12] =  (float)tVecArray[0];
-        mGLPose[13] = -(float)tVecArray[1]; // negate y position
-        mGLPose[14] = -(float)tVecArray[2]; // negate z position
-        mGLPose[15] =  1f;
+//        final double[] rVecArray = mRVec.toArray();
+//        rVecArray[0] *= -1.0; // negate x angle
+//        mRVec.fromArray(rVecArray);
+//
+//        // Convert the Euler angles to a 3x3 rotation matrix.
+//        Calib3d.Rodrigues(mRVec, mRotation);
+//
+//        Log.d("setValTrue",mIsTransformed +"");
+//
+//
+//        final double[] tVecArray = mTVec.toArray();
+//
+//        // OpenCV's matrix format is transposed, relative to
+//        // OpenGL's matrix format.
+//        mGLPose[0]  =  (float)mRotation.get(0, 0)[0];
+//        mGLPose[1]  =  (float)mRotation.get(0, 1)[0];
+//        mGLPose[2]  =  (float)mRotation.get(0, 2)[0];
+//        mGLPose[3]  =  0f;
+//        mGLPose[4]  =  (float)mRotation.get(1, 0)[0];
+//        mGLPose[5]  =  (float)mRotation.get(1, 1)[0];
+//        mGLPose[6]  =  (float)mRotation.get(1, 2)[0];
+//        mGLPose[7]  =  0f;
+//        mGLPose[8]  =  (float)mRotation.get(2, 0)[0];
+//        mGLPose[9]  =  (float)mRotation.get(2, 1)[0];
+//        mGLPose[10] =  (float)mRotation.get(2, 2)[0];
+//        mGLPose[11] =  0f;
+//        mGLPose[12] =  (float)tVecArray[0];
+//        mGLPose[13] = -(float)tVecArray[1]; // negate y position
+//        mGLPose[14] = -(float)tVecArray[2]; // negate z position
+//        mGLPose[15] =  1f;
     }
 
     public MatOfDouble getRVec(){
@@ -287,14 +295,14 @@ public class OverlayImageTransformationMapper {
 
     private void setTrackingImageBoxCorners() {
         Rect box = Imgproc.boundingRect(mCurrentFrameHull);
-        int x = box.x;
-        int y = box.y;
-        int width = box.width;
-        int height = box.height;
-        mTrackingImageBoxCorners.put(0,0,new double[]{x,y});
-        mTrackingImageBoxCorners.put(1,0,new double[]{x + width ,y});
-        mTrackingImageBoxCorners.put(2,0,new double[]{x + width ,y + height});
-        mTrackingImageBoxCorners.put(3,0,new double[]{x ,y + height});
+        mCircuitX = box.x;
+        mCircuitY = box.y;
+        mCircuitWidth = box.width;
+        mCircuitHeight = box.height;
+        mTrackingImageBoxCorners.put(0,0,new double[]{mCircuitX,mCircuitY});
+        mTrackingImageBoxCorners.put(1,0,new double[]{mCircuitX + mCircuitWidth ,mCircuitY});
+        mTrackingImageBoxCorners.put(2,0,new double[]{mCircuitX + mCircuitWidth ,mCircuitY + mCircuitHeight});
+        mTrackingImageBoxCorners.put(3,0,new double[]{mCircuitX ,mCircuitY + mCircuitHeight});
     }
 
     private MatOfPoint2f getBoxPoints(Mat boxCorners) {
@@ -326,6 +334,8 @@ public class OverlayImageTransformationMapper {
         for(int i =0; i < list.size(); i++){
             Imgproc.putText(currentFrame,i+1 + "",list.get(i),1,10.,new Scalar(0,255,0));
         }
+
+
     }
 
     private MatOfPoint2f approxHull(MatOfPoint hull) {
@@ -421,6 +431,7 @@ public class OverlayImageTransformationMapper {
             }
             mCurrentFrameLargestContour = contours.get(largestIndex);
         }
+        contours.clear();
         return largestIndex;
     }
 
@@ -456,7 +467,19 @@ public class OverlayImageTransformationMapper {
         return mCurrentFrameHomography;
     }
 
-    public void setProjection(MatOfDouble projection) {
+    public void setProjection(MatOfDouble projection, double aspectRatio, int width, int height) {
+
         mProjection = projection;
+        mCameraAspectRatio = aspectRatio;
+        mCameraWidth = width;
+        mCameraHeight = height;
+    }
+
+    public int[] getDimens() {
+        return new int[]{mCircuitX,mCircuitY,mCircuitWidth,mCircuitHeight,mCameraWidth,mCameraHeight};
+    }
+
+    public double getAspectRatio(){
+        return mCameraAspectRatio;
     }
 }

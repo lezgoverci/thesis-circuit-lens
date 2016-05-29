@@ -153,8 +153,6 @@ public class ResistorElm extends CircuitElm {
         int ox = 0;
         int hs = sim.euroResistor() ? 6 : 8;
 
-        double v1 = volts[0];
-        double v2 = volts[1];
         setBbox(point1, point2, hs);
         draw2Leads(resistor3D);
 

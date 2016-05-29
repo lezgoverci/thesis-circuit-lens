@@ -124,6 +124,7 @@ public class SwitchElm extends CircuitElm {
         if (position >= posCount) {
             position = 0;
         }
+
     }
 
     public void setPosition(int i) {
@@ -199,6 +200,7 @@ public class SwitchElm extends CircuitElm {
         interpPoint(lead1, lead2, ps, 0, hs1);
         interpPoint(lead1, lead2, ps2, 1, hs2);
 //
+
         drawThickLine(switch3d, ps, ps2);
 
         return switch3d;

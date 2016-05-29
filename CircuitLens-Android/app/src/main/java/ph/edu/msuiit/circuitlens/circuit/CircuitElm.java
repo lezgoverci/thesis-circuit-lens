@@ -13,6 +13,7 @@ import org.rajawali3d.primitives.Line3D;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Stack;
 
 import ph.edu.msuiit.circuitlens.ui.gl.Circle3D;
@@ -116,6 +117,8 @@ public abstract class CircuitElm {
     public void allocNodes() {
         nodes = new int[getPostCount() + getInternalNodeCount()];
         volts = new double[getPostCount() + getInternalNodeCount()];
+        templateDot = new Object3D();
+        drawSquare(templateDot, 0, 0, 5, Color.YELLOW);
     }
 
     public String dump() {
@@ -269,6 +272,9 @@ public abstract class CircuitElm {
         object3D.addChild(triangle);
     }
 
+    static Object3D templateDot;
+    Object3D dots;
+
     public void drawDots(Object3D object3D, Point pa, Point pb, double pos) {
         if (sim.isStopped() || pos == 0 || !sim.isShowingCurrent()) {
             return;
@@ -282,12 +288,34 @@ public abstract class CircuitElm {
             pos += ds;
         }
         double di = 0;
+        int i = 0;
+        if(dots == null) {
+            dots = new Object3D();
+            dots.setRenderChildrenAsBatch(true);
+            object3D.addChild(dots);
+        }
         for (di = pos; di < dn; di += ds) {
             int x0 = (int) (pa.x + di * dx / dn);
             int y0 = (int) (pa.y + di * dy / dn);
-            drawSquare(object3D, x0, y0, 5, Color.YELLOW);
+            Object3D dot3D;
+            if(dots.getNumChildren() <= i) {
+                dot3D = templateDot.clone();
+                dots.addChild(dot3D);
+            } else{
+                dot3D = dots.getChildAt(i);
+            }
+            dot3D.setPosition(x0, y0, 5);
+            dot3D.setVisible(true);
+            i++;
+        }
+        int numChildren = dots.getNumChildren();
+        if(i < numChildren){
+            while(i < numChildren){
+                dots.getChildAt(i).setVisible(false);
+            }
         }
     }
+
 
     private void drawSquare(Object3D object3D, int x0, int y0, int side, int color) {
         Material material = new Material();

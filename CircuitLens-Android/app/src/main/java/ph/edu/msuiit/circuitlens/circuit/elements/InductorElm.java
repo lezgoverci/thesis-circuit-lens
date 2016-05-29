@@ -127,9 +127,6 @@ public class InductorElm extends CircuitElm {
 
     public Object3D generateObject3D() {
         Object3D inductor3d = new Object3D();
-        double v1 = volts[0];
-        double v2 = volts[1];
-        int i;
         int hs = 8;
         setBbox(point1, point2, hs);
         draw2Leads(inductor3d);

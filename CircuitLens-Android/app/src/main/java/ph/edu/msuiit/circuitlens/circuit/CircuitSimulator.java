@@ -240,6 +240,7 @@ public class CircuitSimulator {
     public void updateCircuit() {
         //if (winSize == null || winSize.width() == 0)
         //    return;
+
         if (analyzeFlag) {
             analyzeCircuit();
             analyzeFlag = false;
@@ -274,6 +275,13 @@ public class CircuitSimulator {
             lastTime = sysTime;
         } else
             lastTime = 0;
+
+        // Limit to 50 fps (thanks to Jurgen Klotzer for this)
+        long delay = 1000/50 - (System.currentTimeMillis() - lastFrameTime);
+        if(delay > 0){
+            return;
+        }
+
         int i;
 	    /*else if (conductanceCheckItem.getState())
 	      g.setColor(Color.white);*/
@@ -365,9 +373,6 @@ public class CircuitSimulator {
         frames++;
 
         if (!stopped && circuitMatrix != null) {
-            // Limit to 50 fps (thanks to Jurgen Klotzer for this)
-            long delay = 1000/50 - (System.currentTimeMillis() - lastFrameTime);
-            //realg.drawString("delay: " + delay,  10, 90);
             updateCanvas();
         }
         lastFrameTime = lastTime;
@@ -534,7 +539,6 @@ public class CircuitSimulator {
         for(CircuitElm elm : getElmList()){
             elm.updateObject3D();
         }
-        cv.reload();
     }
 
     public void generateCanvas() {

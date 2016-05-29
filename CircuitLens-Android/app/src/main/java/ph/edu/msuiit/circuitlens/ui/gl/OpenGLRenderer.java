@@ -6,12 +6,16 @@ import android.view.MotionEvent;
 
 import org.opencv.core.MatOfDouble;
 import org.rajawali3d.Object3D;
+import org.rajawali3d.materials.Material;
 import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Line3D;
 import org.rajawali3d.renderer.RajawaliRenderer;
 import org.rajawali3d.util.OnObjectPickedListener;
 import org.rajawali3d.util.RayPicker;
+
+import java.util.Stack;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitCanvas3D;
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
@@ -31,6 +35,8 @@ public class OpenGLRenderer extends RajawaliRenderer implements OnObjectPickedLi
     private boolean isSetProjectionValues = false;
     private RayPicker mPicker;
     private CircuitSimulator cirsim;
+    private float mTime;
+    private Material mMaterial;
 
     public OpenGLRenderer(Context context) {
         super(context);
@@ -50,28 +56,20 @@ public class OpenGLRenderer extends RajawaliRenderer implements OnObjectPickedLi
         //        + currentBarValue + " " + voltageRange + " "
         //        + powerBarValue + "\n";
 
-        final String expectedNetlist = "$ 1 0.000005 14.841315910257661 48 5 50\n" +
-                "v 128 128 128 48 0 1 35 5 0 0 0.5\n" +
-                "v 128 240 128 160 0 1 41.09 5 0 0 0.5\n" +
-                "v 128 352 128 272 0 1 45 5 0 0 0.5\n" +
-                "r 128 48 480 48 0 10\n" +
-                "c 480 48 480 128 0 0.000015 -13.442730220640706\n" +
-                "l 128 128 480 128 0 1 -0.07723247812140081\n" +
-                "r 128 160 480 160 0 10\n" +
-                "c 480 160 480 240 0 0.000015 19.43400535188842\n" +
-                "l 128 240 480 240 0 1 -0.08168000341131327\n" +
-                "r 128 272 480 272 0 10\n" +
-                "c 480 272 480 352 0 0.000015 25.178314901249074\n" +
-                "l 128 352 480 352 0 1 0.0007998750679867475\n" +
-                "o 4 64 0 35 40 0.1 0 -1\n" +
-                "o 7 64 0 35 40 0.2 1 -1\n" +
-                "o 10 64 0 35 40 0.1 2 -1\n" +
-                "h 1 5 4\n";
+        final String expectedNetlist = "$ 1 0.000005 10.20027730826997 50 5 43\n" +
+                "r 176 64 384 64 0 10\n" +
+                "s 384 64 448 64 0 1 false\n" +
+                "w 176 64 176 336 0\n" +
+                "c 384 336 176 336 0 0.000014999999999999998 6.9972736024638955\n" +
+                "l 384 64 384 336 0 1 0.00802331171451973\n" +
+                "v 448 336 448 64 0 0 40 5 0 0 0.5\n" +
+                "r 384 336 448 336 0 100\n" +
+                "o 4 64 0 35 20 0.05 0 -1\n" +
+                "o 3 64 0 35 20 0.05 1 -1\n" +
+                "o 0 64 0 35 0.625 0.05 2 -1\n" +
+                "h 1 4 3\n";
 
         cirsim.readSetup(expectedNetlist);
-        //cirsim.analyzeCircuit();
-        //cirsim.runCircuit();
-        //cirsim.generateCanvas();
         cirsim.updateCircuit();
 
         circuit3D = cirsim.getCircuitCanvas();
@@ -100,13 +98,14 @@ public class OpenGLRenderer extends RajawaliRenderer implements OnObjectPickedLi
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
         cirsim.updateCircuit();
+        //cirsim.updateCanvas();
         /*
         // Use transformation values
         if (isSetProjectionValues) {
             useTransformationValues();
         } else {*/
-            //circuit3D.rotate(Vector3.Axis.X, 5);
-            //circuit3D.rotate(Vector3.Axis.Y, 1);
+            circuit3D.rotate(Vector3.Axis.X, 5);
+            circuit3D.rotate(Vector3.Axis.Y, 1);
         //}
     }
 

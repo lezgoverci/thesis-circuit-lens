@@ -42,10 +42,6 @@ public class CircuitCanvas3D extends Object3D{
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
-        Log.d(getClass().getSimpleName(),"x1: " + x1);
-        Log.d(getClass().getSimpleName(),"y1: " + y1);
-        Log.d(getClass().getSimpleName(),"x2: " + x2);
-        Log.d(getClass().getSimpleName(),"y2: " + y2);
     }
 
     public int getCircuitWidth() {

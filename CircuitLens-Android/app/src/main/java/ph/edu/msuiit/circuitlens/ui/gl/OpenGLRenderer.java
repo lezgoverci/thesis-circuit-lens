@@ -64,30 +64,19 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         CircuitSimulator cirsim = new CircuitSimulator();
         cirsim.init();
         final String expectedNetlist =
-                "$ 1 0.000005 10.20027730826997 50 5 50\n" +
-                        "v 160 368 160 48 0 0 40 5 0 0 0.5\n" +
-                        "w 160 48 256 48 1\n" +
-                        "w 256 48 352 48 0\n" +
-                        "w 352 48 448 48 0\n" +
-                        "s 256 48 256 128 0 0 false\n" +
-                        "s 352 48 352 128 0 1 false\n" +
-                        "s 448 48 448 128 0 0 false\n" +
-                        "r 256 128 256 192 0 100\n" +
-                        "r 352 128 352 192 0 400\n" +
-                        "r 448 128 448 192 0 800\n" +
-                        "w 256 192 352 192 0\n" +
-                        "w 352 192 448 192 0\n" +
-                        "w 352 224 352 192 0\n" +
-                        "w 352 224 448 224 0\n" +
-                        "w 352 224 256 224 0\n" +
-                        "s 352 224 352 304 0 0 false\n" +
-                        "s 256 224 256 304 0 1 false\n" +
-                        "r 256 304 256 368 0 600\n" +
-                        "r 352 304 352 368 0 200\n" +
-                        "s 448 224 448 368 0 1 false\n" +
-                        "w 160 368 256 368 0\n" +
-                        "w 256 368 352 368 0\n" +
-                        "w 352 368 448 368 0\n";
+                "$ 1 0.000005 10.200277308269968 50 5 50\n" +
+                        "w 160 64 256 64 1\n" +
+                        "w 256 64 352 64 0\n" +
+                        "w 352 64 448 64 0\n" +
+                        "s 448 64 448 144 0 0 false\n" +
+                        "r 304 64 304 384 0 100\n" +
+                        "r 448 144 448 208 0 800\n" +
+                        "s 448 208 448 384 0 0 false\n" +
+                        "w 160 384 256 384 0\n" +
+                        "w 256 384 352 384 0\n" +
+                        "w 352 384 448 384 0\n" +
+                        "w 160 400 160 64 0\n";
+
 
         cirsim.readSetup(expectedNetlist);
         cirsim.analyzeCircuit();
@@ -232,8 +221,8 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
             circuit3D.setX(mPosX);
             circuit3D.setY(mPosY);
-            //circuit3D.setZ(mPosZ);
-            circuit3D.setZ(circuit3D.getZ() - 1.0);
+            circuit3D.setZ(mPosZ);
+            //circuit3D.setZ(circuit3D.getZ() - 1.0);
 
             // Orientation
             Quaternion orient = new Quaternion();

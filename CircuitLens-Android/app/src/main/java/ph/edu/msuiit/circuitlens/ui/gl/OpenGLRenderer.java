@@ -148,10 +148,10 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 //        circuit3D.moveUp(initY + 500);
 
 
-        double initX =  ((circuit3D.getCircuitWidth() / 2) + circuit3D.getCircuitBottomLeftX() * mScale) ;
-        double initY = ((circuit3D.getCircuitHeight()/ 2) + circuit3D.getCircuitBottomLeftY() * mScale);
+        double initX =  (circuit3D.getCircuitBottomLeftX() + (circuit3D.getCircuitWidth() / 2)) * mScale;
+        double initY = (circuit3D.getCircuitBottomLeftY() + (circuit3D.getCircuitHeight()/ 2)) * mScale;
 
-        circuit3D.setX(initX * -1);
+        circuit3D.setX(-initX);
         circuit3D.setY(-initY);
 
         
@@ -191,7 +191,7 @@ public class OpenGLRenderer  extends RajawaliRenderer {
                         " y:" + circuit3D.getY() +
                         " z:" + circuit3D.getZ() );
 
-       circuit3D.setScale(mScale,mScale,circuit3D.getScaleZ());
+       circuit3D.setScale(mScale,mScale,mScale);
 
     }
 
@@ -232,7 +232,8 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
             circuit3D.setX(mPosX);
             circuit3D.setY(mPosY);
-            circuit3D.setZ(mPosZ);
+            //circuit3D.setZ(mPosZ);
+            circuit3D.setZ(circuit3D.getZ() - 1.0);
 
             // Orientation
             Quaternion orient = new Quaternion();
@@ -299,8 +300,8 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 //            Log.d("scaleY1",circuit3D.getScaleY() + "");
 //            Log.d("scaleZ1",circuit3D.getScaleZ() + "");
 
-            double initX =  ((circuit3D.getCircuitWidth() / 2) + circuit3D.getCircuitBottomLeftX() * mScale) ;
-            double initY = ((circuit3D.getCircuitHeight()/ 2) + circuit3D.getCircuitBottomLeftY() * mScale);
+            double initX =  (circuit3D.getCircuitBottomLeftX() + (circuit3D.getCircuitWidth() / 2)) * mScale;
+            double initY = (circuit3D.getCircuitBottomLeftY() + (circuit3D.getCircuitHeight()/ 2)) * mScale;
 
 
             mPosX = initX * -1.0;

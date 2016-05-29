@@ -47,9 +47,9 @@ public class CircuitCanvas3D extends Object3D{
         return y1+getCircuitHeight()/2;
     }
 
-    public int getCircuitTopLeftX(){ return x1;}
+    public int getCircuitBottomLeftX(){ return x1;}
 
-    public int getCircuitTopLeftY(){ return y1;}
+    public int getCircuitBottomLeftY(){ return y1;}
 
     public void drawBounds(Object3D object3D){
         drawThickLine(object3D,x1,y1,x2,y1); // top

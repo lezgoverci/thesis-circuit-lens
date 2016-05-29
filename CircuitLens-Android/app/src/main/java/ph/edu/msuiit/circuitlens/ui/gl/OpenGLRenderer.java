@@ -5,13 +5,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import org.opencv.core.MatOfDouble;
-import org.rajawali3d.ATransformable3D;
-import org.rajawali3d.Object3D;
 import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.Quaternion;
-import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.renderer.RajawaliRenderer;
-import org.rajawali3d.scene.RajawaliScene;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitCanvas3D;
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
@@ -21,9 +17,9 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     public Context context;
 
     private CircuitCanvas3D circuit3D;
-    private double mRotX;
-    private double mRotY;
-    private double mRotZ;
+    private double mPitch;
+    private double mYaw;
+    private double mRoll;
     private double mPosX;
     private double mPosY;
     private double mPosZ;
@@ -51,6 +47,11 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     private int mCameraWidth;
     private int mCameraHeight;
     private double mScaleInit;
+    private double mInitRoll;
+    private double mInitYaw;
+    private double mInitPitch;
+    private double mRatio;
+    private double mScale = 1.0;
 
 
     public OpenGLRenderer(Context context) {
@@ -118,14 +119,15 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
     private void setInitViewportTransformation() {
 
-        //double scale = mCameraHeight / (((circuit3D.getCircuitHeight() / 2) + circuit3D.getCircuitTopLeftY()) * 2);
+        //double scale = mCameraHeight / (((circuit3D.getCircuitHeight() / 2) + circuit3D.getCircuitBottomLeftY()) * 2);
         //double scale = mTargetCircuitHeight / circuit3D.getCircuitHeight();
 
         mScaleInit = 1.0;
 
-        circuit3D.setScale(mScaleInit,-mScaleInit,mScaleInit);
+        //circuit3D.setScale(mScaleInit,mScaleInit,mScaleInit);
         //TODO fix Z-axis scaling
-        //circuit3D.setZ(-70.0);
+        circuit3D.setZ(-500.0);
+
 
     }
 
@@ -145,11 +147,17 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 //        circuit3D.moveRight(initX - 500);
 //        circuit3D.moveUp(initY + 500);
 
-        int initX = (int) ((circuit3D.getCircuitWidth() / 2) + circuit3D.getCircuitTopLeftX());
-        int initY = (int) ((circuit3D.getCircuitHeight()/ 2) + circuit3D.getCircuitTopLeftY());
+
+        double initX =  ((circuit3D.getCircuitWidth() / 2) + circuit3D.getCircuitBottomLeftX() * mScale) ;
+        double initY = ((circuit3D.getCircuitHeight()/ 2) + circuit3D.getCircuitBottomLeftY() * mScale);
 
         circuit3D.setX(initX * -1);
-        circuit3D.setY(initY);
+        circuit3D.setY(-initY);
+
+        
+        mInitRoll = circuit3D.getOrientation().getRoll();
+        mInitYaw = circuit3D.getOrientation().getYaw();
+        mInitPitch = circuit3D.getOrientation().getPitch();
 
 
 
@@ -162,16 +170,28 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     @Override
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
+        //circuit3D.setScaleY(circuit3D.getScaleY() - 0.005);
+        //circuit3D.setZ(circuit3D.getZ() - 1.0);
+        Log.d("animScale","X: " + circuit3D.getX() + " Y: " + circuit3D.getY() + " Z: " + circuit3D.getZ());
+
 
         //runRotationTest();
 
         // Use transformation values
-        if(isSetProjectionValues && isSetInitialValues){
+        if(isSetProjectionValues){
             useTransformationValues();
         } else{
             //circuitDiagram.rotate(Vector3.Axis.X, 5);
             //circuitDiagram.rotate(Vector3.Axis.Y, 1);
         }
+
+        Log.d("final",
+                "isSetInitial:" + isSetInitialValues +
+                " x:" + circuit3D.getX() +
+                        " y:" + circuit3D.getY() +
+                        " z:" + circuit3D.getZ() );
+
+       circuit3D.setScale(mScale,mScale,circuit3D.getScaleZ());
 
     }
 
@@ -208,20 +228,22 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
     private void useTransformationValues() {
 
+        if(isSetInitialValues){
 
-        circuit3D.setX(mPosX * 100.0);
-        circuit3D.setY(mPosY * -100.0);
-        circuit3D.setZ(mPosZ * -100.0);
+            circuit3D.setX(mPosX);
+            circuit3D.setY(mPosY);
+            circuit3D.setZ(mPosZ);
 
-        // Orientation
-        Quaternion orient = new Quaternion();
+            // Orientation
+            Quaternion orient = new Quaternion();
 
-        // Yaw, Pitch, Roll
-        double yaw = (mRotY - mInitRotY);
-        double pitch = ((mRotX* -1.0) - mInitRotX);
-        double roll = ((mRotZ * -1.0) - mInitRotZ);
-        orient.fromEuler(yaw,pitch,roll);
-        circuit3D.setOrientation(orient);
+            // Yaw, Pitch, Roll
+            double yaw = MathUtil.radiansToDegrees(mYaw);
+            double pitch = MathUtil.radiansToDegrees(mPitch);
+            double roll = MathUtil.radiansToDegrees(mRoll);
+            orient.fromEuler(yaw,pitch,roll);
+            //circuit3D.setOrientation(orient);
+        }
     }
 
 
@@ -260,39 +282,67 @@ public class OpenGLRenderer  extends RajawaliRenderer {
             mTargetCircuitWidth = dimens[2];
             mTargetCircuitHeight = dimens[3];
 
-            //mInitPosX = mTargetCircuitX - (mTargetCircuitWidth / 2.0);
-           // mInitPosY = mTargetCircuitY + (mTargetCircuitHeight / 2.0);
-            mInitPosX = (circuit3D.getCircuitWidth() / 2.0) * -1.0;
-            mInitPosY = (circuit3D.getCircuitHeight() / 2.0);
-            mInitPosZ = 0;
 
-            // Camera height and width
-           // mCameraWidth = dimens[4];
-           // mCameraHeight = dimens[5];
 
-            // initial rotation
-            mInitRotX = rotXraw;
-            mInitRotY = rotYraw;
-            mInitRotZ = rotZraw;
 
-            mPosX = mInitPosX;
-            mPosY = mInitPosY;
-            mPosZ = 0;
+//            Log.d("scaleInit",mScaleInit + "");
+//            Log.d("scaleRatio1",mRatio + "");
+//            Log.d("scaleX1",circuit3D.getScaleX() + "");
+//            Log.d("scaleY1",circuit3D.getScaleY() + "");
+//            Log.d("scaleZ1",circuit3D.getScaleZ() + "");
+            mRatio = (double) circuit3D.getCircuitHeight() / (double) mTargetCircuitHeight;
+            mScale = mScaleInit * mRatio;
+//            circuit3D.setScale(mScale,-mScale,mScale);
+//            Log.d("scaleX2",circuit3D.getScaleX() + "");
+//            Log.d("scaleRatio2",mRatio + "");
+//            Log.d("scaleX1",circuit3D.getScaleX() + "");
+//            Log.d("scaleY1",circuit3D.getScaleY() + "");
+//            Log.d("scaleZ1",circuit3D.getScaleZ() + "");
+
+            double initX =  ((circuit3D.getCircuitWidth() / 2) + circuit3D.getCircuitBottomLeftX() * mScale) ;
+            double initY = ((circuit3D.getCircuitHeight()/ 2) + circuit3D.getCircuitBottomLeftY() * mScale);
+
+
+            mPosX = initX * -1.0;
+            mPosY = initY * -1.0;
+            mPosZ = 0.0;
+
+            mInitPosX = mPosX;
+            mInitPosY = mPosY;
+            mInitPosZ = mPosZ;
+
+            circuit3D.setX(mInitPosX);
+            circuit3D.setY(mInitPosY);
+            circuit3D.setZ(mInitPosZ);
+
+
 
             isSetInitialValues = true;
+
+
+
         }
         else{
-            mPosX = posXraw;
-            mPosY = posYraw;
-            mPosZ = posZraw;
+            mPosX = /*circuit3D.getX() + */(mInitPosX - posXraw) ;
+            mPosY = /*circuit3D.getY() + */(mInitPosY - posYraw) ;
+            mPosZ = /*circuit3D.getZ() + */(mInitPosZ - posZraw) ;
         }
 
-        mRotX = rotXraw;
-        mRotY = rotYraw;
-        mRotZ = rotZraw;
+        mPitch = circuit3D.getOrientation().getPitch() + (mInitPitch - rotXraw);
+        mYaw = circuit3D.getOrientation().getYaw() + ( mInitYaw - rotYraw);
+        mRoll = circuit3D.getOrientation().getRoll() + (mInitRoll -rotZraw);
 
         // Projection values are set
         isSetProjectionValues = true;
+
+
+
+        Log.d("scalePosX",mPosX +"");
+        Log.d("scalePosY",mPosY +"");
+        Log.d("scalePosZ",mPosZ +"");
+        Log.d("scaleInitPosX",mInitPosX +"");
+        Log.d("scaleInitPosY",mInitPosY +"");
+        Log.d("scaleInitPosZ",mInitPosZ +"");
     }
 
     public void setCameraValues(int width, int height) {

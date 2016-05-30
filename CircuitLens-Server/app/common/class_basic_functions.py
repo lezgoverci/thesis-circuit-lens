@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import cv2
 
 class BasicFunctions:
     @staticmethod
@@ -93,3 +94,7 @@ class BasicFunctions:
             y += 1
 
         return np.array([xs, ys])
+    
+    @staticmethod
+    def loadImage(img):
+        return cv2.bitwise_not(cv2.imread(img, cv2.IMREAD_GRAYSCALE))

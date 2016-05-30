@@ -4,7 +4,6 @@ import class_fur_absolute_magnitude_difference_solver as famd
 
 class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
     def __init__(self):
-        self.__recognizer = fur.FeaturesUsingRecognizer()
         self.__featuresDistanceSolver = famd.FURAbsoluteMagnitudeDifferenceSolver()
         
     #-----------------------------------------
@@ -34,8 +33,10 @@ class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
     def train(self, classesImagesMap):
         if not classes_images_map:
             return self
-
+        
+        recognizer = fur.FeaturesUsingRecognizer()
+        
         for classStr, img in classes_images_map.iteritems():
-            self._classesValuesMap[classStr] = self.__recognizer.setImage(img).getCalculatedFeature(True)
+            self._classesValuesMap[classStr] = recognizer.setImage(img).getCalculatedFeature(True)
         
         return self

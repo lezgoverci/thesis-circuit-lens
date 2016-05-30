@@ -25,3 +25,7 @@ class Recognizer:
     @abstractmethod
     def recognize(self):
         pass
+    
+    @abstractmethod
+    def train(self, classesImagesMap):
+        pass

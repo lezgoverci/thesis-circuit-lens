@@ -78,4 +78,9 @@ class FeaturesUsingRecognizer(r.Recognizer):
         self.__class, self.__matchPercentage = self.__db.match(self.__calculatedFeature)
         
         return self
+    
+    def train(self, classesImageMap):
+        self.__db.train(classesImageMap)
+        
+        return self
         

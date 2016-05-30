@@ -20,3 +20,6 @@ class Recognizer:
 
     def recognize(self):
         return self
+    
+    def train(self, classesImagesMap):
+        return self

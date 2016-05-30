@@ -16,7 +16,7 @@ class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
     def match(self, calculatedFeature):
         if not self._classesValuesMap:
             return None
-        
+
         minClass = None
         minMatchPercentage = float('inf')
         

@@ -41,7 +41,7 @@ class DispersenessFromCentroidFeature(f.Feature):
             return None
             
         if 0 == self.__arguments['area']:
-            return 0
+            return np.array([0.0, 0.0, 0.0])
         
         centralAnglesExtractor = self.__arguments['feature_data_extractors']['central_angles']
         keyPointsExtractor = self.__arguments['feature_data_extractors']['keypoints']

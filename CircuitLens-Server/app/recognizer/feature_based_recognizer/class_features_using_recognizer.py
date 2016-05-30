@@ -80,6 +80,14 @@ class FeaturesUsingRecognizer(r.Recognizer):
                             'img': self.__img,
                             'area': m['m00']
                         }
+                    },
+                    {
+                        'name': 'corner_density',
+                        'arguments': {
+                            'centroid': centroid,
+                            'img': self.__img,
+                            'area': m['m00']
+                        }
                     }]
         
         self.__featuresCalculator.setFeatures(features)

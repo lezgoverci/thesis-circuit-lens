@@ -28,11 +28,14 @@ class IntegratedFeaturesCalculator:
             featureDataExtractors = feature.getNeededFeatureDataExtractors()
             
             featureArgs = featureStr['arguments']
-            featureArgs['feature_data_extractors'] = {}
+            
+            if featureDataExtractors:
+                featureArgs['feature_data_extractors'] = {}
             
             for featureDataExtractorStr in featureDataExtractors:
                 if None == self.__featureDataExtractors.get(featureDataExtractor, None):
                     featureDataExtractor = fdef.FeatureDataExtractorFactory.create(featureDataExtractorStr)
+                    
                     self.__featureDataExtractors[featureDataExtractorStr] = featureDataExtractor
                 else:
                     featureDataExtractor = self.__featureDataExtractors[featureDataExtractorStr]

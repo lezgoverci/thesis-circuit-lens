@@ -1,4 +1,6 @@
 import class_feature_processable_data_extractor as fpde
+import numpy as np
+import cv2
 
 class KeypointsExtractor(fpde.FeatureProcessableDataExtractor):
 
@@ -52,7 +54,7 @@ class KeypointsExtractor(fpde.FeatureProcessableDataExtractor):
             while x < w:
                 if 0 != img[y][x] and dst[y][x] > 0.01 * dst.max():
                     corners.append(np.array([float(x), float(y), 0.0]))
-                    cv2.line(newImg, (centroid[0], centroid[1]), (x, y), 255, 2)
+                    cv2.line(newImg, (int(centroid[0]), int(centroid[1])), (x, y), 255, 2)
                 x += 1
             y += 1
         
@@ -61,4 +63,4 @@ class KeypointsExtractor(fpde.FeatureProcessableDataExtractor):
         return self
     
     def argumentsMet(self):
-        return len(self.__arguments) > 0 and all(neededArg in self.__arguments for neededArg in self.__neededArguments)
+        return self.__arguments is not None and all(neededArg in self.__arguments for neededArg in self.__neededArguments)

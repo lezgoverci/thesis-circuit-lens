@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
-class Feature:
+class Feature(object):
+
     #-----------------------------------------
     # Setters
     #-----------------------------------------

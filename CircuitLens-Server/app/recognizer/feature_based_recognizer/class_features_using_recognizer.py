@@ -51,7 +51,7 @@ class FeaturesUsingRecognizer(r.Recognizer):
     #-----------------------------------------
 
     def recognize(self, recalculate=False):
-        if not self.__img:
+        if self.__img is None:
             return self
 
         m = cv2.moments(self.__img)

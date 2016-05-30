@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
-class FeatureProcessableDataExtractor:
+class FeatureProcessableDataExtractor(object):
+
     #-----------------------------------------
     # Setters
     #-----------------------------------------

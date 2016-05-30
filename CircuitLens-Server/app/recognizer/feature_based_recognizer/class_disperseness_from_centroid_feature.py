@@ -1,6 +1,7 @@
 import class_feature as f
 import numpy as np
 import common.class_basic_functions as bf
+import class_feature_processable_data_extractor as fpde
 
 class DispersenessFromCentroidFeature(f.Feature):
     def __init__(self):
@@ -38,9 +39,9 @@ class DispersenessFromCentroidFeature(f.Feature):
     def calculate(self):
         if not self.argumentsMet():
             return None
-        
-        centralAnglesExtractor = self.__arguments['central_angles']
-        keyPointsExtractor = self.__arguments['keypoints']
+
+        centralAnglesExtractor = self.__arguments['feature_data_extractors']['central_angles']
+        keyPointsExtractor = self.__arguments['feature_data_extractors']['keypoints']
         
         if not keyPointsExtractor.argumentsMet():
             keyPointsExtractor.setArguments({
@@ -86,5 +87,5 @@ class DispersenessFromCentroidFeature(f.Feature):
         
         return len(self.__arguments) > 0 and \
                all(neededArg in self.__arguments for neededArg in self.__neededArguments) and \
-               all(isinstance(featureDataExtractor, fpde.FeatureProcessableDataExtractor) in self.__arguments['feature_data_extractors'] \
+               all(isinstance(self.__arguments['feature_data_extractors'][featureDataExtractor], fpde.FeatureProcessableDataExtractor) \
                     for featureDataExtractor in self.__neededFeatureDataExtractors)

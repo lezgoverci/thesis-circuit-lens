@@ -1,5 +1,6 @@
 import class_feature_processable_data_extractor as fpde
 import common.class_basic_functions as bf
+import numpy as np
 
 class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
 
@@ -51,4 +52,4 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
         return self
     
     def argumentsMet(self):
-        return len(self.__arguments) > 0 and all(neededArg in self.__arguments for neededArg in self.__neededArguments)
+        return self.__arguments is not None and all(neededArg in self.__arguments for neededArg in self.__neededArguments)

@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
-class FeaturesListDistanceSolver:
+class FeaturesListDistanceSolver(object):
+
     #-----------------------------------------
     # Other Functions
     #-----------------------------------------

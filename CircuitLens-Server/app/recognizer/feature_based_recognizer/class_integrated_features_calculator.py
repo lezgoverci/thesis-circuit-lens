@@ -41,7 +41,7 @@ class IntegratedFeaturesCalculator:
                     featureDataExtractor = self.__featureDataExtractors[featureDataExtractorStr]
                 
                 featureArgs['feature_data_extractors'][featureDataExtractorStr] = featureDataExtractor
-            
+
             self.__calculatedFeature.append(feature.setArguments(featureArgs).getCalculatedFeature())
         
         return self.__calculatedFeature

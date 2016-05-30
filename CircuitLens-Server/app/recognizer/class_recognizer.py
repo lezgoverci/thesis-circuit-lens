@@ -18,6 +18,10 @@ class Recognizer:
     def getClass(self, recalculate):
         pass
     
+    @abstractmethod
+    def getMatchPercentage(self, recalculate=False):
+        pass
+    
     #-----------------------------------------
     # Other Functions
     #-----------------------------------------

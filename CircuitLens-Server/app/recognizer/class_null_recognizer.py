@@ -14,6 +14,9 @@ class Recognizer:
     def getClass(self, recalculate):
         return None
     
+    def getMatchPercentage(self, recalculate=False):
+        return 0
+    
     #-----------------------------------------
     # Other Functions
     #-----------------------------------------

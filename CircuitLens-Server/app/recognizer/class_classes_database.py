@@ -5,7 +5,7 @@ import common.class_list_iterable_iterator as lii
 class ClassesDatabase(i.Iterable):
     
     def __init__(self):
-        self.__classes_values_map = {}
+        self._classes_values_map = {}
     
     #-----------------------------------------
     # Getters
@@ -15,20 +15,23 @@ class ClassesDatabase(i.Iterable):
         if not self.accessible():
             raise LookupError
         
-        return self.__classes_values_map[n]
+        return self._classes_values_map[n]
     
     def getIterator(self):
         return lii.ListIterableIterator(self)
     
     def size(self):
-        return len(self.__classes_values_map)
+        return len(self._classes_values_map)
     
     #-----------------------------------------
     # Other Functions
     #----------------------------------------- 
     
     def accessible(self, n):
-        return None == self.__classes_values_map.get(n, None)
+        return None == self._classes_values_map.get(n, None)
+    
+    def clear(self):
+        self._classes_values_map = {}
     
     @abstractmethod
     def train(self, classes_images_map):

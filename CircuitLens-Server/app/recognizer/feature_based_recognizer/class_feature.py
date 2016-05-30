@@ -1,15 +1,15 @@
-from abc import ABCMeta, abstracmethod
+from abc import ABCMeta, abstractmethod
 
 class Feature:
     #-----------------------------------------
     # Setters
     #-----------------------------------------
     
-    @abstracmethod
+    @abstractmethod
     def setArguments(self, args):
         pass
     
-    @abstracmethod
+    @abstractmethod
     def setFeatureDataExtractors(self, featureDataExtractors):
         pass
     
@@ -17,11 +17,11 @@ class Feature:
     # Getters
     #-----------------------------------------
     
-    @abstracmethod
+    @abstractmethod
     def getCalculatedFeature(self, recalculate=False):
         pass
     
-    @abstracmethod
+    @abstractmethod
     def getNeededFeatureDataExtractors(self):
         pass
     
@@ -29,10 +29,10 @@ class Feature:
     # Other Functions
     #-----------------------------------------
     
-    @abstracmethod
+    @abstractmethod
     def calculate(self):
         pass
     
-    @abstracmethod
+    @abstractmethod
     def argumentsMet(self):
         pass

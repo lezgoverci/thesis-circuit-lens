@@ -1,5 +1,5 @@
 import class_classes_database as cdb
-import class_feature_using_recognizer as fur
+import class_features_using_recognizer as fur
 import class_fur_absolute_magnitude_difference_solver as famd
 
 class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):

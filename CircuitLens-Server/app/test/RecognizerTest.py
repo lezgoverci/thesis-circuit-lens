@@ -9,6 +9,7 @@ if root_dir not in sys.path:
 import recognizer.class_recognizer_factory as rf
 import cv2
 import common.class_basic_functions as bf
+import unittest
 
 class RecognizerTest(unittest.TestCase):
 

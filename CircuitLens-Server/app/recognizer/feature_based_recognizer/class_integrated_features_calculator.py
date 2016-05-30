@@ -1,5 +1,6 @@
 import class_feature_factory as ff
 import class_feature_data_extractor_factory as fdef
+import numpy as np
 
 class IntegratedFeaturesCalculator:
     def __init__(self, features=[]):
@@ -18,10 +19,10 @@ class IntegratedFeaturesCalculator:
         return self
     
     def get(self, recalculate=False):
-        if None != self.__calculatedFeature and not recalculate:
+        if self.__calculatedFeature is not None and not recalculate:
             return self.__calculatedFeature
             
-        self.__calculatedFeature = []
+        calculatedFeature = []
         
         for featureStr in self.__features:
             feature = ff.FeatureFactory.create(featureStr['name'])
@@ -42,6 +43,8 @@ class IntegratedFeaturesCalculator:
                 
                 featureArgs['feature_data_extractors'][featureDataExtractorStr] = featureDataExtractor
 
-            self.__calculatedFeature.append(feature.setArguments(featureArgs).getCalculatedFeature())
+            calculatedFeature.append(feature.setArguments(featureArgs).getCalculatedFeature())
+        
+        self.__calculatedFeature = np.array(calculatedFeature)
         
         return self.__calculatedFeature

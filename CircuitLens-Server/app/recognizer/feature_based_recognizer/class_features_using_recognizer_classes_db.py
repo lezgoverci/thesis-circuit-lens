@@ -1,11 +1,13 @@
 import class_classes_database as cdb
 import class_features_using_recognizer as fur
 import class_fur_absolute_magnitude_difference_solver as famd
+import class_fur_feature_difference_solver as ffds
 
 class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
     def __init__(self):
         super(FeaturesUsingRecognizerClassesDB, self).__init__()
-        self.__featuresDistanceSolver = famd.FURAbsoluteMagnitudeDifferenceSolver()
+        # self.__featuresDistanceSolver = famd.FURAbsoluteMagnitudeDifferenceSolver()
+        self.__featuresDistanceSolver = ffds.FURFeatureDifferenceSolver()
         
     #-----------------------------------------
     # Getters

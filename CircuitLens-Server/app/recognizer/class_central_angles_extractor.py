@@ -5,7 +5,7 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
 
     def __init__(self):
         self.__arguments = None
-        self.__needed_arguments = ['corners', 'centroid']
+        self.__neededArguments = ['corners', 'centroid']
     
     #-----------------------------------------
     # Setters
@@ -25,18 +25,15 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
         corners = self.__arguments['corners']
         centroid = self.__arguments['centroid']
         
-        unsorted_central_angles = [corner - centroid for corner in corners]
+        unsortedCentralAngles = [corner - centroid for corner in corners]
     
-        body_centroid = np.array([1.0, 0.0, 0])
+        origin = np.array([1.0, 0.0, 0])
         
-        angle_vector_map = {bf.BasicFunctions.calculateAngle(body_centroid, v): v for v in unsorted_central_angles}
-        central_angles = sorted(angle_vector_map)
-        central_angles.append(central_angles[0])
+        angleVectorMap = {bf.BasicFunctions.calculateAngle(origin, v): v for v in unsortedCentralAngles}
+        centralAngles = sorted(angleVectorMap)
+        centralAngles.append(centralAngles[0])
         
-        return central_angles, angle_vector_map
+        return centralAngles, angleVectorMap
     
     def argumentsMet(self):
-        for needed_arg in self.__needed_arguments:
-            if None == self.__arguments.get(needed_arg, None):
-                return False
-        return True
+        return all(neededArg in self.__arguments for neededArg in self.__neededArguments)

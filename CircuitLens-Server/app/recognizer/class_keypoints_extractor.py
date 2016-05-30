@@ -1,11 +1,10 @@
 import class_feature_processable_data_extractor as fpde
-import common.class_basic_functions as bf
 
 class KeypointsExtractor(fpde.FeatureProcessableDataExtractor):
 
     def __init__(self):
         self.__arguments = None
-        self.__needed_arguments = ['centroid', 'img']
+        self.__neededArguments = ['centroid', 'img']
     
     #-----------------------------------------
     # Setters
@@ -47,7 +46,4 @@ class KeypointsExtractor(fpde.FeatureProcessableDataExtractor):
         return corners, newImg
     
     def argumentsMet(self):
-        for needed_arg in self.__needed_arguments:
-            if None == self.__arguments.get(needed_arg, None):
-                return False
-        return True
+        return all(neededArg in self.__arguments for neededArg in self.__neededArguments)

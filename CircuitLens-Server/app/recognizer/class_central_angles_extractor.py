@@ -33,7 +33,7 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
         central_angles = sorted(angle_vector_map)
         central_angles.append(central_angles[0])
         
-        return central_angles
+        return central_angles, angle_vector_map
     
     def argumentsMet(self):
         for needed_arg in self.__needed_arguments:

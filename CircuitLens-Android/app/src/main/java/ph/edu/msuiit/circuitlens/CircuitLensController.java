@@ -19,25 +19,20 @@ public class CircuitLensController{
     CircuitLensView mView;
     OverlayImageTransformationMapper mMapper;
 
-
-    private final RajawaliSurfaceView mSurface;
-    private OpenGLRenderer mRenderer;
-
     /** OTHER VARIABLES **/
     private CameraProjectionAdapter mCameraAdapter;   // Adapter that contains all information about the camera
+    private OpenGLRenderer mRenderer;
+    private RajawaliSurfaceView mSurface;
 
-
-    public CircuitLensController(CircuitLensView view, String serverUri, RajawaliSurfaceView surface){
+    public CircuitLensController(CircuitLensView view, String serverUri){
         mView = view;
         mNetlistGenerator = new RemoteNetlistGenerator(serverUri);
-        mSurface = surface;
-        initRenderer();
-
     }
 
     public void onCreate(){
         mNetlistGenerator.connect();
         mCameraAdapter= new CameraProjectionAdapter();
+        initRenderer();
     }
 
     public void onFocus(CvCameraViewFrame frame){
@@ -66,7 +61,6 @@ public class CircuitLensController{
 
 
     public void onResume(){
-
         mMapper = new OverlayImageTransformationMapper();
 
 
@@ -82,20 +76,21 @@ public class CircuitLensController{
     }
 
 
-    public void map(Mat src,boolean isTakePhoto){
+    private boolean isHomographyFound(){
+        return mMapper.isHomographyFound();
+    }
+
+    public void map(Mat src, boolean isTakePhoto){
 
         mMapper.map(src,isTakePhoto);
 
         //TODO check if transformation is OK
         if(isHomographyFound()== true){
             // update camera pose using the new transformation from current homography
-            updateRendererCameraPose();
+            mView.updateRendererCameraPose(mMapper.getRVec(),mMapper.getTVec(),mMapper.getDimens());
         }
     }
 
-    private boolean isHomographyFound(){
-        return mMapper.isHomographyFound();
-    }
 
     private void initRenderer() {
 
@@ -103,18 +98,18 @@ public class CircuitLensController{
         mSurface.setTransparent(true);
         mSurface.setSurfaceRenderer(mRenderer);
         mSurface.setZOrderMediaOverlay(true);
-        mRenderer.setRenderSurface();
 
     }
 
-    private void updateRendererCameraPose() {
-        //compute rotation and translation values
-        //mMapper.setTransformationMatrixValues();
-        // set the computed values to renderer
-        mRenderer.setProjectionValues(mMapper.getRVec(),mMapper.getTVec(),mMapper.getDimens());
-    }
+//    private void updateRendererCameraPose() {
+//        //compute rotation and translation values
+//        //mMapper.setTransformationMatrixValues();
+//        // set the computed values to renderer
+//        mRenderer.setProjectionValues(mMapper.getRVec(),mMapper.getTVec(),mMapper.getDimens());
+//    }
 
 //    public void draw(Mat src, Mat dst){
 //        mMapper.draw(src,dst);
 //    }
+
 }

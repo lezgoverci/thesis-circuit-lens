@@ -5,14 +5,22 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import org.opencv.core.MatOfDouble;
+import org.rajawali3d.Object3D;
+import org.rajawali3d.materials.Material;
 import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.Quaternion;
+import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Line3D;
 import org.rajawali3d.renderer.RajawaliRenderer;
+import org.rajawali3d.util.OnObjectPickedListener;
+import org.rajawali3d.util.RayPicker;
+
+import java.util.Stack;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitCanvas3D;
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
 
-public class OpenGLRenderer  extends RajawaliRenderer {
+public class OpenGLRenderer extends RajawaliRenderer implements OnObjectPickedListener {
 
     public Context context;
 
@@ -35,7 +43,6 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     private double mInitGlPosX;
     private double mInitGlPosY;
     private double mInitGlPosZ;
-
     private double testValue = 0.0;
     private boolean isSetInitialValues = false;
     private int mTargetCircuitWidth = 0;
@@ -52,7 +59,10 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     private double mInitOrientX;
     private double mRatio;
     private double mScale = 1.0;
-
+    private RayPicker mPicker;
+    private CircuitSimulator cirsim;
+    private float mTime;
+    private Material mMaterial;
 
     public OpenGLRenderer(Context context) {
         super(context);
@@ -60,9 +70,13 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         setFrameRate(60);
     }
 
-    public void initScene(){
-        CircuitSimulator cirsim = new CircuitSimulator();
+    public void initScene() {
+        mPicker = new RayPicker(this);
+        mPicker.setOnObjectPickedListener(this);
+
+        cirsim = new CircuitSimulator();
         cirsim.init();
+
         final String expectedNetlist =
                 "$ 1 0.000005 10.200277308269968 50 5 50\n" +
                         "w 160 64 256 64 1\n" +
@@ -77,13 +91,11 @@ public class OpenGLRenderer  extends RajawaliRenderer {
                         "w 352 384 448 384 0\n" +
                         "w 160 400 160 64 0\n";
 
-
         cirsim.readSetup(expectedNetlist);
-        cirsim.analyzeCircuit();
-        cirsim.runCircuit();
-        cirsim.setStopped(false);
-        cirsim.draw();
+        cirsim.updateCircuit();
+
         circuit3D = cirsim.getCircuitCanvas();
+
         //circuit3D.drawBounds(circuit3D);
         getCurrentScene().addChild(circuit3D);
 
@@ -112,6 +124,8 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         //double scale = mTargetCircuitHeight / circuit3D.getCircuitHeight();
 
         mScaleInit = 1.0;
+        circuit3D.setScale(1, -1, 1);
+
 
         //circuit3D.setScale(mScaleInit,mScaleInit,mScaleInit);
         //TODO fix Z-axis scaling
@@ -126,6 +140,7 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         // default FOV = 45.0
         getCurrentCamera().setFarPlane(5000);
     }
+
 
     private void setInitModellingTransformation() {
         // default scene and circuit z = 0.0;
@@ -156,20 +171,19 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 
     private void setInitViewingTransformation() {
         // Default camera z = 4.0
+        getCurrentScene().addChild(circuit3D);
+
+        Log.d(getClass().getSimpleName(),"width: "+ getViewportWidth());
+        Log.d(getClass().getSimpleName(),"height: "+ getViewportHeight());
     }
 
     @Override
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
-        //circuit3D.setScaleY(circuit3D.getScaleY() - 0.005);
-        //circuit3D.setZ(circuit3D.getZ() - 1.0);
-        Log.d("animScale","X: " + circuit3D.getX() + " Y: " + circuit3D.getY() + " Z: " + circuit3D.getZ());
-
-
-        //runRotationTest();
+        cirsim.updateCircuit();
 
         // Use transformation values
-        if(isSetProjectionValues){
+        if (isSetProjectionValues) {
             useTransformationValues();
         } else{
             //circuitDiagram.rotate(Vector3.Axis.X, 5);
@@ -239,15 +253,15 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     }
 
 
-    public void onOffsetsChanged(float x, float y, float z, float w, int i, int j){
+    public void onOffsetsChanged(float x, float y, float z, float w, int i, int j) {
 
     }
 
     @Override
     public void onTouchEvent(MotionEvent event) {
-        if(event.getAction() == MotionEvent.ACTION_DOWN)
-        {
-            Log.d(this.getClass().getSimpleName(),": " + event.getX()+ "," + event.getY());
+        Log.d(getClass().getSimpleName(),event.toString());
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
         }
     }
 
@@ -291,6 +305,7 @@ public class OpenGLRenderer  extends RajawaliRenderer {
 //            Log.d("scaleY1",circuit3D.getScaleY() + "");
 //            Log.d("scaleZ1",circuit3D.getScaleZ() + "");
 
+
             double initX =  (circuit3D.getCircuitBottomLeftX() + (circuit3D.getCircuitWidth() / 2)) * mScale;
             double initY = (circuit3D.getCircuitBottomLeftY() + (circuit3D.getCircuitHeight()/ 2)) * mScale;
 
@@ -327,8 +342,6 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         // Projection values are set
         isSetProjectionValues = true;
 
-
-
         Log.d("scalePosX",mPosX +"");
         Log.d("scalePosY",mPosY +"");
         Log.d("scalePosZ",mPosZ +"");
@@ -340,6 +353,11 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     public void setCameraValues(int width, int height) {
         mCameraHeight = height;
         mCameraWidth = width;
+    }
+
+    @Override
+    public void onObjectPicked(Object3D object) {
+
     }
 }
 

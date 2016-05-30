@@ -1,6 +1,7 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
 import org.rajawali3d.Object3D;
+import org.rajawali3d.materials.Material;
 
 import java.util.StringTokenizer;
 
@@ -107,13 +108,24 @@ public class WireElm extends CircuitElm {
         return 'w';
     }
 
+    Material wireMaterial;
+
+    @Override
+    public void updateObject3D() {
+        if(circuitElm3D == null){
+            circuitElm3D = generateObject3D();
+        }
+        int color = getVoltageColor(volts[0]);
+        wireMaterial.setColor(color);
+        //doDots(circuitElm3D);
+    }
+
     public Object3D generateObject3D() {
         Object3D wire3D = new Object3D();
-        int color = getVoltageColor(volts[0]);
-        drawThickLine(wire3D, point1, point2, color);
-        doDots(wire3D);
+        wireMaterial = new Material();
+        drawThickLine(wire3D, point1, point2, wireMaterial);
         setBbox(point1, point2, 3);
-//        if (mustShowCurrent()) {
+//        if (mustShowCurrent()) {\
 //            String s = getShortUnitText(Math.abs(getCurrent()), "A");
 //            drawValues(g, s, 4);
 //        } else if (mustShowVoltage()) {
@@ -121,7 +133,6 @@ public class WireElm extends CircuitElm {
 //            drawValues(g, s, 4);
 //        }
         drawPosts(wire3D);
-
         return wire3D;
     }
 }

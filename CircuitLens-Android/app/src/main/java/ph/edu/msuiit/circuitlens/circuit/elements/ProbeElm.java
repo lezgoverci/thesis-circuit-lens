@@ -79,6 +79,13 @@ public class ProbeElm extends CircuitElm {
     }
 
     @Override
+    public void updateObject3D() {
+        if(circuitElm3D == null) {
+            circuitElm3D = generateObject3D();
+        }
+    }
+
+    @Override
     public Object3D generateObject3D() {
         return new Object3D();
     }

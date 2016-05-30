@@ -1,6 +1,7 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
 import org.rajawali3d.Object3D;
+import org.rajawali3d.materials.Material;
 
 import java.util.StringTokenizer;
 
@@ -78,6 +79,18 @@ public class InductorElm extends CircuitElm {
         return ind.nonLinear();
     }
 
+    Material[] coilMaterials;
+    @Override
+    public void updateObject3D() {
+        if(circuitElm3D == null) {
+            circuitElm3D = generateObject3D();
+        }
+        update2Leads();
+        double v1 = volts[0];
+        double v2 = volts[1];
+        updateCoil(v1,v2,coilMaterials);
+    }
+
     public void calculateCurrent() {
         double voltdiff = volts[0] - volts[1];
         current = ind.calculateCurrent(voltdiff);
@@ -114,19 +127,17 @@ public class InductorElm extends CircuitElm {
 
     public Object3D generateObject3D() {
         Object3D inductor3d = new Object3D();
-        double v1 = volts[0];
-        double v2 = volts[1];
-        int i;
         int hs = 8;
         setBbox(point1, point2, hs);
         draw2Leads(inductor3d);
 //        setPowerColor(g, false);
-        drawCoil(inductor3d, 8, lead1, lead2, v1, v2);
+        coilMaterials = new Material[30];
+        drawCoil(inductor3d, 8, lead1, lead2, coilMaterials);
 //        if (sim.isShowingValues()) {
 //            String s = getShortUnitText(inductance, "H");
 //            drawValues(g, s, hs);
 //        }
-//        doDots(g);
+
         drawPosts(inductor3d);
 
         return inductor3d;

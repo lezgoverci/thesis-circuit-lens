@@ -73,6 +73,8 @@ public class CircuitLensController{
         double aspectRatio = mCameraAdapter.getAspectRatio();
         int width = mCameraAdapter.getCameraWidth();
         int height = mCameraAdapter.getCameraHeight();
+
+        // Camera Matrix from Android camera
         MatOfDouble projection = mCameraAdapter.getProjectionCV();
 
         mMapper.setProjection(projection,aspectRatio,width,height);
@@ -101,6 +103,7 @@ public class CircuitLensController{
         mSurface.setTransparent(true);
         mSurface.setSurfaceRenderer(mRenderer);
         mSurface.setZOrderMediaOverlay(true);
+        mRenderer.setRenderSurface();
 
     }
 

@@ -17,9 +17,9 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     public Context context;
 
     private CircuitCanvas3D circuit3D;
-    private double mPitch;
-    private double mYaw;
-    private double mRoll;
+    private double mOrientX;
+    private double mOrientY;
+    private double mOrientZ;
     private double mPosX;
     private double mPosY;
     private double mPosZ;
@@ -47,9 +47,9 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     private int mCameraWidth;
     private int mCameraHeight;
     private double mScaleInit;
-    private double mInitRoll;
-    private double mInitYaw;
-    private double mInitPitch;
+    private double mInitOrientZ;
+    private double mInitOrientY;
+    private double mInitOrientX;
     private double mRatio;
     private double mScale = 1.0;
 
@@ -144,9 +144,11 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         circuit3D.setY(-initY);
 
         
-        mInitRoll = circuit3D.getOrientation().getRoll();
-        mInitYaw = circuit3D.getOrientation().getYaw();
-        mInitPitch = circuit3D.getOrientation().getPitch();
+        mInitOrientZ = circuit3D.getOrientation().z;
+        mInitOrientY = circuit3D.getOrientation().y;
+        mInitOrientX = circuit3D.getOrientation().x;
+
+        Log.d("orientInit","X: " + mInitOrientX + "Y: " + mInitOrientY + "Z: " + mInitOrientZ + "");
 
 
 
@@ -228,11 +230,11 @@ public class OpenGLRenderer  extends RajawaliRenderer {
             Quaternion orient = new Quaternion();
 
             // Yaw, Pitch, Roll
-            double yaw = MathUtil.radiansToDegrees(mYaw);
-            double pitch = MathUtil.radiansToDegrees(mPitch);
-            double roll = MathUtil.radiansToDegrees(mRoll);
+            double yaw = MathUtil.radiansToDegrees(mOrientY);
+            double pitch = MathUtil.radiansToDegrees(mOrientX);
+            double roll = MathUtil.radiansToDegrees(mOrientZ);
             orient.fromEuler(yaw,pitch,roll);
-            //circuit3D.setOrientation(orient);
+            circuit3D.setOrientation(orient);
         }
     }
 
@@ -253,9 +255,9 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     // After homography is found
     public void setProjectionValues(MatOfDouble rVec, MatOfDouble tVec, int[] dimens) {
         // Raw rotation values in degrees
-        double rotXraw = MathUtil.radiansToDegrees(rVec.toArray()[0]);
-        double rotYraw = MathUtil.radiansToDegrees(rVec.toArray()[1]);
-        double rotZraw = MathUtil.radiansToDegrees(rVec.toArray()[2]);
+        double orientXraw = MathUtil.radiansToDegrees(rVec.toArray()[0]);
+        double orientYraw = MathUtil.radiansToDegrees(rVec.toArray()[1]);
+        double orientZraw = MathUtil.radiansToDegrees(rVec.toArray()[2]);
         
         // Raw translation values
         double posXraw = tVec.toArray()[0];
@@ -318,9 +320,9 @@ public class OpenGLRenderer  extends RajawaliRenderer {
             mPosZ = /*circuit3D.getZ() + */(mInitPosZ - posZraw) ;
         }
 
-        mPitch = circuit3D.getOrientation().getPitch() + (mInitPitch - rotXraw);
-        mYaw = circuit3D.getOrientation().getYaw() + ( mInitYaw - rotYraw);
-        mRoll = circuit3D.getOrientation().getRoll() + (mInitRoll -rotZraw);
+        mOrientX = /*circuit3D.getOrientation().getPitch() +*/ (mInitOrientX - orientXraw);
+        mOrientY = /*circuit3D.getOrientation().getYaw() + */( mInitOrientY - orientYraw);
+        mOrientZ = /*circuit3D.getOrientation().getRoll() +*/ (mInitOrientZ - orientZraw);
 
         // Projection values are set
         isSetProjectionValues = true;

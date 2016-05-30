@@ -17,8 +17,7 @@ class KeypointsExtractor(fpde.FeatureProcessableDataExtractor):
     #-----------------------------------------
     # Getters
     #-----------------------------------------
-    
-    @abstracmethod
+
     def getExtractedData(self, reextract=False):
         if not self.__extractedData or reextract:
             self.extract()

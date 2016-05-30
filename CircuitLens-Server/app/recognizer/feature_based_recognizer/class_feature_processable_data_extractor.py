@@ -1,11 +1,11 @@
-from abc import ABCMeta, abstracmethod
+from abc import ABCMeta, abstractmethod
 
 class FeatureProcessableDataExtractor:
     #-----------------------------------------
     # Setters
     #-----------------------------------------
     
-    @abstracmethod
+    @abstractmethod
     def setArguments(self, args):
         pass
     
@@ -13,7 +13,7 @@ class FeatureProcessableDataExtractor:
     # Getters
     #-----------------------------------------
     
-    @abstracmethod
+    @abstractmethod
     def getExtractedData(self, reextract=False):
         pass
     
@@ -21,10 +21,10 @@ class FeatureProcessableDataExtractor:
     # Other Functions
     #-----------------------------------------
     
-    @abstracmethod
+    @abstractmethod
     def extract(self):
         pass
     
-    @abstracmethod
+    @abstractmethod
     def argumentsMet(self):
         pass

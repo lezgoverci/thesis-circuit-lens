@@ -27,20 +27,20 @@ class FeaturesUsingRecognizer(r.Recognizer):
     #-----------------------------------------
 
     def getClass(self, recalculate=False):
-        if None == self.__class or recalculate:
+        if self.__class is None or recalculate:
             self.recognize(recalculate)
             self.__getOtherArguments()
         
         return self.__class
     
     def getCalculatedFeature(self, recalculate=False):
-        if None == self.__calculatedFeature or recalculate:
+        if self.__calculatedFeature is None or recalculate:
             self.recognize(recalculate)
         
         return self.__calculatedFeature
     
     def getMatchPercentage(self, recalculate=False):
-        if None == self.__matchPercentage or recalculate:
+        if self.__matchPercentage is None or recalculate:
             self.recognize(recalculate)
             self.__getOtherArguments()
         
@@ -62,7 +62,8 @@ class FeaturesUsingRecognizer(r.Recognizer):
                         'name': 'disperseness_from_centroid',
                         'arguments': {
                             'centroid': centroid,
-                            'img': self.__img
+                            'img': self.__img,
+                            'area': m['m00']
                         }
                     },
                     {
@@ -71,7 +72,8 @@ class FeaturesUsingRecognizer(r.Recognizer):
                             'centroid': centroid,
                             'img': self.__img
                         }
-                    }]
+                    }
+                    ]
         
         self.__featuresCalculator.setFeatures(features)
         

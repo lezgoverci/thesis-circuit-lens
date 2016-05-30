@@ -38,10 +38,10 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
         
         corners = self.__arguments['corners']
         centroid = self.__arguments['centroid']
-        
+
         unsortedCentralAngles = [corner - centroid for corner in corners]
-    
-        origin = np.array([1.0, 0.0, 0])
+        
+        origin = np.array([1.0, 0.0, 0.0])
         
         angleVectorMap = {bf.BasicFunctions.calculateAngle(origin, v): v for v in unsortedCentralAngles}
         centralAngles = sorted(angleVectorMap)

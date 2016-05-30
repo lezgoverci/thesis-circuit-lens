@@ -59,7 +59,7 @@ class GearnessFeature(f.Feature):
         
         centralAngles, angleVectorMap = centralAnglesExtractor.getExtractedData()
 
-        gearness = np.array([0, 0, 0])
+        gearness = np.array([0.0, 0.0, 0.0])
     
         prevVector = angleVectorMap[centralAngles[0]]
         

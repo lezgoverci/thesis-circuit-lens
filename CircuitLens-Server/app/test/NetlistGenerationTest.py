@@ -1,12 +1,16 @@
-import sys, unittest
-from os import path
+import sys
+import os
 
-sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+if root_dir not in sys.path:
+    sys.path.append(root_dir)
 
 import unittest
-from common.class_circuit import Circuit
-from common.circuit_elements.class_circuit_element_factory import CircuitElementFactory
-import common.class_node as n
+
+from netlist_generator.class_circuit import Circuit
+from netlist_generator.circuit_elements.class_circuit_element_factory import CircuitElementFactory
+import netlist_generator.class_node as n
 
 class NetlistGenerationTest(unittest.TestCase):
     def setUp(self):
@@ -98,5 +102,7 @@ class NetlistGenerationTest(unittest.TestCase):
         
         self.assertTrue(equal)
 
-if __name__ == '__main__':
+def runtests():
     unittest.main()
+
+runtests()

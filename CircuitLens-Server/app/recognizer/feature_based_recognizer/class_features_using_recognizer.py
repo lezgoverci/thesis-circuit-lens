@@ -85,7 +85,7 @@ class FeaturesUsingRecognizer(r.Recognizer):
         return self
         
     def __getOtherArguments(self):
-        if not self.__calculatedFeature:
+        if self.__calculatedFeature is None:
             self.recognize(True)
         
         self.__class, self.__matchPercentage = db.instance.match(self.__calculatedFeature)

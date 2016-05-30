@@ -56,23 +56,22 @@ class FeaturesUsingRecognizer(r.Recognizer):
         
         centroid = np.array([m['m10'] / m['m00'], m['m01'] / m['m00'], 0])
         
-        if None == self.__class:
-            features = [{
-                            'name': 'disperseness_from_centroid',
-                            'arguments': {
-                                'centroid': centroid,
-                                'img': self.__img
-                            }
-                        },
-                        {
-                            'name': 'gearness',
-                            'arguments': {
-                                'centroid': centroid,
-                                'img': self.__img
-                            }
-                        }]
-            
-            self.__featuresCalculator.setFeatures(features)
+        features = [{
+                        'name': 'disperseness_from_centroid',
+                        'arguments': {
+                            'centroid': centroid,
+                            'img': self.__img
+                        }
+                    },
+                    {
+                        'name': 'gearness',
+                        'arguments': {
+                            'centroid': centroid,
+                            'img': self.__img
+                        }
+                    }]
+        
+        self.__featuresCalculator.setFeatures(features)
         
         self.__calculatedFeature = self.__featuresCalculator.get(recalculate)
         self.__class, self.__matchPercentage = self.__db.match(self.__calculatedFeature)

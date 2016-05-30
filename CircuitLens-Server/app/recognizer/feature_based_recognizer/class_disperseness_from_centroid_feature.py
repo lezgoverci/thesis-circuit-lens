@@ -6,7 +6,7 @@ import class_feature_processable_data_extractor as fpde
 class DispersenessFromCentroidFeature(f.Feature):
     def __init__(self):
         self.__arguments = None
-        self.__neededArguments = ['centroid', 'img', 'feature_data_extractors']
+        self.__neededArguments = ['area', 'centroid', 'img', 'feature_data_extractors']
         self.__neededFeatureDataExtractors = ['central_angles', 'keypoints']
         self.__calculatedFeature = None
     
@@ -59,25 +59,25 @@ class DispersenessFromCentroidFeature(f.Feature):
         
         centralAngles, angleVectorMap = centralAnglesExtractor.getExtractedData()
 
-        dispersenessFromCentroid = np.array([0, 0, 0])
-    
-        prevVector = angleVectorMap[centralAngles[0]]
+        dispersenessFromCentroid = 0
+
+        if 0 == self.__arguments['area']:
+            return 0
+        
+        dispersenessFromCentroid = np.array([0.0, 0.0, 0.0])
+        
         i = 1
         while i < len(centralAngles):
             try:
                 currentVector = angleVectorMap[centralAngles[i]]
-                normalizer = bf.BasicFunctions.calculatePointsDistance(currentVector, prevVector)
-                
-                if 0 != normalizer:
-                    dispersenessFromCentroid += np.cross(prevVector, currentVector) / normalizer
+
+                dispersenessFromCentroid += currentVector / self.__arguments['area']
                 
             except Exception as e:
                 print e
-            
-            prevVector = currentVector
-            
+
             i += 1
-        
+
         self.__calculatedFeature = dispersenessFromCentroid
         
         return self

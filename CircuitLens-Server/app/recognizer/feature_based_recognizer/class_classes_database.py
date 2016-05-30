@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-class ClassesDatabase():
+class ClassesDatabase(object):
     
     def __init__(self):
         self._classesValuesMap = {}

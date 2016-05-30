@@ -34,7 +34,7 @@ class RecognizerTest(unittest.TestCase):
         queryImgName = 'resistor.png'
         queryImg = bf.BasicFunctions.loadImage(imagesDir + queryImgName)
         
-        calculatedClass = recognizer.recognize('resistor').getClass()
+        calculatedClass = recognizer.setImage(queryImg).recognize().getClass()
         
         print "%s matched with %s! Match percentage is %lf." % (queryImgName, calculatedClass, recognizer.getMatchPercentage())
         

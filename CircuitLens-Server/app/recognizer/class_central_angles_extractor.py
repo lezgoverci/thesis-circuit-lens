@@ -36,4 +36,4 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
         return centralAngles, angleVectorMap
     
     def argumentsMet(self):
-        return all(neededArg in self.__arguments for neededArg in self.__neededArguments)
+        return len(self.__arguments) > 0 and all(neededArg in self.__arguments for neededArg in self.__neededArguments)

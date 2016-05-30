@@ -11,6 +11,7 @@ import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 import ph.edu.msuiit.circuitlens.circuit.Graphics;
 
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint2;
 
@@ -135,10 +136,11 @@ public class ResistorElm extends CircuitElm {
             interpPoint2(lead1, lead2, ps1, ps2, 1, hs);
             drawThickLine(resistor3D, ps1, ps2, colorMaterials[0]);
         }
-//        if (sim.isShowingValues()) {
-//            String s = getShortUnitText(resistance, "");
-//            drawValues(g, s, hs);
-//        }
+
+        if (sim.isShowingValues()) {
+            String s = getShortUnitText(resistance, "", shortFormat);
+            drawValues(resistor3D, s, hs);
+        }
         doDots(resistor3D);
         drawPosts(resistor3D);
         return resistor3D;

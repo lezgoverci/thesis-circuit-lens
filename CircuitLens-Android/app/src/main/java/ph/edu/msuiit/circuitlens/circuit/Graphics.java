@@ -17,6 +17,7 @@ import org.rajawali3d.primitives.Cube;
 import org.rajawali3d.primitives.Line3D;
 import org.rajawali3d.primitives.Plane;
 
+import java.text.NumberFormat;
 import java.util.Stack;
 
 import ph.edu.msuiit.circuitlens.ui.gl.Circle3D;
@@ -151,7 +152,6 @@ public class Graphics {
         drawThickLine(object3D, pa.x, pa.y, pb.x, pb.y);
     }
 
-
     public static Material drawThickCircle(Object3D object3D, int cx, int cy, int ri) {
         Material material = new Material();
         material.setColor(Color.WHITE);
@@ -169,7 +169,7 @@ public class Graphics {
         Rect bounds = new Rect();
         Paint paint = new Paint();
         paint.setTextSize(textsize);
-        paint.setTypeface(Typeface.MONOSPACE);
+        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
         paint.setAntiAlias(true);
         paint.getTextBounds(text,0,text.length(),bounds);
         paint.setColor(color);
@@ -180,6 +180,10 @@ public class Graphics {
     }
 
     public static void draw3DText(Object3D object3D, String text, int textSize, int color) {
+        draw3DText(object3D, text, 0, 0, textSize, color);
+    }
+
+    public static void draw3DText(Object3D object3D, String text, int x, int y, int textSize, int color) {
         Bitmap rasterText = Graphics.textAsBitmap(text, textSize, color);
         Material textMaterial = new Material();
         textMaterial.setColor(Color.TRANSPARENT);
@@ -191,22 +195,14 @@ public class Graphics {
         }
         Plane textPlane = new Plane(rasterText.getWidth(), rasterText.getHeight(), 2, 2);
         textPlane.setDoubleSided(true);
-        textPlane.setScaleX(-1);
+        textPlane.setScale(-1,-1,1);
         textPlane.setTransparent(true);
         textPlane.setMaterial(textMaterial);
+        textPlane.setPosition(x,y,0);
         object3D.addChild(textPlane);
     }
 
-    /*
-    public static String getVoltageDText(double v) {
-        return getUnitText(Math.abs(v), "V");
-    }
-
-    public static String getVoltageText(double v) {
-        return getUnitText(v, "V");
-    }
-
-    public synchronized static String getUnitText(double v, String u) {
+    public synchronized static String getUnitText(double v, String u, NumberFormat showFormat) {
         double va = Math.abs(v);
         if (va < 1e-14) {
             return "0 " + u;
@@ -235,40 +231,49 @@ public class Graphics {
         return showFormat.format(v * 1e-9) + " G" + u;
     }
 
-    public static String getShortUnitText(double v, String u) {
+    public static String getShortUnitText(double v, String u, NumberFormat numberFormat) {
         double va = Math.abs(v);
         if (va < 1e-13) {
             return null;
         }
         if (va < 1e-9) {
-            return shortFormat.format(v * 1e12) + "p" + u;
+            return numberFormat.format(v * 1e12) + "p" + u;
         }
         if (va < 1e-6) {
-            return shortFormat.format(v * 1e9) + "n" + u;
+            return numberFormat.format(v * 1e9) + "n" + u;
         }
         if (va < 1e-3) {
-            return shortFormat.format(v * 1e6) + CircuitSimulator.muString + u;
+            return numberFormat.format(v * 1e6) + CircuitSimulator.muString + u;
         }
         if (va < 1) {
-            return shortFormat.format(v * 1e3) + "m" + u;
+            return numberFormat.format(v * 1e3) + "m" + u;
         }
         if (va < 1e3) {
-            return shortFormat.format(v) + u;
+            return numberFormat.format(v) + u;
         }
         if (va < 1e6) {
-            return shortFormat.format(v * 1e-3) + "k" + u;
+            return numberFormat.format(v * 1e-3) + "k" + u;
         }
         if (va < 1e9) {
-            return shortFormat.format(v * 1e-6) + "M" + u;
+            return numberFormat.format(v * 1e-6) + "M" + u;
         }
-        return shortFormat.format(v * 1e-9) + "G" + u;
+        return numberFormat.format(v * 1e-9) + "G" + u;
     }
 
-    public static String getCurrentText(double i) {
-        return getUnitText(i, "A");
+    public static String getCurrentText(double i, NumberFormat numberFormat) {
+        return getUnitText(i, "A", numberFormat);
     }
 
-    public static String getCurrentDText(double i) {
-        return getUnitText(Math.abs(i), "A");
-    }*/
+    public static String getCurrentDText(double i, NumberFormat numberFormat) {
+        return getUnitText(Math.abs(i), "A", numberFormat);
+    }
+
+    public static String getVoltageDText(double v, NumberFormat numberFormat) {
+        return getUnitText(Math.abs(v), "V", numberFormat);
+    }
+
+    public static String getVoltageText(double v, NumberFormat numberFormat) {
+        return getUnitText(v, "V", numberFormat);
+    }
+
 }

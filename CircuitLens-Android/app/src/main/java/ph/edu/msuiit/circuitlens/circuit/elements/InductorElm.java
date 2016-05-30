@@ -10,6 +10,7 @@ import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
 import ph.edu.msuiit.circuitlens.circuit.Graphics;
 
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawCoil;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
 
 public class InductorElm extends CircuitElm {
 
@@ -100,10 +101,10 @@ public class InductorElm extends CircuitElm {
 //        setPowerColor(g, false);
         coilMaterials = new Material[30];
         drawCoil(inductor3d, 8, lead1, lead2, coilMaterials);
-//        if (sim.isShowingValues()) {
-//            String s = getShortUnitText(inductance, "H");
-//            drawValues(g, s, hs);
-//        }
+        if (sim.isShowingValues()) {
+            String s = getShortUnitText(inductance, "H", shortFormat);
+            drawValues(inductor3d, s, hs);
+        }
 
         drawPosts(inductor3d);
         doDots(inductor3d);

@@ -13,6 +13,7 @@ import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickCircle;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawTriangle;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
 
 public class CurrentElm extends CircuitElm {
@@ -42,7 +43,7 @@ public class CurrentElm extends CircuitElm {
         return 'i';
     }
 
-    Point[] rectPoints;
+    Point[] arrowPoints;
     Point ashaft1, ashaft2, center;
 
     public void setPoints() {
@@ -52,7 +53,7 @@ public class CurrentElm extends CircuitElm {
         ashaft2 = interpPoint(lead1, lead2, .6);
         center = interpPoint(lead1, lead2, .5);
         Point p2 = interpPoint(lead1, lead2, .75);
-        rectPoints = new Point[]{center, p2, new Point(center.x+4,center.y),  new Point(center.x,center.y+4)};
+        arrowPoints = new Point[]{p2, new Point(center.x-4,center.y),  new Point(center.x+4,center.y)};
     }
 
     @Override
@@ -75,20 +76,20 @@ public class CurrentElm extends CircuitElm {
         draw2Leads(currentSource3D);
 
         //setPowerColor(g, false);
-
+        colorMaterial = new Material();
         drawThickCircle(currentSource3D, center.x, center.y, cr, colorMaterial);
         Material whiteMaterial = new Material();
         whiteMaterial.setColor(Color.WHITE);
         drawThickLine(currentSource3D, ashaft1, ashaft2, whiteMaterial);
-        drawTriangle(currentSource3D, rectPoints, whiteMaterial);
+        drawTriangle(currentSource3D, arrowPoints, whiteMaterial);
         setBbox(point1, point2, cr);
 
-//        if (sim.isShowingValues()) {
-//            String s = getShortUnitText(currentValue, "A");
-//            if (dx == 0 || dy == 0) {
-//                drawValues(g, s, cr);
-//            }
-//        }
+        if (sim.isShowingValues()) {
+            String s = getShortUnitText(currentValue, "A", shortFormat);
+            if (dx == 0 || dy == 0) {
+                drawValues(currentSource3D, s, cr);
+            }
+        }
         drawPosts(currentSource3D);
         return currentSource3D;
     }

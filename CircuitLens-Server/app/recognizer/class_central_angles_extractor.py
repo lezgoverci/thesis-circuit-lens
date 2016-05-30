@@ -14,6 +14,8 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
 
     def setArguments(self, args):
         self.__arguments = args
+        
+        return self
     
     #-----------------------------------------
     # Getters

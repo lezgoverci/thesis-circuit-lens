@@ -29,6 +29,7 @@ class FeaturesUsingRecognizer(r.Recognizer):
     def getClass(self, recalculate=False):
         if None == self.__class or recalculate:
             self.recognize(recalculate)
+            self.__getOtherArguments()
         
         return self.__class
     
@@ -41,6 +42,7 @@ class FeaturesUsingRecognizer(r.Recognizer):
     def getMatchPercentage(self, recalculate=False):
         if None == self.__matchPercentage or recalculate:
             self.recognize(recalculate)
+            self.__getOtherArguments()
         
         return self.__matchPercentage
     
@@ -49,7 +51,7 @@ class FeaturesUsingRecognizer(r.Recognizer):
     #-----------------------------------------
 
     def recognize(self, recalculate=False):
-        if None == self.__img:
+        if not self.__img:
             return self
 
         m = cv2.moments(self.__img)
@@ -74,12 +76,17 @@ class FeaturesUsingRecognizer(r.Recognizer):
         self.__featuresCalculator.setFeatures(features)
         
         self.__calculatedFeature = self.__featuresCalculator.get(recalculate)
-        self.__class, self.__matchPercentage = db.instance.match(self.__calculatedFeature)
-
+        
         return self
     
     def train(self, classesImageMap):
         db.instance.train(classesImageMap)
         
         return self
+        
+    def __getOtherArguments(self):
+        if not self.__calculatedFeature:
+            self.recognize(True)
+        
+        self.__class, self.__matchPercentage = db.instance.match(self.__calculatedFeature)
         

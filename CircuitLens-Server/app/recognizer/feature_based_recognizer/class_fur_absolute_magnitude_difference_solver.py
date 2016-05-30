@@ -1,5 +1,5 @@
 from __future__ import division
-import np
+import numpy as np
 import class_features_list_distance_solver as flds
 
 class FURAbsoluteMagnitudeDifferenceSolver(flds.FeaturesListDistanceSolver):

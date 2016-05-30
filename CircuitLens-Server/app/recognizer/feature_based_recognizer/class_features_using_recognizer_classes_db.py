@@ -12,13 +12,13 @@ class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
     #-----------------------------------------
     
     def match(self, calculatedFeature):
-        if not self._classes_values_map:
+        if not self._classesValuesMap:
             return None
         
         minClass = None
         minMatchPercentage = float('inf')
         
-        for className, storedFeature in self._classes_values_map.iteritems():
+        for className, storedFeature in self._classesValuesMap.iteritems():
             d = self.__featuresDistanceSolver.solve(storedFeature, calculatedFeature)
             
             if minMatchPercentage > d:
@@ -31,11 +31,11 @@ class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
     # Other Functions
     #-----------------------------------------
     
-    def train(self, classes_images_map):
+    def train(self, classesImagesMap):
         if not classes_images_map:
             return self
 
         for classStr, img in classes_images_map.iteritems():
-            self._classes_values_map[classStr] = self.__recognizer.setImage(img).getCalculatedFeature()
+            self._classesValuesMap[classStr] = self.__recognizer.setImage(img).getCalculatedFeature()
         
         return self

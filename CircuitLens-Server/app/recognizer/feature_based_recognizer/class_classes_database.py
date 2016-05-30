@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 class ClassesDatabase():
     
     def __init__(self):
-        self._classes_values_map = {}
+        self._classesValuesMap = {}
     
     #-----------------------------------------
     # Getters
@@ -18,8 +18,8 @@ class ClassesDatabase():
     #----------------------------------------- 
     
     def clear(self):
-        self._classes_values_map = {}
+        self._classesValuesMap = {}
     
     @abstractmethod
-    def train(self, classes_images_map):
+    def train(self, classesImagesMap):
         pass

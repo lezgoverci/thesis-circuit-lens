@@ -6,14 +6,21 @@ import android.view.MotionEvent;
 
 import org.opencv.core.MatOfDouble;
 import org.rajawali3d.Object3D;
+import org.rajawali3d.materials.Material;
 import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.Quaternion;
+import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Line3D;
 import org.rajawali3d.renderer.RajawaliRenderer;
+import org.rajawali3d.util.OnObjectPickedListener;
+import org.rajawali3d.util.RayPicker;
+
+import java.util.Stack;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitCanvas3D;
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
 
-public class OpenGLRenderer  extends RajawaliRenderer {
+public class OpenGLRenderer extends RajawaliRenderer implements OnObjectPickedListener {
 
     public Context context;
 
@@ -26,6 +33,10 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     private double mPosZ;
     private float[] mGLpose;
     private boolean isSetProjectionValues = false;
+    private RayPicker mPicker;
+    private CircuitSimulator cirsim;
+    private float mTime;
+    private Material mMaterial;
 
     public OpenGLRenderer(Context context) {
         super(context);
@@ -33,42 +44,36 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         setFrameRate(60);
     }
 
-    public void initScene(){
-        CircuitSimulator cirsim = new CircuitSimulator();
+    public void initScene() {
+        mPicker = new RayPicker(this);
+        mPicker.setOnObjectPickedListener(this);
+
+        cirsim = new CircuitSimulator();
         cirsim.init();
-        final String expectedNetlist =
-                "$ 1 0.000005 10.20027730826997 50 5 50\n" +
-                        "v 160 368 160 48 0 0 40 5 0 0 0.5\n" +
-                        "w 160 48 256 48 1\n" +
-                        "w 256 48 352 48 0\n" +
-                        "w 352 48 448 48 0\n" +
-                        "s 256 48 256 128 0 0 false\n" +
-                        "s 352 48 352 128 0 1 false\n" +
-                        "s 448 48 448 128 0 0 false\n" +
-                        "r 256 128 256 192 0 100\n" +
-                        "r 352 128 352 192 0 400\n" +
-                        "r 448 128 448 192 0 800\n" +
-                        "w 256 192 352 192 0\n" +
-                        "w 352 192 448 192 0\n" +
-                        "w 352 224 352 192 0\n" +
-                        "w 352 224 448 224 0\n" +
-                        "w 352 224 256 224 0\n" +
-                        "s 352 224 352 304 0 0 false\n" +
-                        "s 256 224 256 304 0 1 false\n" +
-                        "r 256 304 256 368 0 600\n" +
-                        "r 352 304 352 368 0 200\n" +
-                        "s 448 224 448 368 0 1 false\n" +
-                        "w 160 368 256 368 0\n" +
-                        "w 256 368 352 368 0\n" +
-                        "w 352 368 448 368 0\n";
+
+        // String dump = "$ " + f + " "
+        //        + timeStep + " " + getIterCount() + " "
+        //        + currentBarValue + " " + voltageRange + " "
+        //        + powerBarValue + "\n";
+
+        final String expectedNetlist = "$ 1 0.000005 10.20027730826997 50 5 43\n" +
+                "r 176 64 384 64 0 10\n" +
+                "s 384 64 448 64 0 1 false\n" +
+                "w 176 64 176 336 0\n" +
+                "c 384 336 176 336 0 0.000014999999999999998 6.9972736024638955\n" +
+                "l 384 64 384 336 0 1 0.00802331171451973\n" +
+                "v 448 336 448 64 0 0 40 5 0 0 0.5\n" +
+                "r 384 336 448 336 0 100\n" +
+                "o 4 64 0 35 20 0.05 0 -1\n" +
+                "o 3 64 0 35 20 0.05 1 -1\n" +
+                "o 0 64 0 35 0.625 0.05 2 -1\n" +
+                "h 1 4 3\n";
 
         cirsim.readSetup(expectedNetlist);
-        cirsim.analyzeCircuit();
-        cirsim.runCircuit();
-        cirsim.setStopped(false);
-        cirsim.draw();
+        cirsim.updateCircuit();
+
         circuit3D = cirsim.getCircuitCanvas();
-        circuit3D.setScale(1,-1,1);
+        circuit3D.setScale(1, -1, 1);
 
         // show bounds of circuitcanvas for debugging
         //Object3D bounds3D = new Object3D();
@@ -84,32 +89,34 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         getCurrentCamera().setFarPlane(5000);
 
         getCurrentScene().addChild(circuit3D);
+
+        Log.d(getClass().getSimpleName(),"width: "+ getViewportWidth());
+        Log.d(getClass().getSimpleName(),"height: "+ getViewportHeight());
     }
 
     @Override
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
-
-
+        cirsim.updateCircuit();
+        //cirsim.updateCanvas();
+        /*
         // Use transformation values
-        if(isSetProjectionValues){
+        if (isSetProjectionValues) {
             useTransformationValues();
-        } else{
-            //circuitDiagram.rotate(Vector3.Axis.X, 5);
-            //circuitDiagram.rotate(Vector3.Axis.Y, 1);
-        }
-
+        } else {*/
+            circuit3D.rotate(Vector3.Axis.X, 5);
+            circuit3D.rotate(Vector3.Axis.Y, 1);
+        //}
     }
 
     private void useTransformationValues() {
-
         // Orientation
         Quaternion orient = new Quaternion();
         // Yaw, Pitch, Roll
         double yaw = mRotX;
         double pitch = mRotY;
         double roll = mRotZ;
-        orient.fromEuler(yaw,pitch,roll);
+        orient.fromEuler(yaw, pitch, roll);
         getCurrentCamera().setOrientation(orient);
 
         // Translation
@@ -119,15 +126,15 @@ public class OpenGLRenderer  extends RajawaliRenderer {
     }
 
 
-    public void onOffsetsChanged(float x, float y, float z, float w, int i, int j){
+    public void onOffsetsChanged(float x, float y, float z, float w, int i, int j) {
 
     }
 
     @Override
     public void onTouchEvent(MotionEvent event) {
-        if(event.getAction() == MotionEvent.ACTION_DOWN)
-        {
-            Log.d(this.getClass().getSimpleName(),": " + event.getX()+ "," + event.getY());
+        Log.d(getClass().getSimpleName(),event.toString());
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
         }
     }
 
@@ -145,12 +152,17 @@ public class OpenGLRenderer  extends RajawaliRenderer {
         // OpenGL pose
         mGLpose = pose;
 
-        Log.d("setValRot",mRotX + " " + mRotY + " " + mRotZ + " ");
-        Log.d("setValTrans",mPosX + " " + mPosY + " " + mPosX + " ");
-        Log.d("setValPose",pose.toString());
+        Log.d("setValRot", mRotX + " " + mRotY + " " + mRotZ + " ");
+        Log.d("setValTrans", mPosX + " " + mPosY + " " + mPosX + " ");
+        Log.d("setValPose", pose.toString());
 
         // Projection values are set
         isSetProjectionValues = true;
+    }
+
+    @Override
+    public void onObjectPicked(Object3D object) {
+
     }
 }
 

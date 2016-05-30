@@ -18,6 +18,11 @@ public class GraphicElm extends CircuitElm {
     }
 
     @Override
+    public void updateObject3D() {
+        circuitElm3D = generateObject3D();
+    }
+
+    @Override
     public Object3D generateObject3D() {
         return new Object3D();
     }

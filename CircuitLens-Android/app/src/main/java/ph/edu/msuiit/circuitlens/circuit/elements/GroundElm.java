@@ -4,10 +4,7 @@ import android.graphics.Color;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
-import org.rajawali3d.math.vector.Vector3;
-import org.rajawali3d.primitives.Line3D;
 
-import java.util.Stack;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
@@ -76,19 +73,30 @@ public class GroundElm extends CircuitElm {
         return 'g';
     }
 
+    @Override
+    public void updateObject3D() {
+        if(circuitElm3D == null) {
+            circuitElm3D = generateObject3D();
+        }
+        int color = getVoltageColor(0);
+        wireMaterial.setColor(color);
+    }
+
+    Material wireMaterial;
+
     public Object3D generateObject3D() {
         Object3D ground3d = new Object3D();
 
-//        setVoltageColor(g, 0);
-        drawThickLine(ground3d, point1, point2);
+        wireMaterial = new Material();
+        drawThickLine(ground3d, point1, point2, wireMaterial);
         int i;
         for (i = 0; i != 3; i++) {
             int a = 10 - i * 4;
             int b = i * 5; // -10;
             interpPoint2(point1, point2, ps1, ps2, 1 + b / dn, a);
-            drawThickLine(ground3d, ps1, ps2);
+            drawThickLine(ground3d, ps1, ps2, wireMaterial);
         }
-//        doDots(g);
+        doDots(ground3d);
         interpPoint(point1, point2, ps2, 1 + 11. / dn);
         setBbox(point1, ps2, 11);
         drawPost(ground3d, x, y, nodes[0]);

@@ -11,13 +11,30 @@ import org.rajawali3d.primitives.Line3D;
 import java.util.Stack;
 
 public class CircuitCanvas3D extends Object3D{
+    private final CircuitSimulator sim;
     private int x1;
     private int x2;
     private int y1;
     private int y2;
 
-    public CircuitCanvas3D(CircuitSimulator circuitSimulator) {
+    public int getX1() {
+        return x1;
+    }
 
+    public int getX2() {
+        return x2;
+    }
+
+    public int getY1() {
+        return y1;
+    }
+
+    public int getY2() {
+        return y2;
+    }
+
+    public CircuitCanvas3D(CircuitSimulator circuitSimulator) {
+        sim = circuitSimulator;
     }
 
     public void setCircuitBounds(int x1, int y1, int x2, int y2){
@@ -25,10 +42,6 @@ public class CircuitCanvas3D extends Object3D{
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
-        Log.d(getClass().getSimpleName(),"x1: " + x1);
-        Log.d(getClass().getSimpleName(),"y1: " + y1);
-        Log.d(getClass().getSimpleName(),"x2: " + x2);
-        Log.d(getClass().getSimpleName(),"y2: " + y2);
     }
 
     public int getCircuitWidth() {
@@ -71,5 +84,9 @@ public class CircuitCanvas3D extends Object3D{
         thickLine.setMaterial(material);
 
         object3D.addChild(thickLine);
+    }
+
+    public void init() {
+
     }
 }

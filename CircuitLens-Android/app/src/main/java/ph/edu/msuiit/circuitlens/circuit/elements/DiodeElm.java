@@ -3,6 +3,7 @@ package ph.edu.msuiit.circuitlens.circuit.elements;
 import android.graphics.Point;
 
 import org.rajawali3d.Object3D;
+import org.rajawali3d.materials.Material;
 import org.rajawali3d.math.vector.Vector3;
 
 import java.util.Stack;
@@ -17,9 +18,6 @@ public class DiodeElm extends CircuitElm {
     static final int FLAG_FWDROP = 1;
     final double defaultdrop = .805904783;
     double fwdrop, zvoltage;
-
-    Stack<Vector3> points;
-
 
     public DiodeElm(int xx, int yy) {
         super(xx, yy);
@@ -65,7 +63,7 @@ public class DiodeElm extends CircuitElm {
     }
 
     final int hs = 8;
-//    Polygon poly;
+    Point[] rectPoints;
     Point cathode[];
 
     public void setPoints() {
@@ -76,10 +74,7 @@ public class DiodeElm extends CircuitElm {
         interpPoint2(lead1, lead2, pa[0], pa[1], 0, hs);
         interpPoint2(lead1, lead2, cathode[0], cathode[1], 1, hs);
         //poly = createPolygon(pa[0], pa[1], lead2);
-        points = new Stack<>();
-        points.add(new Vector3(pa[0].x,pa[0].y,0));
-        points.add(new Vector3(pa[1].x,pa[1].y,0));
-        points.add(new Vector3(lead2.x,lead2.y,0));
+        rectPoints = new Point[]{ pa[0], pa[1], lead2 };
     }
 
     /*
@@ -131,11 +126,26 @@ public class DiodeElm extends CircuitElm {
         return 'd';
     }
 
+    Material triangleMaterial, lineMaterial;
+
+    @Override
+    public void updateObject3D() {
+        if(circuitElm3D == null) {
+            circuitElm3D = generateObject3D();
+        }
+        update2Leads();
+        int color1 = getVoltageColor(volts[0]);
+        triangleMaterial.setColor(color1);
+        int color2 = getVoltageColor(volts[1]);
+        lineMaterial.setColor(color2);
+
+        //doDots(circuitElm3D);
+    }
+
     @Override
     public Object3D generateObject3D() {
         Object3D diode3d = new Object3D();
         drawDiode(diode3d);
-//        doDots(g);
         drawPosts(diode3d);
         return diode3d;
     }
@@ -143,20 +153,16 @@ public class DiodeElm extends CircuitElm {
     Object3D drawDiode(Object3D diode3d) {
         setBbox(point1, point2, hs);
 
-        double v1 = volts[0];
-        double v2 = volts[1];
-
         draw2Leads(diode3d);
 
         // draw arrow thingy
         //setPowerColor(true);
-        //setVoltageColor(v1);
-
-        drawTriangle(diode3d,points);
+        triangleMaterial = new Material();
+        drawTriangle(diode3d, rectPoints, triangleMaterial);
 
         // draw thing arrow is pointing to
-        //setVoltageColor(v2);
-        drawThickLine(diode3d, cathode[0], cathode[1]);
+        lineMaterial = new Material();
+        drawThickLine(diode3d, cathode[0], cathode[1], lineMaterial);
         return diode3d;
     }
 }

@@ -1,16 +1,10 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
-import android.graphics.Color;
 import android.graphics.Point;
-import android.util.Log;
 
-import org.opencv.core.Mat;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
-import org.rajawali3d.math.vector.Vector3;
-import org.rajawali3d.primitives.Line3D;
 
-import java.util.Stack;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
@@ -25,7 +19,7 @@ public class ResistorElm extends CircuitElm {
     }
 
     public ResistorElm(int xa, int ya, int xb, int yb, int f,
-            StringTokenizer st) {
+                       StringTokenizer st) {
         super(xa, ya, xb, yb, f);
         resistance = new Double(st.nextToken()).doubleValue();
     }
@@ -55,7 +49,7 @@ public class ResistorElm extends CircuitElm {
 
 //    @Override
 //    public void draw(Graphics g) {
-//        int segments = 16;
+//        int SEGMENTS = 16;
 //        int i;
 //        int ox = 0;
 //        int hs = sim.euroResistor() ? 6 : 8;
@@ -64,10 +58,10 @@ public class ResistorElm extends CircuitElm {
 //        setBbox(point1, point2, hs);
 //        draw2Leads(g);
 //        setPowerColor(g, true);
-//        double segf = 1. / segments;
+//        double segf = 1. / SEGMENTS;
 //        if (!sim.euroResistor()) {
 //            // draw zigzag
-//            for (i = 0; i != segments; i++) {
+//            for (i = 0; i != SEGMENTS; i++) {
 //                int nx = 0;
 //                switch (i & 3) {
 //                    case 0:
@@ -80,7 +74,7 @@ public class ResistorElm extends CircuitElm {
 //                        nx = 0;
 //                        break;
 //                }
-//                double v = v1 + (v2 - v1) * i / segments;
+//                double v = v1 + (v2 - v1) * i / SEGMENTS;
 //                setVoltageColor(g, v);
 //                interpPoint(lead1, lead2, ps1, i * segf, hs * ox);
 //                interpPoint(lead1, lead2, ps2, (i + 1) * segf, hs * nx);
@@ -92,8 +86,8 @@ public class ResistorElm extends CircuitElm {
 //            setVoltageColor(g, v1);
 //            interpPoint2(lead1, lead2, ps1, ps2, 0, hs);
 //            drawThickLine(g, ps1, ps2);
-//            for (i = 0; i != segments; i++) {
-//                double v = v1 + (v2 - v1) * i / segments;
+//            for (i = 0; i != SEGMENTS; i++) {
+//                double v = v1 + (v2 - v1) * i / SEGMENTS;
 //                setVoltageColor(g, v);
 //                interpPoint2(lead1, lead2, ps1, ps2, i * segf, hs);
 //                interpPoint2(lead1, lead2, ps3, ps4, (i + 1) * segf, hs);
@@ -133,25 +127,40 @@ public class ResistorElm extends CircuitElm {
         return 'r';
     }
 
+    @Override
+    public void updateObject3D() {
+        if (circuitElm3D == null) {
+            circuitElm3D = generateObject3D();
+        }
+        double v1 = volts[0];
+        double v2 = volts[1];
+        for (int i = 0; i != SEGMENTS; i++) {
+            double v = v1 + (v2 - v1) * i / SEGMENTS;
+            int color = getVoltageColor(v);
+            colorMaterials[i].setColor(color);
+        }
+
+        update2Leads();
+    }
+
+    Material[] colorMaterials;
+    final int SEGMENTS = 16;
+
     public Object3D generateObject3D() {
-        Material resistorMaterial = new Material();
-        resistorMaterial.setColor(Color.WHITE);
-        Object3D resistor3d = new Object3D();
-        resistor3d.setMaterial(resistorMaterial);
-        int segments = 16;
+        Object3D resistor3D = new Object3D();
+        colorMaterials = new Material[SEGMENTS];
         int i;
         int ox = 0;
         int hs = sim.euroResistor() ? 6 : 8;
-        double v1 = volts[0];
-        double v2 = volts[1];
+
         setBbox(point1, point2, hs);
-        draw2Leads(resistor3d);
+        draw2Leads(resistor3D);
 
         //setPowerColor(g, true);
-        double segf = 1. / segments;
+        double segf = 1. / SEGMENTS;
         if (!sim.euroResistor()) {
             // draw zigzag
-            for (i = 0; i != segments; i++) {
+            for (i = 0; i != SEGMENTS; i++) {
                 int nx = 0;
                 switch (i & 3) {
                     case 0:
@@ -164,45 +173,36 @@ public class ResistorElm extends CircuitElm {
                         nx = 0;
                         break;
                 }
-                double v = v1 + (v2 - v1) * i / segments;
-                int color = getVoltageColor(v);
+                colorMaterials[i] = new Material();
                 interpPoint(lead1, lead2, ps1, i * segf, hs * ox);
                 interpPoint(lead1, lead2, ps2, (i + 1) * segf, hs * nx);
-                drawThickLine(resistor3d, ps1, ps2, color);
+                drawThickLine(resistor3D, ps1, ps2, colorMaterials[i]);
                 ox = nx;
             }
         } else {
-//            // draw rectangle
-//            setVoltageColor(g, v1);
-//            interpPoint2(lead1, lead2, ps1, ps2, 0, hs);
-//            drawThickLine(g, ps1, ps2);
-//            for (i = 0; i != segments; i++) {
-//                double v = v1 + (v2 - v1) * i / segments;
-//                setVoltageColor(g, v);
-//                interpPoint2(lead1, lead2, ps1, ps2, i * segf, hs);
-//                interpPoint2(lead1, lead2, ps3, ps4, (i + 1) * segf, hs);
-//                drawThickLine(g, ps1, ps3);
-//                drawThickLine(g, ps2, ps4);
-//            }
-//            interpPoint2(lead1, lead2, ps1, ps2, 1, hs);
-//            drawThickLine(g, ps1, ps2);
-       }
+            // draw rectangle
+            colorMaterials[0] = new Material();
+            interpPoint2(lead1, lead2, ps1, ps2, 0, hs);
+            drawThickLine(resistor3D, ps1, ps2, colorMaterials[0]);
+            for (i = 0; i != SEGMENTS; i++) {
+                if (colorMaterials[i] == null) {
+                    colorMaterials[i] = new Material();
+                }
+                interpPoint2(lead1, lead2, ps1, ps2, i * segf, hs);
+                interpPoint2(lead1, lead2, ps3, ps4, (i + 1) * segf, hs);
+                drawThickLine(resistor3D, ps1, ps3, colorMaterials[i]);
+                drawThickLine(resistor3D, ps2, ps4, colorMaterials[i]);
+            }
+            interpPoint2(lead1, lead2, ps1, ps2, 1, hs);
+            drawThickLine(resistor3D, ps1, ps2, colorMaterials[0]);
+        }
 //        if (sim.isShowingValues()) {
 //            String s = getShortUnitText(resistance, "");
 //            drawValues(g, s, hs);
 //        }
-//        doDots(g);
-        drawPosts(resistor3d);
+        doDots(resistor3D);
+        drawPosts(resistor3D);
 
-        return resistor3d;
+        return resistor3D;
     }
-
-    /*
-    public Object3D generateObject3D() {
-        Stack<Vector3> points = new Stack<>();
-        points.add(new Vector3(point1.x,point1.y,0));
-        points.add(new Vector3(point2.x,point2.y,0));
-        Line3D line = new Line3D(points,10);
-        return line;
-    }*/
 }

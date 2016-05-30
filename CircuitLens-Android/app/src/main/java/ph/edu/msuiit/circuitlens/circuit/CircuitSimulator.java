@@ -5,17 +5,15 @@ package ph.edu.msuiit.circuitlens.circuit;
 
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.util.Log;
 
 import org.rajawali3d.Object3D;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilterInputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -39,7 +37,6 @@ public class CircuitSimulator {
 
     Rect winSize;
     /* static */
-    public static final String PROPERTY_CIRCUIT_CHANGE = "undo";
     public static final int sourceRadius = 7;
     public static final double freqMult = Math.PI * 2 * 4;
     static final int infoWidth = 120;
@@ -67,8 +64,6 @@ public class CircuitSimulator {
     boolean analyzeFlag;
     boolean dumpMatrix;
     boolean useBufferedImage;
-    boolean isMac;
-    String ctrlMetaKey;
     double t;
     int pause = 10;
     int scopeSelected = -1;
@@ -104,9 +99,8 @@ public class CircuitSimulator {
     Vector<String> undoStack, redoStack;
 
     private boolean whiteBackground;//printable
-    private boolean stopped = true;//stoppedCheckItemState
+    private boolean stopped = false;//stoppedCheckItemState
     private double currentBarValue;
-    private boolean conventionCheckItemState = true;
     private boolean showPowerDissipation;//powerCheckItemState
     private double powerBarValue;
     private int speedBarValue;
@@ -119,14 +113,10 @@ public class CircuitSimulator {
     String startCircuit = null;
     String startLabel = null;
     public String startCircuitText = null;
-    String baseURL = "http://www.falstad.com/circuit/";
     public CircuitCanvas3D cv;
     Vector<CircuitNode> nodeList;
     CircuitElm voltageSources[];
-    protected final PropertyChangeSupport support;
 
-    boolean shown = false;
-    private static boolean pasteEnabled = false;
     private boolean unstable = false;
     private boolean disabled = false;
 
@@ -135,8 +125,6 @@ public class CircuitSimulator {
     }
 
     public CircuitSimulator(boolean canvas) {
-        support = new PropertyChangeSupport(this);
-
         dumpTypes = new Class[300];
         shortcuts = new Class[127];
 
@@ -148,6 +136,7 @@ public class CircuitSimulator {
         dumpTypes[(int) '?'] = Scope.class;
         dumpTypes[(int) 'B'] = Scope.class;
         cv = new CircuitCanvas3D(this);
+        euroResistor = false;
     }
 
     public int getrand(int x) {
@@ -162,95 +151,25 @@ public class CircuitSimulator {
         return whiteBackground;
     }
 
-    public void draw(){
-        for(CircuitElm elm : elmList){
-            Object3D circuitElm3d = elm.generateObject3D();
-            cv.addChild(circuitElm3d);
-        }
-    }
-
     public void init() {
-        register(ResistorElm.class);
-        register(InductorElm.class);
         register(CapacitorElm.class);
+        register(CurrentElm.class);
         register(DCVoltageElm.class);
-        register(WireElm.class);
-        register(SwitchElm.class);
-        register(DCVoltageElm.class);
-        register(GroundElm.class);
         register(DiodeElm.class);
+        register(GroundElm.class);
+        register(InductorElm.class);
+        //register(OutputElm.class);
+        //register(ProbeElm.class);
+        register(RailElm.class);
+        register(ResistorElm.class);
+        register(SwitchElm.class);
+        register(WireElm.class);
 
         String euroResistor = null;
-        String useFrameStr = null;
-        boolean printable = false;
-        boolean convention = true;
-
-//        try {
-//            baseURL = applet.getDocumentBase().getFile();
-//            // look for circuit embedded in URL
-//            String doc = applet.getDocumentBase().toString();
-//            int in = doc.indexOf('#');
-//            if (in > 0) {
-//                String x = null;
-//                try {
-//                    x = doc.substring(in + 1);
-//                    x = URLDecoder.decode(x);
-//                    startCircuitText = x;
-//                } catch (Exception e) {
-//                    System.out.println("can't decode " + x);
-//                    e.printStackTrace();
-//                }
-//            }
-//            in = doc.lastIndexOf('/');
-//            if (in > 0) {
-//                baseURL = doc.substring(0, in + 1);
-//            }
-//
-//            String param = applet.getParameter("PAUSE");
-//            if (param != null) {
-//                pause = Integer.parseInt(param);
-//            }
-//            startCircuit = applet.getParameter("startCircuit");
-//            startLabel = applet.getParameter("startLabel");
-//            euroResistor = applet.getParameter("euroResistors");
-//            useFrameStr = applet.getParameter("useFrame");
-//            String x = applet.getParameter("whiteBackground");
-//            if (x != null && x.equalsIgnoreCase("true")) {
-//                printable = true;
-//            }
-//            x = applet.getParameter("conventionalCurrent");
-//            if (x != null && x.equalsIgnoreCase("true")) {
-//                convention = false;
-//            }
-//        } catch (Exception e) {
-//        }
-//
-        boolean euro = (euroResistor != null && euroResistor.equalsIgnoreCase("true"));
-//        useFrame = (useFrameStr == null || !useFrameStr.equalsIgnoreCase("false"));
-//        if (useFrame) {
-//            main = this;
-//        } else {
-//            main = applet;
-//        }
-
-        String os = System.getProperty("os.name");
-        isMac = (os.indexOf("Mac ") == 0);
-        ctrlMetaKey = (isMac) ? "\u2318" : "Ctrl";
-        String jv = System.getProperty("java.class.version");
-        double jvf = new Double(jv).doubleValue();
-        if (jvf >= 48) {
-            muString = "\u03bc";
-            ohmString = "\u03a9";
-            useBufferedImage = true;
-        }
-
-        //main.setLayout(new CircuitLayout());
-        //cv.addListeners(gui);
-        //ain.add(cv.getCanvas());
+        currentMult = 1.7 * 10;
 
         setGrid();
         elmList = new Vector<>();
-//	setupList = new Vector();
         undoStack = new Vector<>();
         redoStack = new Vector<>();
 
@@ -259,46 +178,7 @@ public class CircuitSimulator {
         scopeCount = 0;
 
         random = new Random();
-        //cv.setBackground(Color.BLACK);
-        //cv.setForeground(Color.LTGRAY);
-
     }
-
-    public void posInit() {
-
-        if (startCircuitText != null) {
-            readSetup(startCircuitText);
-        } else if (stopMessage == null && startCircuit != null) {
-            readSetupFile(startCircuit, startLabel);
-        } else {
-            readSetup(null, 0, false);
-        }
-
-//        if (useFrame) {
-        //Dimension screen = getToolkit().getScreenSize();
-        //resize(860, 640);
-        handleResize();
-        //Dimension x = getSize();
-        //setLocation((screen.width - x.width) / 2,
-        //        (screen.height - x.height) / 2);
-        //show();
-//        } else {
-//            if (!powerCheckItem.getState()) {
-//                main.remove(powerBar);
-//                main.remove(powerLabel);
-//                main.validate();
-//            }
-//            hide();
-//            handleResize();
-//            applet.validate();
-//        }
-        //requestFocus();
-        if (!disabled) {
-            //cv.init();
-        }
-    }
-
-
 
     public double getT() {
         return t;
@@ -306,13 +186,6 @@ public class CircuitSimulator {
 
     public double getTimeStep() {
         return timeStep;
-    }
-
-    public void triggerShow() {
-//        if (!shown) {
-//            show();
-//        }
-        shown = true;
     }
 
     public void register(Class c) {
@@ -363,6 +236,147 @@ public class CircuitSimulator {
     int frames = 0;
     int steps = 0;
     int framerate = 0, steprate = 0;
+
+    public void updateCircuit() {
+        //if (winSize == null || winSize.width() == 0)
+        //    return;
+
+        if (analyzeFlag) {
+            analyzeCircuit();
+            analyzeFlag = false;
+        }
+
+        //setupScopes();
+
+        if (!stopped) {
+            try {
+                runCircuit();
+            } catch (Exception e) {
+                e.printStackTrace();
+                analyzeFlag = true;
+                updateCanvas();
+                return;
+            }
+        }
+        if (!stopped) {
+            long sysTime = System.currentTimeMillis();
+            if (lastTime != 0) {
+                int inc = (int) (sysTime-lastTime);
+                double c = currentBarValue;
+                Log.d(getClass().getSimpleName(),"CurrentBarValue: "+currentBarValue);
+                c = java.lang.Math.exp(c/3.5-14.2);
+                currentMult = 1.7 * inc * c;
+            }
+            if (sysTime-secTime >= 1000) {
+                framerate = frames; steprate = steps;
+                frames = 0; steps = 0;
+                secTime = sysTime;
+            }
+            lastTime = sysTime;
+        } else
+            lastTime = 0;
+
+        // Limit to 50 fps (thanks to Jurgen Klotzer for this)
+        long delay = 1000/50 - (System.currentTimeMillis() - lastFrameTime);
+        if(delay > 0){
+            return;
+        }
+
+        int i;
+	    /*else if (conductanceCheckItem.getState())
+	      g.setColor(Color.white);*/
+        int badnodes = 0;
+        // find bad connections, nodes not connected to other elements which
+        // intersect other elements' bounding boxes
+        // debugged by hausen: nullPointerException
+        if ( nodeList != null )
+            for (i = 0; i != nodeList.size(); i++) {
+                CircuitNode cn = getCircuitNode(i);
+                if (!cn.internal && cn.links.size() == 1) {
+                    int bb = 0, j;
+                    CircuitNodeLink cnl = cn.links.elementAt(0);
+                    for (j = 0; j != elmList.size(); j++)
+                    { // TODO: (hausen) see if this change does not break stuff
+                        CircuitElm ce = getElm(j);
+                        if ( ce instanceof GraphicElm )
+                            continue;
+                        if (cnl.elm != ce &&
+                                getElm(j).boundingBox.contains(cn.x, cn.y))
+                            bb++;
+                    }
+                    if (bb > 0) {
+                        badnodes++;
+                    }
+                }
+            }
+        int ct = scopeCount;
+        if (stopMessage != null)
+            ct = 0;
+        //for (i = 0; i != ct; i++)
+        //    scopes[i].draw(g);
+        //g.setColor(CircuitElm.whiteColor);
+        if (stopMessage != null) {
+        //    g.drawString(stopMessage, 10, circuitArea.height());
+        } else {
+            if (circuitBottom == 0)
+                calcCircuitBottom();
+            String info[] = new String[10];
+            if (mouseElm != null) {
+                if (mousePost == -1)
+                    mouseElm.getInfo(info);
+                else
+                    info[0] = "V = " +
+                            CircuitElm.getUnitText(mouseElm.getPostVoltage(mousePost), "V");
+		/* //shownodes
+		for (i = 0; i != mouseElm.getPostCount(); i++)
+		    info[0] += " " + mouseElm.nodes[i];
+		if (mouseElm.getVoltageSourceCount() > 0)
+		    info[0] += ";" + (mouseElm.getVoltageSource()+nodeList.size());
+		*/
+
+            } else {
+                CircuitElm.showFormat.setMinimumFractionDigits(2);
+                info[0] = "t = " + CircuitElm.getUnitText(t, "s");
+                CircuitElm.showFormat.setMinimumFractionDigits(0);
+            }
+            if (hintType != -1) {
+                for (i = 0; info[i] != null; i++)
+                    ;
+                String s = getHint();
+                if (s == null)
+                    hintType = -1;
+                else
+                    info[i] = s;
+            }
+            int x = 0;
+            //if (ct != 0)
+            //    x = scopes[ct-1].rightEdge() + 20;
+            //x = max(x, winSize.width()*2/3);
+
+            // count lines of data
+            for (i = 0; info[i] != null; i++)
+                ;
+            if (badnodes > 0)
+                info[i++] = badnodes + ((badnodes == 1) ?
+                        " bad connection" : " bad connections");
+
+            // find where to show data; below circuit, not too high unless we need it
+            //int ybase = winSize.height()-15*i-5;
+            //ybase = min(ybase, circuitArea.height());
+            //ybase = max(ybase, circuitBottom);
+            /*
+            for (i = 0; info[i] != null; i++)
+                g.drawString(info[i], x,
+                        ybase+15*(i+1));
+                        */
+        }
+        frames++;
+
+        if (!stopped && circuitMatrix != null) {
+            updateCanvas();
+        }
+        lastFrameTime = lastTime;
+    }
 
     void setupScopes() {
         int i;
@@ -513,17 +527,35 @@ public class CircuitSimulator {
                 if (n == 0) {
                     ((SwitchElm) ce).toggle();
                     analyzeFlag = true;
-                    //cv.repaintCanvas();
+                    updateCanvas();
                     return;
                 }
             }
         }
     }
 
+    public void updateCanvas() {
+        Log.d(getClass().getSimpleName(),"updateCanvas()");
+        for(CircuitElm elm : getElmList()){
+            elm.updateObject3D();
+        }
+    }
+
+    public void generateCanvas() {
+        Log.d(getClass().getSimpleName(),"generateCanvas()");
+        for(CircuitElm elm : getElmList()){
+            elm.updateObject3D();
+            Object3D circuitElm3D = elm.circuitElm3D;
+            if(circuitElm3D != null) {
+                cv.addChild(circuitElm3D);
+            }
+        }
+    }
+
     public void needAnalyze() {
-//        unstable = true;
+        unstable = true;
         analyzeFlag = true;
-//        cv.repaintCanvas();
+        updateCanvas();
     }
 
     public CircuitNode getCircuitNode(int n) {
@@ -971,14 +1003,14 @@ public class CircuitSimulator {
         }
         circuitNeedsMap = true;
 
-        /*
+
          System.out.println("matrixSize = " + matrixSize + " " + circuitNonLinear);
          for (j = 0; j != circuitMatrixSize; j++) {
          for (i = 0; i != circuitMatrixSize; i++)
          System.out.print(circuitMatrix[j][i] + " ");
          System.out.print("  " + circuitRightSide[j] + "\n");
          }
-         System.out.print("\n");*/
+         System.out.print("\n");
         // if a matrix is linear, we can do the lu_factor here instead of
         // needing to do it every frame
         if (!circuitNonLinear) {
@@ -987,7 +1019,6 @@ public class CircuitSimulator {
                 return;
             }
         }
-        support.firePropertyChange(PROPERTY_CIRCUIT_CHANGE, "", dumpCircuit());
     }
 
     void calcCircuitBottom() {
@@ -1124,14 +1155,6 @@ public class CircuitSimulator {
         return currentMult;
     }
 
-    public void addCircuitChangeListener(PropertyChangeListener l) {
-        support.addPropertyChangeListener(l);
-    }
-
-    public void removeCircuitChangeListener(PropertyChangeListener l) {
-        support.removePropertyChangeListener(l);
-    }
-
     public void addElement(CircuitElm dragElm) {
         elmList.add(dragElm);
     }
@@ -1150,6 +1173,10 @@ public class CircuitSimulator {
 
     public boolean isDisabled() {
         return disabled;
+    }
+
+    public Vector<CircuitElm> getElmList() {
+        return elmList;
     }
 
     public class FindPathInfo {
@@ -1271,11 +1298,11 @@ public class CircuitSimulator {
 
     public void stop(String s, CircuitElm ce) {
         stopMessage = s;
-//        circuitMatrix = null;
+        circuitMatrix = null;
         stopElm = ce;
         stopped = true;
         analyzeFlag = false;
-//        cv.repaintCanvas();
+        updateCanvas();
     }
 
     // control voltage source vs with voltage from n1 to n2 (must
@@ -1331,7 +1358,7 @@ public class CircuitSimulator {
         stampMatrix(n2, n1, -r0);
     }
 
-    // current from cn1 to cn2 is equal to voltage from vn1 to 2, divided by g
+    // current from cn1 to void reset()cn2 is equal to voltage from vn1 to 2, divided by g
     public void stampVCCurrentSource(int cn1, int cn2, int vn1, int vn2, double g) {
         stampMatrix(cn1, vn1, g);
         stampMatrix(cn2, vn2, g);
@@ -1423,9 +1450,11 @@ public class CircuitSimulator {
         //int maxIter = getIterCount();
         boolean debugprint = dumpMatrix;
         dumpMatrix = false;
+        Log.d(getClass().getSimpleName(),"getIterCount() = "+getIterCount());
         long steprate = (long) (160 * getIterCount());
         long tm = System.currentTimeMillis();
         long lit = lastIterTime;
+        Log.d(getClass().getSimpleName(),"lastIterTime: "+ lit);
         if (1000 >= steprate * (tm - lastIterTime)) {
             return;
         }
@@ -1544,11 +1573,6 @@ public class CircuitSimulator {
         //System.out.println((System.currentTimeMillis()-lastFrameTime)/(double) iter);
     }
 
-    public void editFuncPoint(int x, int y) {
-        // XXX
-        //cv.repaintCanvas(pause);
-    }
-
     void stackScope(int s) {
         if (s == 0) {
             if (scopeCount < 2) {
@@ -1599,9 +1623,6 @@ public class CircuitSimulator {
 
     void doExport(boolean url) {
         String dump = dumpCircuit();
-        if (url) {
-            dump = baseURL + "#" + URLEncoder.encode(dump);
-        }
         System.out.println("\nd:" + dump);
     }
 
@@ -1713,7 +1734,6 @@ public class CircuitSimulator {
             voltageRange = 5;
             scopeCount = 0;
         }
-//        cv.repaintCanvas();
         int p;
         for (p = 0; p < len;) {
             int l;
@@ -1800,10 +1820,8 @@ public class CircuitSimulator {
             p += l;
 
         }
-        //enableItems();
-        //enableItems();
-            handleResize();
-        //}
+        generateCanvas();
+        handleResize();
         needAnalyze();
     }
 
@@ -2105,17 +2123,6 @@ public class CircuitSimulator {
         return null;
     }
 
-    void enableItems() {
-//        if (powerCheckItemState) { //TODO
-//            powerBar.enable();
-//            powerLabel.enable();
-//        } else {
-//            powerBar.disable();
-//            powerLabel.disable();
-//        }
-        enableUndoRedo();
-    }
-
     void setGrid() {
         gridSize = (smallGrid) ? 8 : 16;
         gridMask = ~(gridSize - 1);
@@ -2159,48 +2166,9 @@ public class CircuitSimulator {
 //        undoItem.setEnabled(undoStack.size() > 0);
     }
 
-    /*
-    void setMouseMode(int mode) {
-        mouseMode = mode;
-        if (mode == CircuitController.MODE_ADD_ELM) {
-            cv.setCanvasCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
-        } else {
-            cv.setCanvasCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        }
-    }
-    */
-
-    void setMenuSelection() {
-        if (menuElm != null) {
-            if (menuElm.selected) {
-                return;
-            }
-            clearSelection();
-            menuElm.setSelected(true);
-        }
-    }
-
-    void doCut() {
-        int i;
-        pushUndo();
-        setMenuSelection();
-        clipboard = "";
-        for (i = elmList.size() - 1; i >= 0; i--) {
-            CircuitElm ce = getElm(i);
-            if (ce.isSelected()) {
-                clipboard += ce.dump() + "\n";
-                ce.delete();
-                elmList.removeElementAt(i);
-            }
-        }
-        enablePaste();
-        needAnalyze();
-    }
-
     void doDelete() {
         int i;
         pushUndo();
-        setMenuSelection();
         boolean hasDeleted = false;
 
         for (i = elmList.size() - 1; i >= 0; i--) {
@@ -2229,77 +2197,6 @@ public class CircuitSimulator {
             needAnalyze();
         }
     }
-
-    void doCopy() {
-        int i;
-        System.out.println("copy");
-        clipboard = "";
-        setMenuSelection();
-        for (i = elmList.size() - 1; i >= 0; i--) {
-            CircuitElm ce = getElm(i);
-            if (ce.isSelected()) {
-                clipboard += ce.dump() + "\n";
-            }
-        }
-        enablePaste();
-    }
-
-    void enablePaste() {
-        pasteEnabled = true;
-    }
-
-    /*
-    void doPaste() {
-        if (pasteEnabled) {
-            pushUndo();
-            clearSelection();
-            int i;
-            Rectangle oldbb = null;
-            for (i = 0; i != elmList.size(); i++) {
-                CircuitElm ce = getElm(i);
-                Rectangle bb = ce.getBoundingBox();
-                if (oldbb != null) {
-                    oldbb = oldbb.union(bb);
-                } else {
-                    oldbb = bb;
-                }
-            }
-            int oldsz = elmList.size();
-            readSetup(clipboard, true);
-
-            // select new items
-            Rectangle newbb = null;
-            for (i = oldsz; i != elmList.size(); i++) {
-                CircuitElm ce = getElm(i);
-                ce.setSelected(true);
-                Rectangle bb = ce.getBoundingBox();
-                if (newbb != null) {
-                    newbb = newbb.union(bb);
-                } else {
-                    newbb = bb;
-                }
-            }
-            if (oldbb != null && newbb != null && oldbb.intersects(newbb)) {
-                // find a place for new items
-                int dx = 0, dy = 0;
-                int spacew = circuitArea.width - oldbb.width - newbb.width;
-                int spaceh = circuitArea.height - oldbb.height - newbb.height;
-                if (spacew > spaceh) {
-                    dx = snapGrid(oldbb.x + oldbb.width - newbb.x + gridSize);
-                } else {
-                    dy = snapGrid(oldbb.y + oldbb.height - newbb.y + gridSize);
-                }
-                for (i = oldsz; i != elmList.size(); i++) {
-                    CircuitElm ce = getElm(i);
-                    ce.move(dx, dy);
-                }
-                // center circuit
-                handleResize();
-            }
-            needAnalyze();
-        }
-    }
-    */
 
     void clearSelection() {
         int i;

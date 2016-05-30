@@ -12,8 +12,7 @@ class FeaturesUsingRecognizer(r.Recognizer):
         self.__matchPercentage = None
         self.__featuresCalculator = ifc.IntegratedFeaturesCalculator()
         self.__db = db.FeaturesUsingRecognizerClassesDB()
-        
-        self.setImage(img)
+        self.__img = img
     
     #-----------------------------------------
     # Setters
@@ -21,6 +20,8 @@ class FeaturesUsingRecognizer(r.Recognizer):
 
     def setImage(self, img):
         self.__img = img
+        
+        return self
     
     #-----------------------------------------
     # Getters
@@ -51,7 +52,7 @@ class FeaturesUsingRecognizer(r.Recognizer):
     def recognize(self, recalculate=False):
         if None == self.__img:
             return self
-        
+
         m = cv2.moments(self.__img)
         
         centroid = np.array([m['m10'] / m['m00'], m['m01'] / m['m00'], 0])
@@ -75,6 +76,8 @@ class FeaturesUsingRecognizer(r.Recognizer):
         
         self.__calculatedFeature = self.__featuresCalculator.get(recalculate)
         self.__class, self.__matchPercentage = self.__db.match(self.__calculatedFeature)
+        
+        print "The class: %s The match rate: %lf" % (self.__class, self.__matchPercentage)
         
         return self
     

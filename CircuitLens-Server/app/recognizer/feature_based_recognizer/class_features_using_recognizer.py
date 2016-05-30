@@ -11,7 +11,6 @@ class FeaturesUsingRecognizer(r.Recognizer):
         self.__calculatedFeature = None
         self.__matchPercentage = None
         self.__featuresCalculator = ifc.IntegratedFeaturesCalculator()
-        self.__db = db.FeaturesUsingRecognizerClassesDB()
         self.__img = img
     
     #-----------------------------------------
@@ -75,14 +74,12 @@ class FeaturesUsingRecognizer(r.Recognizer):
         self.__featuresCalculator.setFeatures(features)
         
         self.__calculatedFeature = self.__featuresCalculator.get(recalculate)
-        self.__class, self.__matchPercentage = self.__db.match(self.__calculatedFeature)
-        
-        print "The class: %s The match rate: %lf" % (self.__class, self.__matchPercentage)
-        
+        self.__class, self.__matchPercentage = db.instance.match(self.__calculatedFeature)
+
         return self
     
     def train(self, classesImageMap):
-        self.__db.train(classesImageMap)
+        db.instance.train(classesImageMap)
         
         return self
         

@@ -41,3 +41,5 @@ class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
             self._classesValuesMap[classStr] = recognizer.setImage(img).getCalculatedFeature(True)
         
         return self
+
+instance = FeaturesUsingRecognizerClassesDB()

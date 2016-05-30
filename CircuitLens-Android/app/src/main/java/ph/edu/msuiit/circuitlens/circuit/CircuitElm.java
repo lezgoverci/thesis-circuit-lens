@@ -1,20 +1,28 @@
 package ph.edu.msuiit.circuitlens.circuit;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.util.Log;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
+import org.rajawali3d.materials.textures.ATexture;
+import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Plane;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import ph.edu.msuiit.circuitlens.circuit.elements.RailElm;
+import ph.edu.msuiit.circuitlens.circuit.elements.VoltageElm;
 import ph.edu.msuiit.circuitlens.ui.gl.Circle3D;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.draw3DText;
 
 public abstract class CircuitElm {
 
@@ -315,8 +323,6 @@ public abstract class CircuitElm {
 
     public void setBbox(Point p1, Point p2, double w) {
         setBbox(p1.x, p1.y, p2.x, p2.y);
-        //int gx = p2.y - p1.y;
-        //int gy = p1.x - p2.x;
         int dpx = (int) (dpx1 * w);
         int dpy = (int) (dpy1 * w);
         adjustBbox(p1.x + dpx, p1.y + dpy, p1.x - dpx, p1.y - dpy);
@@ -342,34 +348,48 @@ public abstract class CircuitElm {
 
     public void adjustBbox(Point p1, Point p2) {
         adjustBbox(p1.x, p1.y, p2.x, p2.y);
-    }/*
+    }
 
     public boolean isCenteredText() {
         return false;
     }
 
-    public void drawCenteredText(Graphics g, String s, int x, int y, boolean cx) {
-        FontMetrics fm = g.getFontMetrics();
-        int w = fm.stringWidth(s);
-        if (cx) {
-            x -= w / 2;
-        }
-        g.drawString(s, x, y + fm.getAscent() / 2);
-        adjustBbox(x, y - fm.getAscent() / 2,
-                x + w, y + fm.getAscent() / 2 + fm.getDescent());
+    public void drawCenteredText(Object3D object3D, String s, int x, int y, boolean cx) {
+        //Graphics.draw3DText(object3D, s, x, y, cx);
     }
 
-    public void drawValues(Graphics g, String s, double hs) {
+    public void drawValues(Object3D object3D, String s, double hs) {
+        Log.d(getClass().getSimpleName(), "drawValues(object3d,"+s+","+hs+")");
         if (s == null) {
             return;
         }
-        g.setFont(unitsFont);
+
+        Bitmap rasterText = Graphics.textAsBitmap(s, 12, Color.WHITE);
+        Material textMaterial = new Material();
+        textMaterial.setColor(Color.TRANSPARENT);
+        Texture texture = new Texture("text",rasterText);
+
+        int w = rasterText.getWidth();
+
+        try {
+            textMaterial.addTexture(texture);
+        } catch (ATexture.TextureException e) {
+            e.printStackTrace();
+        }
+        Plane textPlane = new Plane(w, rasterText.getHeight(), 2, 2);
+        textPlane.setDoubleSided(true);
+        textPlane.setScale(-1,-1,1);
+        textPlane.setTransparent(true);
+        textPlane.setMaterial(textMaterial);
+        object3D.addChild(textPlane);
+
+        /*g.setFont(unitsFont);
         FontMetrics fm = g.getFontMetrics();
-        int w = fm.stringWidth(s);
         g.setColor(whiteColor);
-        int ya = fm.getAscent() / 2;
+        int ya = fm.getAscent() / 2;*/
+
         int xc, yc;
-        if (this instanceof RailElm || this instanceof SweepElm) {
+        if (this instanceof RailElm /*|| this instanceof SweepElm*/) {
             xc = x2;
             yc = y2;
         } else {
@@ -379,16 +399,17 @@ public abstract class CircuitElm {
         int dpx = (int) (dpx1 * hs);
         int dpy = (int) (dpy1 * hs);
         if (dpx == 0) {
-            g.drawString(s, xc - w / 2, yc - abs(dpy) - 2);
+            //g.drawString(s, xc - w / 2, yc - abs(dpy) - 2);
+            textPlane.setPosition(xc, yc - abs(dpy) - 12, 5);
         } else {
-            int xx = xc + abs(dpx) + 2;
+            int xx = xc + abs(dpx) + w/2;
             if (this instanceof VoltageElm || (x < x2 && y > y2)) {
-                xx = xc - (w + abs(dpx) + 2);
+                xx = xc - (w/2 + abs(dpx) + 2);
             }
-            g.drawString(s, xx, yc + dpy + ya);
+            //g.drawString(s, xx, yc + dpy + ya);
+            textPlane.setPosition(xx, yc, 5);
         }
     }
-    }*/
 
     public void updateCoil(double v1, double v2, Material[] materials) {
         int segments = 30;

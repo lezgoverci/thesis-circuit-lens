@@ -14,6 +14,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickCircle;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint2;
 
@@ -220,14 +221,13 @@ public class VoltageElm extends CircuitElm {
                break;
             }
         }
-        /*
+
         if (sim.isShowingValues()) {
-            String s = getShortUnitText(frequency, "Hz");
+            String s = getShortUnitText(frequency, "Hz", shortFormat);
             if (dx == 0 || dy == 0) {
-                drawValues(g, s, circleSize);
+                drawValues(object3D, s, circleSize);
             }
         }
-        */
     }
 
     public int getVoltageSourceCount() {

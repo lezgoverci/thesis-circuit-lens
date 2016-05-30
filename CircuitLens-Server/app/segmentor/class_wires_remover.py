@@ -50,7 +50,7 @@ class WiresRemover(CircuitElementFinder):
         labeled[labeled == 0] = -0.1
         
         self.__markLinePixels(angularMatrix, labeled, -255)
-
+        return labeled
         k = np.ones((3, 3), np.float32) * 0.11
         k[1][1] = 0.12
         

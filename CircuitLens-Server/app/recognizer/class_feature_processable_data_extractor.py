@@ -10,6 +10,14 @@ class FeatureProcessableDataExtractor:
         pass
     
     #-----------------------------------------
+    # Getters
+    #-----------------------------------------
+    
+    @abstracmethod
+    def getExtractedData(self, reextract=False):
+        pass
+    
+    #-----------------------------------------
     # Other Functions
     #-----------------------------------------
     

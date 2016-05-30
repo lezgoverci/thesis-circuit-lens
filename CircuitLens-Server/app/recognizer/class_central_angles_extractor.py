@@ -6,6 +6,7 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
     def __init__(self):
         self.__arguments = None
         self.__neededArguments = ['corners', 'centroid']
+        self.__extractedData = None
     
     #-----------------------------------------
     # Setters
@@ -13,6 +14,17 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
 
     def setArguments(self, args):
         self.__arguments = args
+    
+    #-----------------------------------------
+    # Getters
+    #-----------------------------------------
+    
+    @abstracmethod
+    def getExtractedData(self, reextract=False):
+        if not self.__extractedData or reextract:
+            self.extract()
+        
+        return self.__extractedData
     
     #-----------------------------------------
     # Other Functions
@@ -33,7 +45,7 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
         centralAngles = sorted(angleVectorMap)
         centralAngles.append(centralAngles[0])
         
-        return centralAngles, angleVectorMap
+        self.__extractedData = (centralAngles, angleVectorMap)
     
     def argumentsMet(self):
         return len(self.__arguments) > 0 and all(neededArg in self.__arguments for neededArg in self.__neededArguments)

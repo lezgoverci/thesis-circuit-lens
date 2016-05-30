@@ -8,6 +8,8 @@ import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
+
 public class ProbeElm extends CircuitElm {
 
     static final int FLAG_SHOWVOLTAGE = 1;

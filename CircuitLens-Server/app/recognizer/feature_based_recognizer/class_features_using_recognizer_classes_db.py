@@ -4,7 +4,7 @@ import class_fur_absolute_magnitude_difference_solver as famd
 
 class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
     def __init__(self):
-        self.__recognizer = fur.FeatureUsingRecognizer()
+        self.__recognizer = fur.FeaturesUsingRecognizer()
         self.__featuresDistanceSolver = famd.FURAbsoluteMagnitudeDifferenceSolver()
         
     #-----------------------------------------

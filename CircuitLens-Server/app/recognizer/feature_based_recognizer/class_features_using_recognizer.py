@@ -72,8 +72,15 @@ class FeaturesUsingRecognizer(r.Recognizer):
                             'centroid': centroid,
                             'img': self.__img
                         }
-                    }
-                    ]
+                    },
+                    {
+                        'name': 'corner_distance',
+                        'arguments': {
+                            'centroid': centroid,
+                            'img': self.__img,
+                            'area': m['m00']
+                        }
+                    }]
         
         self.__featuresCalculator.setFeatures(features)
         

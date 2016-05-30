@@ -3,7 +3,7 @@ import numpy as np
 import common.class_basic_functions as bf
 import class_feature_processable_data_extractor as fpde
 
-class DispersenessFromCentroidFeature(f.Feature):
+class CornerDistanceFeature(f.Feature):
     def __init__(self):
         self.__arguments = None
         self.__neededArguments = ['area', 'centroid', 'img', 'feature_data_extractors']
@@ -39,7 +39,7 @@ class DispersenessFromCentroidFeature(f.Feature):
     def calculate(self):
         if not self.argumentsMet():
             return None
-            
+        
         if 0 == self.__arguments['area']:
             return 0
         
@@ -62,23 +62,25 @@ class DispersenessFromCentroidFeature(f.Feature):
         
         centralAngles, angleVectorMap = centralAnglesExtractor.getExtractedData()
 
-        dispersenessFromCentroid = 0
-
-        dispersenessFromCentroid = np.array([0.0, 0.0, 0.0])
+        cornerDistance = np.array([0.0, 0.0, 0.0])
+    
+        prevVector = angleVectorMap[centralAngles[0]]
         
         i = 1
         while i < len(centralAngles):
             try:
                 currentVector = angleVectorMap[centralAngles[i]]
 
-                dispersenessFromCentroid += currentVector / self.__arguments['area']
+                cornerDistance += (currentVector - prevVector) / self.__arguments['area']
                 
             except Exception as e:
                 print e
-
+            
+            prevVector = currentVector
+            
             i += 1
-
-        self.__calculatedFeature = dispersenessFromCentroid
+        
+        self.__calculatedFeature = cornerDistance
         
         return self
 

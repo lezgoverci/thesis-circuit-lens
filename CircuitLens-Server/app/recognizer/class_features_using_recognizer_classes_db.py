@@ -2,6 +2,10 @@ import class_classes_database as cdb
 import class_feature_using_recognizer as fur
 
 class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
+    #-----------------------------------------
+    # Other Functions
+    #-----------------------------------------
+    
     def train(self, classes_images_map):
         if not classes_images_map:
             return self

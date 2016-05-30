@@ -8,6 +8,11 @@ import org.rajawali3d.materials.Material;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
+import ph.edu.msuiit.circuitlens.circuit.Graphics;
+
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint2;
 
 public class GroundElm extends CircuitElm {
 
@@ -27,22 +32,6 @@ public class GroundElm extends CircuitElm {
     public int getPostCount() {
         return 1;
     }
-
-//    public void draw(Graphics g) {
-//        setVoltageColor(g, 0);
-//        drawThickLine(g, point1, point2);
-//        int i;
-//        for (i = 0; i != 3; i++) {
-//            int a = 10 - i * 4;
-//            int b = i * 5; // -10;
-//            interpPoint2(point1, point2, ps1, ps2, 1 + b / dn, a);
-//            drawThickLine(g, ps1, ps2);
-//        }
-//        doDots(g);
-//        interpPoint(point1, point2, ps2, 1 + 11. / dn);
-//        setBbox(point1, ps2, 11);
-//        drawPost(g, x, y, nodes[0]);
-//    }
 
     public void setCurrent(int x, double c) {
         current = -c;

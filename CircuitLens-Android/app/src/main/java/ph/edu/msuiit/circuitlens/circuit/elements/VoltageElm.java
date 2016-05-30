@@ -12,6 +12,10 @@ import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 import static java.lang.Math.PI;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickCircle;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint2;
 
 public class VoltageElm extends CircuitElm {
 
@@ -304,10 +308,10 @@ public class VoltageElm extends CircuitElm {
         updateDotCount();
         if (sim.getDragElm() != this) {
             if (waveform == WF_DC) {
-                drawDots(voltage3D, point1, point2, curcount);
+                //drawDots(voltage3D, point1, point2, curcount);
             } else {
-                drawDots(voltage3D, point1, lead1, curcount);
-                drawDots(voltage3D, point2, lead2, -curcount);
+                //drawDots(voltage3D, point1, lead1, curcount);
+                //drawDots(voltage3D, point2, lead2, -curcount);
             }
         }
         drawPosts(voltage3D);

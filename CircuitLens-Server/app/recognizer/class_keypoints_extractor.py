@@ -56,6 +56,8 @@ class KeypointsExtractor(fpde.FeatureProcessableDataExtractor):
             y += 1
         
         self.__extractedData = (corners, newImg)
+        
+        return self
     
     def argumentsMet(self):
         return len(self.__arguments) > 0 and all(neededArg in self.__arguments for neededArg in self.__neededArguments)

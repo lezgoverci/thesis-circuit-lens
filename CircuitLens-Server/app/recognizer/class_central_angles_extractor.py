@@ -46,6 +46,8 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
         centralAngles.append(centralAngles[0])
         
         self.__extractedData = (centralAngles, angleVectorMap)
+        
+        return self
     
     def argumentsMet(self):
         return len(self.__arguments) > 0 and all(neededArg in self.__arguments for neededArg in self.__neededArguments)

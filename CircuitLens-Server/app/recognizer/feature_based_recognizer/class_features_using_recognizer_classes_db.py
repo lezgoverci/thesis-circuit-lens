@@ -31,12 +31,12 @@ class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
     #-----------------------------------------
     
     def train(self, classesImagesMap):
-        if not classes_images_map:
+        if not self._classesValuesMap:
             return self
         
         recognizer = fur.FeaturesUsingRecognizer()
         
-        for classStr, img in classes_images_map.iteritems():
+        for classStr, img in self._classesValuesMap.iteritems():
             self._classesValuesMap[classStr] = recognizer.setImage(img).getCalculatedFeature(True)
         
         return self

@@ -25,19 +25,27 @@ import ph.edu.msuiit.circuitlens.R;
 import ph.edu.msuiit.circuitlens.ui.gl.OpenGLRenderer;
 
 
-public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, CircuitLensView {
+public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
     private static final String TAG = "CircuitLens::ARActivity";
     private long startTime;
     private CircuitLensController mController;
-    private OpenGLRenderer mRenderer;
-    private RajawaliSurfaceView mSurface;
-    private CameraBridgeViewBase mOpenCvCameraView;
+    protected CameraBridgeViewBase mOpenCvCameraView;
+
+    protected View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if(event.getAction() == MotionEvent.ACTION_DOWN)
+            {
+                // this needs to be defined on the renderer:
+                Log.d(this.getClass().getSimpleName(),": " + event.getX()+ "," + event.getY());
+                //mRenderer.onTouchEvent(event);
+            }
+            return true;
+        }
+    };
 
     // V: camera shutter
     private boolean mTakePhoto = false;
-    private boolean isSetTrackingImage = false;
-    private boolean isMapped = false;
-    private boolean isDrawn;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -80,20 +88,20 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         String serverUri = preferences.getString("server_uri","ws://127.0.0.1:8080/ws");
         boolean rotate = preferences.getBoolean("rotate",false);
 
-        mSurface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-        mSurface.setOnTouchListener(touchListener);
-        mController = new CircuitLensController(this,serverUri);
+//        mSurface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
+//        mSurface.setOnTouchListener(touchListener);
+        mController = new CircuitLensController(serverUri);
         mController.onCreate();
         initializeViews();
-        initializeRenderer();
+//        initializeRenderer();
     }
 
-    private void initializeRenderer() {
-        mRenderer = new OpenGLRenderer(this);
-        mSurface.setTransparent(true);
-        mSurface.setSurfaceRenderer(mRenderer);
-        mSurface.setZOrderMediaOverlay(true);
-    }
+//    private void initializeRenderer() {
+//        mRenderer = new OpenGLRenderer(this);
+//        mSurface.setTransparent(true);
+//        mSurface.setSurfaceRenderer(mRenderer);
+//        mSurface.setZOrderMediaOverlay(true);
+//    }
 
     private void initializeViews(){
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.surfaceView);
@@ -159,34 +167,12 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
     }
 
     @Override
-    public void showMessage(String message) {
-        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean ret = super.onTouchEvent(event);
         mTakePhoto = true;
         return ret;
     }
 
-    private View.OnTouchListener touchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            if(event.getAction() == MotionEvent.ACTION_DOWN)
-            {
-                // this needs to be defined on the renderer:
-                Log.d(this.getClass().getSimpleName(),": " + event.getX()+ "," + event.getY());
-                mRenderer.onTouchEvent(event);
-            }
-            return true;
-        }
-    };
 
-    public void updateRendererCameraPose(MatOfDouble rVec, MatOfDouble tVec, int[] floats) {
-        //compute rotation and translation values
-        //mMapper.setTransformationMatrixValues();
-        // set the computed values to renderer
-        mRenderer.setProjectionValues(rVec,tVec,floats);
-    }
+
 }

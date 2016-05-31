@@ -94,6 +94,7 @@ public class CameraProjectionAdapter {
         mProjectionDirtyCV = true;
     }
 
+    // implement this in mapper
     public MatOfDouble getProjectionCV(){
         if(mProjectionDirtyCV){
             if(mProjectionCV == null){

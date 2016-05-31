@@ -10,6 +10,7 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import ph.edu.msuiit.circuitlens.render.CameraProjectionAdapter;
 import ph.edu.msuiit.circuitlens.render.OverlayImageTransformationMapper;
+import ph.edu.msuiit.circuitlens.ui.ARView;
 import ph.edu.msuiit.circuitlens.ui.CircuitLensView;
 import ph.edu.msuiit.circuitlens.ui.gl.OpenGLRenderer;
 
@@ -24,14 +25,14 @@ public class CircuitLensController{
     private OpenGLRenderer mRenderer;
     private RajawaliSurfaceView mSurface;
 
-    public CircuitLensController(CircuitLensView view, String serverUri){
-        mView = view;
+    public CircuitLensController(String serverUri){
         mNetlistGenerator = new RemoteNetlistGenerator(serverUri);
     }
 
     public void onCreate(){
         mNetlistGenerator.connect();
         mCameraAdapter= new CameraProjectionAdapter();
+        mView = new ARView();
         initRenderer();
     }
 

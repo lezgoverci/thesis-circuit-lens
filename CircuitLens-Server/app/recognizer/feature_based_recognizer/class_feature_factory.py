@@ -3,6 +3,7 @@ import class_gearness_feature as gf
 import class_null_feature as nf
 import class_corner_distance_feature as cdf
 import class_corner_density_feature as cordf
+import class_hu_moments_feature as hm
 
 class FeatureFactory:
     @staticmethod
@@ -15,5 +16,7 @@ class FeatureFactory:
             return cdf.CornerDistanceFeature()
         elif 'corner_density' == feature:
             return cordf.CornerDensityFeature()
+        elif 'hu_moments' == feature:
+            return hm.HuMomentsFeature()
         else:
             return nf.NullFeature()

@@ -18,8 +18,18 @@ class FeaturesUsingRecognizer(r.Recognizer):
     #-----------------------------------------
 
     def setImage(self, img):
-        self.__img = img
+        if img is None:
+            return
         
+        before = img.copy()
+        
+        scaleVector = db.instance.getScaleVectorWRTNearestRes(img.shape[:2])
+        scaled = scaleVector * img.shape[:2]
+        self.__img = cv2.resize(img, (int(scaled[0]), int(scaled[1])))
+        
+        cv2.imshow("before", before)
+        cv2.imshow("result", self.__img)
+        cv2.waitKey()
         return self
     
     #-----------------------------------------
@@ -87,6 +97,12 @@ class FeaturesUsingRecognizer(r.Recognizer):
                             'centroid': centroid,
                             'img': self.__img,
                             'area': m['m00']
+                        }
+                    },
+                    {
+                        'name': 'hu_moments',
+                        'arguments': {
+                            'moments': m
                         }
                     }]
         

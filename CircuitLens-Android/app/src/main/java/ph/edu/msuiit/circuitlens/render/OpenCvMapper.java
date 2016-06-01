@@ -21,6 +21,9 @@ public class OpenCvMapper implements Mapper {
     private float mVerticalFOV;
     private double mNear = 0.1;
     private double mFar = 10;
+    private Vector mRotation;
+    private Vector mTranslation;
+    private Vector mScaling;
 
     public void setCameraWidth(int width){
         mCameraWidthPx = width;
@@ -47,6 +50,7 @@ public class OpenCvMapper implements Mapper {
 
     @Override
     public Vector getRotation() {
+
         return null;
     }
 
@@ -132,9 +136,10 @@ public class OpenCvMapper implements Mapper {
             final double diagonalPx = Math.sqrt((Math.pow(mCameraWidthPx,2.0) + Math.pow(mCameraWidthPx / fovAspectRatio,2.0)));
             final double focalLengthPx = 0.5 * diagonalPx / Math.sqrt(
                     Math.pow(Math.tan(0.5 * mHorizontalFOV * Math.PI / 180f), 2.0) +
-                            Math.pow(Math.tan(0.5 * mVerticalFOV * Math.PI / 180f), 2.0)
+                    Math.pow(Math.tan(0.5 * mVerticalFOV * Math.PI / 180f), 2.0)
             );
 
+            //TODO verify these values
             mCameraMatrix.put(0, 0, focalLengthPx);
             mCameraMatrix.put(0, 1, 0.0);
             mCameraMatrix.put(0, 2, 0.5 * mCameraWidthPx);

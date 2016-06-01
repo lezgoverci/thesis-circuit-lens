@@ -19,9 +19,6 @@ public class AndroidCameraAdapter implements CameraAdapter {
     private float mVerticalFOV = 45f; // equivalent in 35mm photography: 28mm lens
     private float mHorizontalFOV = 60f; // equivalent in 35mm photography: 28mm lens
     private double mAspectRatio;
-    private double mNear = 0.1;
-    private double mFar = 10;
-    private boolean mProjectionDirty = true;
     private boolean mIsCameraBackFacing;
     private Camera mCamera;
     private Camera.Parameters mCameraParameters;
@@ -96,15 +93,6 @@ public class AndroidCameraAdapter implements CameraAdapter {
 
         mAspectRatio = (double) mWidthPx / (double) mHeightPx;
 
-        mProjectionDirty = true;
-    }
-
-    public double getNearClippingPlane(){
-        return mNear;
-    }
-
-    public double getFarClippingPlane(){
-        return mFar;
     }
 
 
@@ -172,8 +160,5 @@ public class AndroidCameraAdapter implements CameraAdapter {
 
     }
 
-    @Override
-    public double[] getCameraProjectionMatrix() {
-        return new double[0];
-    }
+
 }

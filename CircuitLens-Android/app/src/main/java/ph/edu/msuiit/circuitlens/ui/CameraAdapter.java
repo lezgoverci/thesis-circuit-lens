@@ -17,7 +17,7 @@ public interface CameraAdapter {
     boolean isMultipleCameras();
     void useCamera(int index);
     void calibrate();
-    double[] getCameraProjectionMatrix();
+
 
 
 }

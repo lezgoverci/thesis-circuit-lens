@@ -1,5 +1,7 @@
 package ph.edu.msuiit.circuitlens.render;
 
+import org.opencv.core.MatOfDouble;
+
 import java.util.Vector;
 
 /**
@@ -30,4 +32,5 @@ public interface Mapper {
 
     // Matrices
     double[] getTransformationMatrix();
+    MatOfDouble getCameraProjectionMatrix();
 }

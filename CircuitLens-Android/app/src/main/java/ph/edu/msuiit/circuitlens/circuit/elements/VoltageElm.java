@@ -14,7 +14,9 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickCircle;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getCurrentText;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getVoltageText;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint2;
 
@@ -264,21 +266,21 @@ public class VoltageElm extends CircuitElm {
                 arr[0] = "triangle gen";
                 break;
         }
-//        arr[1] = "I = " + getCurrentText(getCurrent());
-//        arr[2] = ((this instanceof RailElm) ? "V = " : "Vd = ")
-//                + getVoltageText(getVoltageDiff());
-//        if (waveform != WF_DC && waveform != WF_VAR) {
-//            arr[3] = "f = " + getUnitText(frequency, "Hz");
-//            arr[4] = "Vmax = " + getVoltageText(maxVoltage);
-//            int i = 5;
-//            if (bias != 0) {
-//                arr[i++] = "Voff = " + getVoltageText(bias);
-//            } else if (frequency > 500) {
-//                arr[i++] = "wavelength = "
-//                        + getUnitText(2.9979e8 / frequency, "m");
-//            }
-//            arr[i++] = "P = " + getUnitText(getPower(), "W");
-//        }
+        arr[1] = "I = " + getCurrentText(getCurrent(), shortFormat);
+        arr[2] = ((this instanceof RailElm) ? "V = " : "Vd = ")
+                + getVoltageText(getVoltageDiff(), shortFormat);
+        if (waveform != WF_DC && waveform != WF_VAR) {
+            arr[3] = "f = " + getUnitText(frequency, "Hz");
+            arr[4] = "Vmax = " + getVoltageText(maxVoltage, shortFormat);
+            int i = 5;
+            if (bias != 0) {
+                arr[i++] = "Voff = " + getVoltageText(bias, shortFormat);
+                arr[i++] = "Voff = " + getVoltageText(bias, shortFormat);
+                arr[i++] = "wavelength = "
+                        + getUnitText(2.9979e8 / frequency, "m");
+            }
+            arr[i++] = "P = " + getUnitText(getPower(), "W");
+        }
     }
 
     Material color1Material, color2Material;

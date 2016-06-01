@@ -6,6 +6,12 @@ import java.util.Vector;
  * Created by vercillius on 5/31/2016.
  */
 public class OpenCvMapper implements Mapper {
+
+    // A 4x4 transformation matrix
+    private double[] mProjection = new double[16];
+    // A 3x3 camera matrix
+    private double[] mCameraMatrix= new double[9];
+
     @Override
     public Vector getRotation() {
         return null;
@@ -76,13 +82,11 @@ public class OpenCvMapper implements Mapper {
         return 0;
     }
 
+
     @Override
-    public double[] getCameraMatrix() {
+    public double[] getTransformationMatrix() {
         return new double[0];
     }
 
-    @Override
-    public double[] getProjectionMatrix() {
-        return new double[0];
-    }
+
 }

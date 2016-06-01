@@ -29,6 +29,5 @@ public interface Mapper {
     int getPixelDensity();
 
     // Matrices
-    double[] getCameraMatrix();
-    double[] getProjectionMatrix();
+    double[] getTransformationMatrix();
 }

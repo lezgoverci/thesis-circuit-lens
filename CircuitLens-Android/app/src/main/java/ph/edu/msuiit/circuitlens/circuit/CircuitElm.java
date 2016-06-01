@@ -11,10 +11,12 @@ import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Line3D;
 import org.rajawali3d.primitives.Plane;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Stack;
 
 import ph.edu.msuiit.circuitlens.circuit.elements.RailElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.VoltageElm;
@@ -110,6 +112,7 @@ public abstract class CircuitElm {
         boundingBox = new Rect();
         boundingBox.set(min(x, x2), min(y, y2),
                 abs(x2 - x) + 1, abs(y2 - y) + 1);
+
     }
 
     public void allocNodes() {
@@ -322,10 +325,14 @@ public abstract class CircuitElm {
     }
 
     public void setBbox(Point p1, Point p2, double w) {
+        boundingBox.set(p1.x-10,p1.y-10,p2.x+10,p2.y+10);
+        /*
         setBbox(p1.x, p1.y, p2.x, p2.y);
+        int gx = p2.y - p1.y;
+        int gy = p1.x - p2.x;
         int dpx = (int) (dpx1 * w);
         int dpy = (int) (dpy1 * w);
-        adjustBbox(p1.x + dpx, p1.y + dpy, p1.x - dpx, p1.y - dpy);
+        adjustBbox(p1.x + dpx, p1.y + dpy, p1.x - dpx, p1.y - dpy);*/
     }
 
     public void adjustBbox(int x1, int y1, int x2, int y2) {
@@ -358,8 +365,21 @@ public abstract class CircuitElm {
         //Graphics.draw3DText(object3D, s, x, y, cx);
     }
 
+    public void drawBoundingBox(Object3D object3D){
+        Material material = new Material();
+        material.setColor(Color.RED);
+        Stack<Vector3> boxPts = new Stack<>();
+        boxPts.add(new Vector3(boundingBox.left,boundingBox.top,0));
+        boxPts.add(new Vector3(boundingBox.left,boundingBox.bottom,0));
+        boxPts.add(new Vector3(boundingBox.right,boundingBox.bottom,0));
+        boxPts.add(new Vector3(boundingBox.right,boundingBox.top,0));
+        boxPts.add(new Vector3(boundingBox.left,boundingBox.top,0));
+
+        Line3D boundingBox = new Line3D(boxPts,3);
+        boundingBox.setMaterial(material);
+        object3D.addChild(boundingBox);
+    }
     public void drawValues(Object3D object3D, String s, double hs) {
-        Log.d(getClass().getSimpleName(), "drawValues(object3d,"+s+","+hs+")");
         if (s == null) {
             return;
         }

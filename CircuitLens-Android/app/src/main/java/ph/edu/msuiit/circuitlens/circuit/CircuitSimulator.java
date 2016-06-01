@@ -261,15 +261,17 @@ public class CircuitSimulator {
         if (!stopped) {
             long sysTime = System.currentTimeMillis();
             if (lastTime != 0) {
-                int inc = (int) (sysTime-lastTime);
+                int inc = (int) (sysTime - lastTime);
                 double c = currentBarValue;
-                Log.d(getClass().getSimpleName(),"CurrentBarValue: "+currentBarValue);
-                c = java.lang.Math.exp(c/3.5-14.2);
+                Log.d(getClass().getSimpleName(), "CurrentBarValue: " + currentBarValue);
+                c = java.lang.Math.exp(c / 3.5 - 14.2);
                 currentMult = 1.7 * inc * c;
             }
-            if (sysTime-secTime >= 1000) {
-                framerate = frames; steprate = steps;
-                frames = 0; steps = 0;
+            if (sysTime - secTime >= 1000) {
+                framerate = frames;
+                steprate = steps;
+                frames = 0;
+                steps = 0;
                 secTime = sysTime;
             }
             lastTime = sysTime;
@@ -277,28 +279,27 @@ public class CircuitSimulator {
             lastTime = 0;
 
         // Limit to 50 fps (thanks to Jurgen Klotzer for this)
-        long delay = 1000/50 - (System.currentTimeMillis() - lastFrameTime);
-        if(delay > 0){
+        long delay = 1000 / 50 - (System.currentTimeMillis() - lastFrameTime);
+        if (delay > 0) {
             return;
         }
 
         int i;
-	    /*else if (conductanceCheckItem.getState())
+        /*else if (conductanceCheckItem.getState())
 	      g.setColor(Color.white);*/
         int badnodes = 0;
         // find bad connections, nodes not connected to other elements which
         // intersect other elements' bounding boxes
         // debugged by hausen: nullPointerException
-        if ( nodeList != null )
+        if (nodeList != null)
             for (i = 0; i != nodeList.size(); i++) {
                 CircuitNode cn = getCircuitNode(i);
                 if (!cn.internal && cn.links.size() == 1) {
                     int bb = 0, j;
                     CircuitNodeLink cnl = cn.links.elementAt(0);
-                    for (j = 0; j != elmList.size(); j++)
-                    { // TODO: (hausen) see if this change does not break stuff
+                    for (j = 0; j != elmList.size(); j++) { // TODO: (hausen) see if this change does not break stuff
                         CircuitElm ce = getElm(j);
-                        if ( ce instanceof GraphicElm )
+                        if (ce instanceof GraphicElm)
                             continue;
                         if (cnl.elm != ce &&
                                 getElm(j).boundingBox.contains(cn.x, cn.y))
@@ -316,7 +317,7 @@ public class CircuitSimulator {
         //    scopes[i].draw(g);
         //g.setColor(CircuitElm.whiteColor);
         if (stopMessage != null) {
-        //    g.drawString(stopMessage, 10, circuitArea.height());
+            //    g.drawString(stopMessage, 10, circuitArea.height());
         } else {
             if (circuitBottom == 0)
                 calcCircuitBottom();
@@ -449,6 +450,41 @@ public class CircuitSimulator {
         }
     }
 
+
+    public CircuitElm getElmAtPosition(int x, int y){
+        int bestDist = 100000;
+        int bestArea = 100000;
+
+        for(CircuitElm ce : elmList) {
+            if (ce.boundingBox.contains(x, y)) {
+                int j;
+                int area = ce.boundingBox.width() * ce.boundingBox.height();
+                int jn = ce.getPostCount();
+                if (jn > 2) {
+                    jn = 2;
+                }
+                for (j = 0; j != jn; j++) {
+                    Point pt = ce.getPost(j);
+                    int dist = distanceSq(x, y, pt.x, pt.y);
+
+                    // if multiple elements have overlapping bounding boxes,
+                    // we prefer selecting elements that have posts close
+                    // to the mouse pointer and that have a small bounding
+                    // box area.
+                    if (dist <= bestDist && area <= bestArea) {
+                        bestDist = dist;
+                        bestArea = area;
+                        return ce;
+                    }
+                }
+                if (ce.getPostCount() == 0) {
+                    return ce;
+                }
+            }
+        }
+        return null;
+    }
+
     String getHint() {
         CircuitElm c1 = getElm(hintItem1);
         CircuitElm c2 = getElm(hintItem2);
@@ -535,18 +571,18 @@ public class CircuitSimulator {
     }
 
     public void updateCanvas() {
-        Log.d(getClass().getSimpleName(),"updateCanvas()");
-        for(CircuitElm elm : getElmList()){
+        Log.d(getClass().getSimpleName(), "updateCanvas()");
+        for (CircuitElm elm : getElmList()) {
             elm.updateObject3D();
         }
     }
 
     public void generateCanvas() {
-        Log.d(getClass().getSimpleName(),"generateCanvas()");
-        for(CircuitElm elm : getElmList()){
+        Log.d(getClass().getSimpleName(), "generateCanvas()");
+        for (CircuitElm elm : getElmList()) {
             elm.updateObject3D();
             Object3D circuitElm3D = elm.circuitElm3D;
-            if(circuitElm3D != null) {
+            if (circuitElm3D != null) {
                 cv.addChild(circuitElm3D);
             }
         }
@@ -1004,13 +1040,13 @@ public class CircuitSimulator {
         circuitNeedsMap = true;
 
 
-         System.out.println("matrixSize = " + matrixSize + " " + circuitNonLinear);
-         for (j = 0; j != circuitMatrixSize; j++) {
-         for (i = 0; i != circuitMatrixSize; i++)
-         System.out.print(circuitMatrix[j][i] + " ");
-         System.out.print("  " + circuitRightSide[j] + "\n");
-         }
-         System.out.print("\n");
+        System.out.println("matrixSize = " + matrixSize + " " + circuitNonLinear);
+        for (j = 0; j != circuitMatrixSize; j++) {
+            for (i = 0; i != circuitMatrixSize; i++)
+                System.out.print(circuitMatrix[j][i] + " ");
+            System.out.print("  " + circuitRightSide[j] + "\n");
+        }
+        System.out.print("\n");
         // if a matrix is linear, we can do the lu_factor here instead of
         // needing to do it every frame
         if (!circuitNonLinear) {
@@ -1450,15 +1486,15 @@ public class CircuitSimulator {
         //int maxIter = getIterCount();
         boolean debugprint = dumpMatrix;
         dumpMatrix = false;
-        Log.d(getClass().getSimpleName(),"getIterCount() = "+getIterCount());
+        Log.d(getClass().getSimpleName(), "getIterCount() = " + getIterCount());
         long steprate = (long) (160 * getIterCount());
         long tm = System.currentTimeMillis();
         long lit = lastIterTime;
-        Log.d(getClass().getSimpleName(),"lastIterTime: "+ lit);
+        Log.d(getClass().getSimpleName(), "lastIterTime: " + lit);
         if (1000 >= steprate * (tm - lastIterTime)) {
             return;
         }
-        for (iter = 1;; iter++) {
+        for (iter = 1; ; iter++) {
             int i, j, k, subiter;
             for (i = 0; i != elmList.size(); i++) {
                 CircuitElm ce = getElm(i);
@@ -1735,7 +1771,7 @@ public class CircuitSimulator {
             scopeCount = 0;
         }
         int p;
-        for (p = 0; p < len;) {
+        for (p = 0; p < len; ) {
             int l;
             int linelen = 0;
             for (l = 0; l != len - p; l++) {

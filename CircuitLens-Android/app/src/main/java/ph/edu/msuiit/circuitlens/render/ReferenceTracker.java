@@ -42,6 +42,11 @@ public class ReferenceTracker {
 
     // Used for SolvePNP to generate transformations
     public MatOfPoint3f getBoundingBoxPoints3D(){
+
+        return mBoundingBoxPoints3d;
+    }
+
+    public void setBoundingBoxPoints3D(){
         if(isBoundingBoxCornersSet){
             mBoundingBoxPoints3d.fromArray(
                     new Point3(mBoundingBoxPoints2D.get(0,0)[0],mBoundingBoxPoints2D.get(0,0)[1],0.0),
@@ -50,7 +55,6 @@ public class ReferenceTracker {
                     new Point3(mBoundingBoxPoints2D.get(3,0)[0],mBoundingBoxPoints2D.get(3,0)[1],0.0)
             );
         }
-        return mBoundingBoxPoints3d;
     }
 
     // Used for findHomography
@@ -62,7 +66,7 @@ public class ReferenceTracker {
         mApproxConvexHullPoints2D = points;
     }
 
-    public Mat getBoundingBoxCorners(MatOfPoint convexHullPoints){
+    public void setBoundingBoxCorners(MatOfPoint convexHullPoints){
         Rect box = Imgproc.boundingRect(convexHullPoints);
         mCircuitX = box.x;
         mCircuitY = box.y;
@@ -73,6 +77,10 @@ public class ReferenceTracker {
         mBoundingBoxCorners.put(2,0,new double[]{mCircuitX + mCircuitWidth ,mCircuitY + mCircuitHeight});
         mBoundingBoxCorners.put(3,0,new double[]{mCircuitX ,mCircuitY + mCircuitHeight});
         isBoundingBoxCornersSet = true;
+
+    }
+
+    public Mat getBoundingBoxCorners(){
         return mBoundingBoxCorners;
     }
 

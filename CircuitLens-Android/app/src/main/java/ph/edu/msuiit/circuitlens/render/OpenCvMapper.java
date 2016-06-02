@@ -58,18 +58,21 @@ public class OpenCvMapper implements Mapper {
             mProcessedImg = ImagePreprocessor.getProcessedImage(mImg);
 
             // find convex hull points in 2D
-            MatOfPoint2f hullPoints = new MatOfPoint2f();
-            hullPoints = PointsExtractor.getPoints2D(mProcessedImg);
+            MatOfPoint2f approxHullPoints = new MatOfPoint2f();
+            approxHullPoints = PointsExtractor.getPoints2D(mProcessedImg); // approximated convex hull points 2D
 
             if(isTakePhoto){
                 // update the tracking reference
-                mReference.setApproxConvexHullPoints2D(hullPoints);
+                mReference.setApproxConvexHullPoints2D(approxHullPoints); // setting the convex hull
+                mReference.setBoundingBoxCorners(PointsExtractor.getConvexHullPoints());  // not approx convex hull
+                //mReference.setBoundingBoxCorners(approxHullPoints);  // approx convex hull
+                mReference.setBoundingBoxPoints3D();
                 isSetTracking = true;
             }
             if(isSetTracking){
                 // for all succeeding frames,
                 // update homography using the current convex hull points
-                updateHomography(hullPoints);
+                updateHomography(approxHullPoints);
                 if(isHomographyFound){
 
                     isHomographyFound = false;
@@ -93,9 +96,7 @@ public class OpenCvMapper implements Mapper {
     }
 
     private static void getCurrentFrameBoxCorners() {
-
-        Mat referenceBoxCorners = mReference.getBoundingBoxCorners(PointsExtractor.getConvexHullPoints());
-        Core.perspectiveTransform(referenceBoxCorners,mCurrentFrameBoxCorners,mHomography); // output is saved in mCurrentFrameBoxCorners
+        Core.perspectiveTransform(mReference.getBoundingBoxCorners(),mCurrentFrameBoxCorners,mHomography); // output is saved in mCurrentFrameBoxCorners
     }
 
     private static void updateCurrentFrameBox2D() {
@@ -113,10 +114,10 @@ public class OpenCvMapper implements Mapper {
         );
     }
 
-    private static void updateHomography(MatOfPoint2f hullPoints) {
+    private static void updateHomography(MatOfPoint2f approxHullPoints) {
 
-        if(mReference.getApproxConvexHullPoints2D().toList().size() == hullPoints.toList().size()){
-            mHomography = Calib3d.findHomography(mReference.getApproxConvexHullPoints2D(),hullPoints,Calib3d.RANSAC,50.0);
+        if(mReference.getApproxConvexHullPoints2D().toList().size() == approxHullPoints.toList().size()){
+            mHomography = Calib3d.findHomography(mReference.getApproxConvexHullPoints2D(),approxHullPoints,Calib3d.RANSAC,50.0);
             isHomographyFound = true;
         }
     }

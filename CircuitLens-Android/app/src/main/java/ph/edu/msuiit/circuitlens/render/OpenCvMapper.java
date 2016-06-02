@@ -53,38 +53,23 @@ public class OpenCvMapper implements Mapper {
 
     public static void map(boolean isTakePhoto) {
         if(mImg != null){
-            // preprocess img
-            Mat mProcessedImg = new Mat();
-            mProcessedImg = ImagePreprocessor.getProcessedImage(mImg);
+            Mat mProcessedImg = ImagePreprocessor.getProcessedImage(mImg);                  // preprocess img
+            MatOfPoint2f approxHullPoints = PointsExtractor.getPoints2D(mProcessedImg);     // find approx convex hull points in 2D
 
-            // find convex hull points in 2D
-            MatOfPoint2f approxHullPoints = new MatOfPoint2f();
-            approxHullPoints = PointsExtractor.getPoints2D(mProcessedImg); // approximated convex hull points 2D
-
-            if(isTakePhoto){
-                // update the tracking reference
-                mReference.setApproxConvexHullPoints2D(approxHullPoints); // setting the convex hull
-                mReference.setBoundingBoxCorners(PointsExtractor.getConvexHullPoints());  // not approx convex hull
-                //mReference.setBoundingBoxCorners(approxHullPoints);  // approx convex hull
+            if(isTakePhoto){ // update the tracking reference
+                mReference.setConvexHullPoints(PointsExtractor.getConvexHullPoints());      // setting the raw convex hull
+                mReference.setApproxConvexHullPoints2D(approxHullPoints);                   // setting the approx convex hull
+                mReference.setBoundingBoxCorners();
                 mReference.setBoundingBoxPoints3D();
                 isSetTracking = true;
             }
             if(isSetTracking){
-                // for all succeeding frames,
-                // update homography using the current convex hull points
-                updateHomography(approxHullPoints);
+                updateHomography(approxHullPoints); // update homography using the current convex hull points
                 if(isHomographyFound){
-
                     isHomographyFound = false;
-
-                    // get current frame box corners
-                    getCurrentFrameBoxCorners();
-
-                    // update current frame box points 2D
-                    updateCurrentFrameBox2D();
-
-                    // update transformations
-                    updateTransformations();
+                    getCurrentFrameBoxCorners();    // get current frame box corners
+                    updateCurrentFrameBox2D();      // update current frame box points 2D
+                    updateTransformations();        // update transformations
                 }
             }
 
@@ -100,8 +85,6 @@ public class OpenCvMapper implements Mapper {
     }
 
     private static void updateCurrentFrameBox2D() {
-
-
         final double[] trackingImageBoxCorner0 = mCurrentFrameBoxCorners.get(0,0);
         final double[] trackingImageBoxCorner1 = mCurrentFrameBoxCorners.get(1,0);
         final double[] trackingImageBoxCorner2 = mCurrentFrameBoxCorners.get(2,0);
@@ -115,7 +98,6 @@ public class OpenCvMapper implements Mapper {
     }
 
     private static void updateHomography(MatOfPoint2f approxHullPoints) {
-
         if(mReference.getApproxConvexHullPoints2D().toList().size() == approxHullPoints.toList().size()){
             mHomography = Calib3d.findHomography(mReference.getApproxConvexHullPoints2D(),approxHullPoints,Calib3d.RANSAC,50.0);
             isHomographyFound = true;

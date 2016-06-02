@@ -15,12 +15,13 @@ import org.opencv.imgproc.Imgproc;
 public class ReferenceTracker {
 
     // Bounding Box
-    private MatOfPoint2f mBoundingBoxPoints2D = new MatOfPoint2f();
-    private Mat mBoundingBoxCorners = new Mat(4,1, CvType.CV_32FC2); // To be used in finding the perspective transform
-    private MatOfPoint3f mBoundingBoxPoints3d;          // To be used in SolvePNP function to generate transformations
+    private Mat mBoundingBoxCorners; // To be used in finding the perspective transform
+    private MatOfPoint2f mBoundingBoxPoints2D;
+    private MatOfPoint3f mBoundingBoxPoints3D;          // To be used in SolvePNP function to generate transformations
 
     // Convex Hull
     private MatOfPoint2f mApproxConvexHullPoints2D;     // To be used in finding the homography
+    private MatOfPoint mConvexHullPoints;
 
     private int mCircuitX;
     private int mCircuitY;
@@ -29,13 +30,15 @@ public class ReferenceTracker {
     private boolean isBoundingBoxCornersSet;
 
     public ReferenceTracker(){
-        mBoundingBoxPoints3d = new MatOfPoint3f();
+        mBoundingBoxCorners = new Mat(4,1, CvType.CV_32FC2);
+        mBoundingBoxPoints2D = new MatOfPoint2f();
+        mBoundingBoxPoints3D = new MatOfPoint3f();
         mApproxConvexHullPoints2D = new MatOfPoint2f();
         isBoundingBoxCornersSet = false;
     }
 
     public ReferenceTracker(MatOfPoint2f hullPoints2D){
-        mBoundingBoxPoints3d = new MatOfPoint3f();
+        mBoundingBoxPoints3D = new MatOfPoint3f();
         mApproxConvexHullPoints2D = hullPoints2D;
         isBoundingBoxCornersSet = false;
     }
@@ -43,12 +46,12 @@ public class ReferenceTracker {
     // Used for SolvePNP to generate transformations
     public MatOfPoint3f getBoundingBoxPoints3D(){
 
-        return mBoundingBoxPoints3d;
+        return mBoundingBoxPoints3D;
     }
 
     public void setBoundingBoxPoints3D(){
         if(isBoundingBoxCornersSet){
-            mBoundingBoxPoints3d.fromArray(
+            mBoundingBoxPoints3D.fromArray(
                     new Point3(mBoundingBoxPoints2D.get(0,0)[0],mBoundingBoxPoints2D.get(0,0)[1],0.0),
                     new Point3(mBoundingBoxPoints2D.get(1,0)[0],mBoundingBoxPoints2D.get(1,0)[1],0.0),
                     new Point3(mBoundingBoxPoints2D.get(2,0)[0],mBoundingBoxPoints2D.get(2,0)[1],0.0),
@@ -66,8 +69,8 @@ public class ReferenceTracker {
         mApproxConvexHullPoints2D = points;
     }
 
-    public void setBoundingBoxCorners(MatOfPoint convexHullPoints){
-        Rect box = Imgproc.boundingRect(convexHullPoints);
+    public void setBoundingBoxCorners(){
+        Rect box = Imgproc.boundingRect(mConvexHullPoints);
         mCircuitX = box.x;
         mCircuitY = box.y;
         mCircuitWidth = box.width;
@@ -84,4 +87,8 @@ public class ReferenceTracker {
         return mBoundingBoxCorners;
     }
 
+    public void setConvexHullPoints(MatOfPoint convexHullPoints) {
+        mConvexHullPoints = convexHullPoints;
+
+    }
 }

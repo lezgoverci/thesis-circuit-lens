@@ -18,13 +18,13 @@ public class PointsExtractor {
     private static Mat mImageGray;
 
     // Contours
-    private static List<MatOfPoint> mContoursList = new ArrayList<>();
-    private static MatOfPoint mLargestContour = new MatOfPoint();
-    private static Mat mContoursHierarchy = new Mat();
+    private static List<MatOfPoint> mContoursList;
+    private static MatOfPoint mLargestContour;
+    private static Mat mContoursHierarchy;
 
     // Convex Hull
-    private static MatOfInt mConvexHullIndices = new MatOfInt();
-    private static MatOfPoint mConvexHullPoints = new MatOfPoint();
+    private static MatOfInt mConvexHullIndices;
+    private static MatOfPoint mConvexHullPoints;
     private static Mat mApproxHullCorners;
     private static MatOfPoint2f mApproxHullPoints2D;
 
@@ -33,8 +33,18 @@ public class PointsExtractor {
     public static MatOfPoint2f getPoints2D(Mat img){
         mImageGray = new Mat(); //TODO is this necessary?
         mImageGray = img;
+
         mApproxHullPoints2D = new MatOfPoint2f();
         mApproxHullCorners = new MatOfPoint2f();
+
+        mConvexHullIndices = new MatOfInt();
+        mConvexHullPoints = new MatOfPoint();
+
+        mContoursList = new ArrayList<>();
+        mContoursHierarchy = new Mat();
+
+        mLargestContour = new MatOfPoint();
+
         findPoints2D();
         return mApproxHullPoints2D;
     }

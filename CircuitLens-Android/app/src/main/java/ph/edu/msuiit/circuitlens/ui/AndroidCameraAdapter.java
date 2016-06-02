@@ -3,6 +3,9 @@ package ph.edu.msuiit.circuitlens.ui;
 import android.hardware.Camera;
 import android.os.Build;
 
+import org.opencv.core.CvType;
+import org.opencv.core.MatOfDouble;
+
 import java.util.List;
 
 /**
@@ -20,10 +23,13 @@ public class AndroidCameraAdapter implements CameraAdapter {
     private float mHorizontalFOV = 60f; // equivalent in 35mm photography: 28mm lens
     private double mAspectRatio;
     private boolean mIsCameraBackFacing;
+    private boolean mCameraMatrixDirty = true;
     private Camera mCamera;
     private Camera.Parameters mCameraParameters;
     private Camera.Size mImageSize;
     private List<Camera.Size> mSupportedImageSizes; // The image sizes supported by the active camera.
+    private MatOfDouble mCameraMatrix;          // A 3x3 camera matrix
+    private final MatOfDouble   mDistCoeffs = new MatOfDouble(0.0, 0.0, 0.0, 0.0);          // Assume no distortion
 
 
     public AndroidCameraAdapter() {
@@ -158,6 +164,40 @@ public class AndroidCameraAdapter implements CameraAdapter {
     public void calibrate() {
         //TODO implement how to calibrate camera
 
+    }
+
+    @Override
+    public MatOfDouble getCameraProjectionMatrix() {
+        if(mCameraMatrixDirty){
+            if(mCameraMatrix == null){
+                mCameraMatrix = new MatOfDouble();
+                mCameraMatrix.create(3,3, CvType.CV_64FC1);
+            }
+            final float fovAspectRatio = mHorizontalFOV / mVerticalFOV;
+            final double diagonalPx = Math.sqrt((Math.pow(mWidthPx,2.0) + Math.pow(mWidthPx / fovAspectRatio,2.0)));
+            final double focalLengthPx = 0.5 * diagonalPx / Math.sqrt(
+                    Math.pow(Math.tan(0.5 * mHorizontalFOV * Math.PI / 180f), 2.0) +
+                            Math.pow(Math.tan(0.5 * mVerticalFOV * Math.PI / 180f), 2.0)
+            );
+
+            //TODO verify these values
+            mCameraMatrix.put(0, 0, focalLengthPx);
+            mCameraMatrix.put(0, 1, 0.0);
+            mCameraMatrix.put(0, 2, 0.5 * mWidthPx);
+            mCameraMatrix.put(1, 0, 0.0);
+            mCameraMatrix.put(1, 1, focalLengthPx);
+            mCameraMatrix.put(1, 2, 0.5 * mHeightPx);
+            mCameraMatrix.put(2, 0, 0.0);
+            mCameraMatrix.put(2, 1, 0.0);
+            mCameraMatrix.put(2, 2, 1.0);
+        }
+
+        return mCameraMatrix;
+
+    }
+
+    public MatOfDouble getDistortion(){
+        return mDistCoeffs;
     }
 
 

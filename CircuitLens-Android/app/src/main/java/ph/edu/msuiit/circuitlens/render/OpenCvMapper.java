@@ -1,159 +1,207 @@
 package ph.edu.msuiit.circuitlens.render;
 
+import org.opencv.calib3d.Calib3d;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
+import org.opencv.core.Mat;
 import org.opencv.core.MatOfDouble;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.MatOfPoint3f;
+import org.opencv.core.Point;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by vercillius on 5/31/2016.
  */
 public class OpenCvMapper implements Mapper {
 
+    private static ReferenceTracker mReference = new ReferenceTracker();
+
+    private static Mat mImg;
+    private static Mat mHomography;
+    private static Mat mCurrentFrameBoxCorners = new Mat(4,1, CvType.CV_32FC2);
+    private static boolean isSetTracking = false;
+    private static boolean isHomographyFound = false;
 
     private MatOfDouble mProjectionMatrix;      // A 4x4 transformation matrix
-    private MatOfDouble mCameraMatrix;          // A 3x3 camera matrix
     private boolean mProjectionMatrixDirty = true;
-    private boolean mCameraMatrixDirty = true;
-    private int mCameraWidthPx;
-    private int mCameraHeightPx;
-    private float mHorizontalFOV;
-    private float mVerticalFOV;
-    private double mNear = 0.1;
-    private double mFar = 10;
-    private Vector mRotation;
-    private Vector mTranslation;
-    private Vector mScaling;
 
-    public void setCameraWidth(int width){
-        mCameraWidthPx = width;
+    private static MatOfPoint2f mCurrentFrameBoxPoints2D = new MatOfPoint2f();
+
+    private static double[] mRotation = new double[3];
+    private static double[] mTranslation = new double[3];
+    private static double[] mScaling = new double[3];
+
+    private static MatOfDouble   mRVec = new MatOfDouble();                                  // The Euler angles of the detected target.
+    private static MatOfDouble   mTVec = new MatOfDouble();
+
+
+    private int mPixelDensity;
+    private static MatOfDouble mCameraMatrix;
+    private static MatOfDouble mDistortion;
+
+    public void setImg(Mat img){
+        mImg = img;
     }
 
-    public void setCameraHeight(int height){
-        mCameraHeightPx = height;
+    public void setCamera(MatOfDouble cameraMatrix, MatOfDouble distortion){
+        mCameraMatrix = cameraMatrix;
+        mDistortion = distortion;
     }
 
-    public void setCameraHorizontalFOV(float horizontalFOV){
-        mHorizontalFOV = horizontalFOV;
+    public static void map(boolean isTakePhoto) {
+        if(mImg != null){
+            // preprocess img
+            Mat mProcessedImg = new Mat();
+            mProcessedImg = ImagePreprocessor.getProcessedImage(mImg);
+
+            // find convex hull points in 2D
+            MatOfPoint2f hullPoints = new MatOfPoint2f();
+            hullPoints = PointsExtractor.getPoints2D(mProcessedImg);
+
+            if(isTakePhoto){
+                // update the tracking reference
+                mReference.setApproxConvexHullPoints2D(hullPoints);
+                isSetTracking = true;
+            }
+            if(isSetTracking){
+                // for all succeeding frames,
+                // update homography using the current convex hull points
+                updateHomography(hullPoints);
+                if(isHomographyFound){
+
+                    isHomographyFound = false;
+
+                    // get current frame box corners
+                    getCurrentFrameBoxCorners();
+
+                    // update current frame box points 2D
+                    updateCurrentFrameBox2D();
+
+                    // update transformations
+                    updateTransformations();
+                }
+            }
+
+        }
     }
 
-    public void setCameraVerticalFOV(float verticalFOV){
-        mVerticalFOV = verticalFOV;
+    private static void updateTransformations() {
+        Calib3d.solvePnP(mReference.getBoundingBoxPoints3D(),mCurrentFrameBoxPoints2D,mCameraMatrix,mDistortion,mRVec,mTVec);
     }
 
+    private static void getCurrentFrameBoxCorners() {
 
-    public double getNearClippingPlane(){
-        return mNear;
+        Mat referenceBoxCorners = mReference.getBoundingBoxCorners(PointsExtractor.getConvexHullPoints());
+        Core.perspectiveTransform(referenceBoxCorners,mCurrentFrameBoxCorners,mHomography); // output is saved in mCurrentFrameBoxCorners
     }
 
-    public double getFarClippingPlane(){  return mFar;  }
+    private static void updateCurrentFrameBox2D() {
+
+
+        final double[] trackingImageBoxCorner0 = mCurrentFrameBoxCorners.get(0,0);
+        final double[] trackingImageBoxCorner1 = mCurrentFrameBoxCorners.get(1,0);
+        final double[] trackingImageBoxCorner2 = mCurrentFrameBoxCorners.get(2,0);
+        final double[] trackingImageBoxCorner3 = mCurrentFrameBoxCorners.get(3,0);
+        mCurrentFrameBoxPoints2D.fromArray(
+                new Point(trackingImageBoxCorner0[0],trackingImageBoxCorner0[1]),
+                new Point(trackingImageBoxCorner1[0],trackingImageBoxCorner1[1]),
+                new Point(trackingImageBoxCorner2[0],trackingImageBoxCorner2[1]),
+                new Point(trackingImageBoxCorner3[0],trackingImageBoxCorner3[1])
+        );
+    }
+
+    private static void updateHomography(MatOfPoint2f hullPoints) {
+
+        if(mReference.getApproxConvexHullPoints2D().toList().size() == hullPoints.toList().size()){
+            mHomography = Calib3d.findHomography(mReference.getApproxConvexHullPoints2D(),hullPoints,Calib3d.RANSAC,50.0);
+            isHomographyFound = true;
+        }
+    }
 
     @Override
-    public Vector getRotation() {
-
-        return null;
+    public double[] getRotation() {
+        mRotation[0] = mRVec.toArray()[0];
+        mRotation[1] = mRVec.toArray()[1];
+        mRotation[2] = mRVec.toArray()[2];
+        return mRotation;
     }
 
     @Override
     public double getAxisRotationX() {
-        return 0;
+        return mRotation[0] = mRVec.toArray()[0];
     }
 
     @Override
     public double getAxisRotationY() {
-        return 0;
+        return mRotation[1] = mRVec.toArray()[1];
     }
 
     @Override
     public double getAxisRotationZ() {
-        return 0;
+        return mRotation[2] = mRVec.toArray()[2];
     }
 
     @Override
-    public Vector getTranslation() {
-        return null;
+    public double[] getTranslation() {
+        mTranslation[0] = mTVec.toArray()[0];
+        mTranslation[1] = mTVec.toArray()[1];
+        mTranslation[2] = mTVec.toArray()[2];
+        return mTranslation;
     }
 
     @Override
     public double getTranslationX() {
-        return 0;
+        return mTranslation[0] = mTVec.toArray()[0];
     }
 
     @Override
     public double getTranslationY() {
-        return 0;
+        return mTranslation[1] = mTVec.toArray()[1];
     }
 
     @Override
     public double getTranslationZ() {
-        return 0;
+        return mTranslation[2] = mTVec.toArray()[2];
     }
 
     @Override
-    public Vector getScaleTransformation() {
-        return null;
+    public double[] getScaleTransformation() {
+        return mScaling;
     }
 
     @Override
     public double getScaleTransformationX() {
-        return 0;
+        return mScaling[0];
     }
 
     @Override
     public double getScaleTransformationY() {
-        return 0;
+        return mScaling[1];
     }
 
     @Override
     public double getScaleTransformationZ() {
-        return 0;
+        return mScaling[2];
     }
 
     @Override
     public void setPixelDensity(int pixelDensity) {
-
+        mPixelDensity = pixelDensity;
     }
 
     @Override
     public int getPixelDensity() {
-        return 0;
+        return mPixelDensity;
     }
-
 
     @Override
     public double[] getTransformationMatrix() {
         return new double[0];
     }
 
-    @Override
-    public MatOfDouble getCameraProjectionMatrix() {
-        if(mCameraMatrixDirty){
-            if(mCameraMatrix == null){
-                mCameraMatrix = new MatOfDouble();
-                mCameraMatrix.create(3,3, CvType.CV_64FC1);
-            }
-            final float fovAspectRatio = mHorizontalFOV / mVerticalFOV;
-            final double diagonalPx = Math.sqrt((Math.pow(mCameraWidthPx,2.0) + Math.pow(mCameraWidthPx / fovAspectRatio,2.0)));
-            final double focalLengthPx = 0.5 * diagonalPx / Math.sqrt(
-                    Math.pow(Math.tan(0.5 * mHorizontalFOV * Math.PI / 180f), 2.0) +
-                    Math.pow(Math.tan(0.5 * mVerticalFOV * Math.PI / 180f), 2.0)
-            );
-
-            //TODO verify these values
-            mCameraMatrix.put(0, 0, focalLengthPx);
-            mCameraMatrix.put(0, 1, 0.0);
-            mCameraMatrix.put(0, 2, 0.5 * mCameraWidthPx);
-            mCameraMatrix.put(1, 0, 0.0);
-            mCameraMatrix.put(1, 1, focalLengthPx);
-            mCameraMatrix.put(1, 2, 0.5 * mCameraHeightPx);
-            mCameraMatrix.put(2, 0, 0.0);
-            mCameraMatrix.put(2, 1, 0.0);
-            mCameraMatrix.put(2, 2, 1.0);
-        }
-
-        return mCameraMatrix;
-
-    }
 
 
 }

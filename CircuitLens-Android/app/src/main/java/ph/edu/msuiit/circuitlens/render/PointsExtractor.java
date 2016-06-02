@@ -28,15 +28,23 @@ public class PointsExtractor {
     private static Mat mApproxHullCorners;
     private static MatOfPoint2f mApproxHullPoints2D;
 
-    public static void setImage(Mat img){
+
+    // useful for finding the homography in mapper
+    public static MatOfPoint2f getPoints2D(Mat img){
         mImageGray = new Mat(); //TODO is this necessary?
         mImageGray = img;
         mApproxHullPoints2D = new MatOfPoint2f();
         mApproxHullCorners = new MatOfPoint2f();
+        findPoints2D();
+        return mApproxHullPoints2D;
+    }
+
+    public static MatOfPoint getConvexHullPoints(){
+        return mConvexHullPoints;
     }
 
 
-    public static void findPoints2D(){
+    private static void findPoints2D(){
         // Find all contours
         findContours();
         // Find the largest contour
@@ -117,10 +125,6 @@ public class PointsExtractor {
         return result;
     }
 
-    // useful for finding the homography in mapper
-    public static MatOfPoint2f getPoints2D(){
-        findPoints2D();
-        return mApproxHullPoints2D;
-    }
+
 
 }

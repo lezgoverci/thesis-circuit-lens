@@ -1,5 +1,7 @@
 package ph.edu.msuiit.circuitlens.ui;
 
+import org.opencv.core.MatOfDouble;
+
 /**
  * Created by vercillius on 5/31/2016.
  */
@@ -17,6 +19,7 @@ public interface CameraAdapter {
     boolean isMultipleCameras();
     void useCamera(int index);
     void calibrate();
+    MatOfDouble getCameraProjectionMatrix();
 
 
 

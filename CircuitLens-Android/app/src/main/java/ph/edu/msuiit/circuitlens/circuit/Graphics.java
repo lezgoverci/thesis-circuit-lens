@@ -24,6 +24,7 @@ import ph.edu.msuiit.circuitlens.ui.gl.Circle3D;
 import ph.edu.msuiit.circuitlens.ui.gl.Triangle3D;
 
 public class Graphics {
+
     public static Point interpPoint(Point a, Point b, double f) {
         Point p = new Point();
         interpPoint(a, b, p, f);

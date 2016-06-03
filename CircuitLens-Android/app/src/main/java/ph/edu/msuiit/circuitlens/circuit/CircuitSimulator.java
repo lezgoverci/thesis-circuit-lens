@@ -165,7 +165,6 @@ public class CircuitSimulator {
         register(SwitchElm.class);
         register(WireElm.class);
 
-        String euroResistor = null;
         currentMult = 1.7 * 10;
 
         setGrid();
@@ -263,7 +262,7 @@ public class CircuitSimulator {
             if (lastTime != 0) {
                 int inc = (int) (sysTime - lastTime);
                 double c = currentBarValue;
-                Log.d(getClass().getSimpleName(), "CurrentBarValue: " + currentBarValue);
+                //Log.d(getClass().getSimpleName(), "CurrentBarValue: " + currentBarValue);
                 c = java.lang.Math.exp(c / 3.5 - 14.2);
                 currentMult = 1.7 * inc * c;
             }
@@ -571,7 +570,7 @@ public class CircuitSimulator {
     }
 
     public void updateCanvas() {
-        Log.d(getClass().getSimpleName(), "updateCanvas()");
+        //Log.d(getClass().getSimpleName(), "updateCanvas()");
         for (CircuitElm elm : getElmList()) {
             elm.updateObject3D();
         }
@@ -609,6 +608,7 @@ public class CircuitSimulator {
     }
 
     public void analyzeCircuit() {
+        Log.d(getClass().getSimpleName(),"analyzeCircuit()");
         calcCircuitBottom();
         if (elmList.isEmpty()) {
             return;
@@ -1058,9 +1058,8 @@ public class CircuitSimulator {
     }
 
     void calcCircuitBottom() {
-        int i;
         circuitBottom = 0;
-        for (i = 0; i != elmList.size(); i++) {
+        for (int i = 0; i != elmList.size(); i++) {
             Rect rect = getElm(i).boundingBox;
             int bottom = rect.height() + rect.top;
             if (bottom > circuitBottom) {
@@ -1486,11 +1485,11 @@ public class CircuitSimulator {
         //int maxIter = getIterCount();
         boolean debugprint = dumpMatrix;
         dumpMatrix = false;
-        Log.d(getClass().getSimpleName(), "getIterCount() = " + getIterCount());
+        //Log.d(getClass().getSimpleName(), "getIterCount() = " + getIterCount());
         long steprate = (long) (160 * getIterCount());
         long tm = System.currentTimeMillis();
         long lit = lastIterTime;
-        Log.d(getClass().getSimpleName(), "lastIterTime: " + lit);
+        //Log.d(getClass().getSimpleName(), "lastIterTime: " + lit);
         if (1000 >= steprate * (tm - lastIterTime)) {
             return;
         }
@@ -1942,17 +1941,12 @@ public class CircuitSimulator {
         return (x + gridRound) & gridMask;
     }
 
-    boolean doSwitch(int x, int y) {
-        if (mouseElm == null || !(mouseElm instanceof SwitchElm)) {
-            return false;
-        }
-        SwitchElm se = (SwitchElm) mouseElm;
+    public void doSwitch(SwitchElm se) {
         se.toggle();
         if (se.isMomentary()) {
             heldSwitchElm = se;
         }
         needAnalyze();
-        return true;
     }
 
     public int locateElm(CircuitElm elm) {
@@ -2235,16 +2229,14 @@ public class CircuitSimulator {
     }
 
     void clearSelection() {
-        int i;
-        for (i = 0; i != elmList.size(); i++) {
+        for (int i = 0; i < elmList.size(); i++) {
             CircuitElm ce = getElm(i);
             ce.setSelected(false);
         }
     }
 
     void doSelectAll() {
-        int i;
-        for (i = 0; i != elmList.size(); i++) {
+        for (int i = 0; i < elmList.size(); i++) {
             CircuitElm ce = getElm(i);
             ce.setSelected(true);
         }

@@ -116,7 +116,7 @@ public class DiodeElm extends CircuitElm {
         int color2 = getVoltageColor(volts[1]);
         lineMaterial.setColor(color2);
 
-        //doDots(circuitElm3D);
+        doDots(circuitElm3D);
     }
 
     @Override

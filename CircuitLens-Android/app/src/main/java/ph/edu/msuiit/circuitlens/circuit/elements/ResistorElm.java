@@ -1,6 +1,7 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
 import android.graphics.Point;
+import android.util.Log;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
@@ -81,6 +82,7 @@ public class ResistorElm extends CircuitElm {
             colorMaterials[i].setColor(color);
         }
         update2Leads();
+        doDots(circuitElm3D);
     }
 
     Material[] colorMaterials;
@@ -141,7 +143,6 @@ public class ResistorElm extends CircuitElm {
             String s = getShortUnitText(resistance, "", shortFormat);
             drawValues(resistor3D, s, hs);
         }
-        doDots(resistor3D);
         drawPosts(resistor3D);
         return resistor3D;
     }

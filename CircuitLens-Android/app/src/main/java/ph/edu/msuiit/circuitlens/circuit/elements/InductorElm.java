@@ -77,6 +77,7 @@ public class InductorElm extends CircuitElm {
         double v1 = volts[0];
         double v2 = volts[1];
         updateCoil(v1, v2, coilMaterials);
+        doDots(circuitElm3D);
     }
 
     public void calculateCurrent() {
@@ -107,7 +108,6 @@ public class InductorElm extends CircuitElm {
         }
 
         drawPosts(inductor3d);
-        doDots(inductor3d);
         return inductor3d;
     }
 }

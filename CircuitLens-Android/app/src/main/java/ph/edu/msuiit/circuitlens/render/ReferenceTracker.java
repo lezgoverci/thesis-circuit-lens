@@ -52,10 +52,10 @@ public class ReferenceTracker {
     public void setBoundingBoxPoints3D(){
         if(isBoundingBoxCornersSet){
             mBoundingBoxPoints3D.fromArray(
-                    new Point3(mBoundingBoxPoints2D.get(0,0)[0],mBoundingBoxPoints2D.get(0,0)[1],0.0),
-                    new Point3(mBoundingBoxPoints2D.get(1,0)[0],mBoundingBoxPoints2D.get(1,0)[1],0.0),
-                    new Point3(mBoundingBoxPoints2D.get(2,0)[0],mBoundingBoxPoints2D.get(2,0)[1],0.0),
-                    new Point3(mBoundingBoxPoints2D.get(3,0)[0],mBoundingBoxPoints2D.get(3,0)[1],0.0)
+                    new Point3(mBoundingBoxCorners.get(0,0)[0],mBoundingBoxCorners.get(0,0)[1],0.0),
+                    new Point3(mBoundingBoxCorners.get(1,0)[0],mBoundingBoxCorners.get(1,0)[1],0.0),
+                    new Point3(mBoundingBoxCorners.get(2,0)[0],mBoundingBoxCorners.get(2,0)[1],0.0),
+                    new Point3(mBoundingBoxCorners.get(3,0)[0],mBoundingBoxCorners.get(3,0)[1],0.0)
             );
         }
     }

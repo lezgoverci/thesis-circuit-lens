@@ -55,14 +55,11 @@ public class PointsExtractor {
 
 
     private static void findPoints2D(){
-        // Find all contours
-        findContours();
-        // Find the largest contour
-        findLargestContour();
-        // Find the convex hull of the largest contour
-        findConvexHull();
-        // Approximate convex hull to 2D points
-        approximateConvexHull();
+
+        findContours();             // Find all contours
+        findLargestContour();       // Find the largest contour
+        findConvexHull();           // Find the convex hull of the largest contour
+        approximateConvexHull();    // Approximate convex hull to 2D points
 
     }
 

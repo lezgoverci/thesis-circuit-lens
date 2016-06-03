@@ -39,11 +39,11 @@ public class AndroidCameraAdapter implements CameraAdapter {
         mCameraSizeIndex = 0;
         mNumCameras = 1;
         mIsCameraBackFacing = true;
+        getCameraParameters();
 
     }
 
-    //TODO public for use in controller? or private for local call?
-    public void getCameraParameters(){
+    private void getCameraParameters(){
 
         // Check if the device supports front and back camera.
         // else, use the back camera

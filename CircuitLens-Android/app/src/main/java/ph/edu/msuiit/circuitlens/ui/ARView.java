@@ -125,6 +125,11 @@ public class ARView extends ARActivity implements CircuitLensView{
 
     @Override
     public void setCameraMatrix(double[] cameraMatrix) {
+//        width = cameraMatrix[0];
+//        height = cameraMatrix[1];
+//        vertical = cameraMatrix[2];
+//        horizontal = cameraMatrix[3];
+//        aspectRatio = cameraMatrix[4];
 
     }
 

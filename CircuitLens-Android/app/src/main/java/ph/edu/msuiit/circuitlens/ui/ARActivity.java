@@ -160,7 +160,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
 
         // Update renderer using the current frame
-        mController.map(frame,mTakePhoto);
+        mController.map(frame,mTakePhoto); //TODO use AsyncTask?
         mTakePhoto = false;
 
         return frame;

@@ -1,39 +1,32 @@
 package ph.edu.msuiit.circuitlens;
 
-import android.content.Context;
 import android.util.Log;
-
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfDouble;
-import org.rajawali3d.surface.RajawaliSurfaceView;
-
-import ph.edu.msuiit.circuitlens.render.CameraProjectionAdapter;
-import ph.edu.msuiit.circuitlens.render.OverlayImageTransformationMapper;
+import ph.edu.msuiit.circuitlens.render.OpenCvMapper;
 import ph.edu.msuiit.circuitlens.ui.ARView;
-import ph.edu.msuiit.circuitlens.ui.CircuitLensView;
-import ph.edu.msuiit.circuitlens.ui.gl.OpenGLRenderer;
+import ph.edu.msuiit.circuitlens.ui.AndroidCameraAdapter;
 
 public class CircuitLensController{
     private static final String TAG = "CircuitLens::CLC";
     RemoteNetlistGenerator mNetlistGenerator;
-    CircuitLensView mView;
-    OverlayImageTransformationMapper mMapper;
 
-    /** OTHER VARIABLES **/
-    private CameraProjectionAdapter mCameraAdapter;   // Adapter that contains all information about the camera
-    private OpenGLRenderer mRenderer;
-    private RajawaliSurfaceView mSurface;
+    /** NEW STRUCTURE **/
+    OpenCvMapper mMapper;
+    AndroidCameraAdapter mCameraAdapter;
+    ARView mArView;
 
     public CircuitLensController(String serverUri){
         mNetlistGenerator = new RemoteNetlistGenerator(serverUri);
+
+        /** New constructors **/
+        mMapper = new OpenCvMapper();
+        mCameraAdapter = new AndroidCameraAdapter();
+        mArView = new ARView();
     }
 
     public void onCreate(){
         mNetlistGenerator.connect();
-        mCameraAdapter= new CameraProjectionAdapter();
-        mView = new ARView();
-        initRenderer();
     }
 
     public void onFocus(CvCameraViewFrame frame){
@@ -56,61 +49,46 @@ public class CircuitLensController{
         @Override
         public void onError(String error) {
             Log.d(TAG,error);
-            mView.showMessage(error);
+            //mView.showMessage(error);
         }
     };
 
 
     public void onResume(){
-        mMapper = new OverlayImageTransformationMapper();
+        // get height, width, camera matrix  from camera adapter
+        //mCameraAdapter = new AndroidCameraAdapter();       // Only use this if you want to use new and updated camera parameters
+        mCameraAdapter.setCameraParameters();       // This will update camera parameters based on the recent camera parameters
 
+        // set height, width, camera matrix to ARView
+        mArView.setCameraMatrix(new double[]{
+                mCameraAdapter.getCameraWidth(),
+                mCameraAdapter.getCameraHeight(),
+                mCameraAdapter.getVerticalFOV(),
+                mCameraAdapter.getHorizontalFOV(),
+                mCameraAdapter.getAspectRatio()
+        });
 
-        double aspectRatio = mCameraAdapter.getAspectRatio();
-        int width = mCameraAdapter.getCameraWidth();
-        int height = mCameraAdapter.getCameraHeight();
+        // Reset mapper values
+        mMapper = new OpenCvMapper();
+        mMapper.setCamera(mCameraAdapter.getCameraProjectionMatrix(),mCameraAdapter.getDistortion());
+        //mMapper.reset(); //TODO create a reset function?
 
-        // Camera Matrix from Android camera
-        MatOfDouble projection = mCameraAdapter.getProjectionCV();
-
-        mMapper.setProjection(projection,aspectRatio,width,height);
-        mRenderer.setCameraValues(width,height);
-    }
-
-
-    private boolean isHomographyFound(){
-        return mMapper.isHomographyFound();
     }
 
     public void map(Mat src, boolean isTakePhoto){
 
-        mMapper.map(src,isTakePhoto);
+        mMapper.setImg(src);
+        mMapper.map(isTakePhoto);
+        mMapper.drawDebug(); // turn on debug drawing
 
-        //TODO check if transformation is OK
-        if(isHomographyFound()== true){
-            // update camera pose using the new transformation from current homography
-            mView.updateRendererCameraPose(mMapper.getRVec(),mMapper.getTVec(),mMapper.getDimens());
-        }
-    }
+        mArView.setRotationX(mMapper.getAxisRotationX());
+        mArView.setRotationY(mMapper.getAxisRotationY());
+        mArView.setRotationZ(mMapper.getAxisRotationZ());
 
-
-    private void initRenderer() {
-
-        mRenderer = new OpenGLRenderer((Context) mView);
-        mSurface.setTransparent(true);
-        mSurface.setSurfaceRenderer(mRenderer);
-        mSurface.setZOrderMediaOverlay(true);
+        mArView.setTranslationX(mMapper.getTranslationX());
+        mArView.setTranslationY(mMapper.getTranslationY());
+        mArView.setTranslationZ(mMapper.getTranslationZ());
 
     }
-
-//    private void updateRendererCameraPose() {
-//        //compute rotation and translation values
-//        //mMapper.setTransformationMatrixValues();
-//        // set the computed values to renderer
-//        mRenderer.setProjectionValues(mMapper.getRVec(),mMapper.getTVec(),mMapper.getDimens());
-//    }
-
-//    public void draw(Mat src, Mat dst){
-//        mMapper.draw(src,dst);
-//    }
 
 }

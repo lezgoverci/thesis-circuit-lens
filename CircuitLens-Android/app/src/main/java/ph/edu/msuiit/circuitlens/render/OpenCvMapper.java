@@ -186,5 +186,11 @@ public class OpenCvMapper implements Mapper {
     }
 
 
+    public void reset() {
 
+    }
+
+    public void drawDebug() {
+
+    }
 }

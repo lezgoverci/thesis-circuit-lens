@@ -200,9 +200,30 @@ public class RendererTransformations extends OpenGLRenderer {
     }
 
     private void renderImageTranslation() {
-        circuit3D.setX(mPosX);
-        circuit3D.setY(mPosY);
-        circuit3D.setZ(mPosZ);
+        if(true){
+            // turn this to true for debugging
+            double rawPosX = mPosX;
+            double rawPosY = mPosY;
+            double rawPosZ = mPosZ;
+
+            double diffPosX = mInitPosX - rawPosX;
+            double diffPosY = mInitPosY - rawPosY;
+            double diffPosZ = mInitPosZ - rawPosZ;
+
+            double posX = circuit3D.getX() + diffPosX;
+            double posY = circuit3D.getY() + diffPosY;
+            double posZ = circuit3D.getZ() + diffPosZ;
+
+            circuit3D.setX(posX);
+            circuit3D.setY(posY);
+            circuit3D.setZ(posZ);
+
+        }else{
+            circuit3D.setX(mPosX);
+            circuit3D.setY(mPosY);
+            circuit3D.setZ(mPosZ);
+        }
+
     }
 
     private void renderImageScaling() {

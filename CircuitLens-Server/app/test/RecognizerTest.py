@@ -13,205 +13,126 @@ import unittest
 import numpy as np
 
 class RecognizerTest(unittest.TestCase):
-    
-    
-    # def test_symmetrical_feature(self):
-    #     recognizer = rf.RecognizerFactory.create('free_features_using')
+    def setUp(self):
+        self.__imagesDir = 'D:\\Thesis\\Recognizer\\training_set\\'
+        self.__recognizer = rf.RecognizerFactory.create('features_using')
         
-    #     imagesDir = 'D:\\Thesis\\Recognizer\\training_set\\'
+        # For training only
+        # classesImagesMap = {
+        #     'inductor': self.__imagesDir + 'symbol_inductor.png',
+        #     'resistor': self.__imagesDir + 'symbol_resistor.png',
+        #     'diode': self.__imagesDir + 'symbol_diode.png',
+        #     'capacitor': self.__imagesDir + 'symbol_capacitor.png',
+        #     'voltage_source': self.__imagesDir + 'symbol_voltage_source.png',
+        #     'voltage_source_2': self.__imagesDir + 'symbol_voltage_source2.png',
+        #     'ground': self.__imagesDir + 'ground.png'
+        # }
+        
+        # for className, imgName in classesImagesMap.iteritems():
+        #     gray = bf.BasicFunctions.loadImage(imgName)
+        #     classesImagesMap[className] = gray
 
-    #     queryImgName1 = 'symbol_capacitor_small'
-    #     queryImg1 = bf.BasicFunctions.loadImage(imagesDir + queryImgName1 + '.png')
+        # self.__recognizer.train(classesImagesMap)
         
-    #     m1 = cv2.moments(queryImg1)
-    #     centroid1 = np.array([m1['m10'] / m1['m00'], m1['m01'] / m1['m00'], 0])
-        
-    #     queryImgName2 = 'symbol_capacitor'
-    #     queryImg2 = bf.BasicFunctions.loadImage(imagesDir + queryImgName2 + '.png')
-        
-    #     m2 = cv2.moments(queryImg2)
-    #     centroid2 = np.array([m2['m10'] / m2['m00'], m2['m01'] / m2['m00'], 0])
+    def test_curved_capacitor_recognized(self):
+        expectedClass = 'capacitor'
+        queryImgName = 'capacitor'
+        queryImg = bf.BasicFunctions.loadImage(self.__imagesDir + queryImgName + '.png')
 
-    #     recognizer.setFeatures([{
-    #                                 'name': 'symmetrical',
-    #                                 'arguments': {
-    #                                     'centroid': centroid1,
-    #                                     'img': queryImg1
-    #                                 }
-    #                             }])
-        
-    #     f1 = recognizer.setImage(queryImg1).recognize(True).getCalculatedFeature()
-        
-    #     recognizer.setFeatures([{
-    #                                 'name': 'symmetrical',
-    #                                 'arguments': {
-    #                                     'centroid': centroid2,
-    #                                     'img': queryImg2
-    #                                 }
-    #                             }])
-        
-    #     f2 = recognizer.setImage(queryImg2).recognize(True).getCalculatedFeature()
-        
-    #     print "Symmetry feature: %s: %s %s: %s" % (queryImgName1, str(np.linalg.norm(f1)), queryImgName2, str(np.linalg.norm(f2)))
-        
-    #     self.assertTrue(True)
-        
-    # def test_corner_density_feature(self):
-    #     recognizer = rf.RecognizerFactory.create('free_features_using')
-        
-    #     imagesDir = 'D:\\Thesis\\Recognizer\\training_set\\'
+        calculatedClass = self.__recognizer.setImage(queryImg).getClass(True)
 
-    #     queryImgName1 = 'symbol_capacitor'
-    #     queryImg1 = bf.BasicFunctions.loadImage(imagesDir + queryImgName1 + '.png')
-        
-    #     m1 = cv2.moments(queryImg1)
-    #     centroid1 = np.array([m1['m10'] / m1['m00'], m1['m01'] / m1['m00'], 0])
-        
-    #     queryImgName2 = 'symbol_resistor'
-    #     queryImg2 = bf.BasicFunctions.loadImage(imagesDir + queryImgName2 + '.png')
-        
-    #     m2 = cv2.moments(queryImg2)
-    #     centroid2 = np.array([m2['m10'] / m2['m00'], m2['m01'] / m2['m00'], 0])
-
-    #     recognizer.setFeatures([{
-    #                                 'name': 'corner_density',
-    #                                 'arguments': {
-    #                                     'centroid': centroid1,
-    #                                     'img': queryImg1,
-    #                                     'area': m1['m00']
-    #                                 }
-    #                             }])
-        
-    #     f1 = recognizer.setImage(queryImg1).recognize(True).getCalculatedFeature()
-        
-    #     recognizer.setFeatures([{
-    #                                 'name': 'corner_density',
-    #                                 'arguments': {
-    #                                     'centroid': centroid2,
-    #                                     'img': queryImg2,
-    #                                     'area': m2['m00']
-    #                                 }
-    #                             }])
-        
-    #     f2 = recognizer.setImage(queryImg2).recognize(True).getCalculatedFeature()
-        
-    #     print "Corner density feature: %s: %s %s: %s" % (queryImgName1, str(np.linalg.norm(f1)), queryImgName2, str(np.linalg.norm(f2)))
-        
-    #     self.assertTrue(True)
+        self.assertEqual(expectedClass, calculatedClass)
     
-    
-    # def test_num_contours_feature(self):
-    #     recognizer = rf.RecognizerFactory.create('free_features_using')
-        
-    #     imagesDir = 'D:\\Thesis\\Recognizer\\training_set\\'
+    def test_straight_capacitor_recognized(self):
+        expectedClass = 'capacitor'
+        queryImgName = 'capacitor2'
+        queryImg = bf.BasicFunctions.loadImage(self.__imagesDir + queryImgName + '.png')
 
-    #     queryImgName1 = 'symbol_capacitor'
-    #     queryImg1 = bf.BasicFunctions.loadImage(imagesDir + queryImgName1 + '.png')
-        
-    #     m1 = cv2.moments(queryImg1)
-    #     centroid1 = np.array([m1['m10'] / m1['m00'], m1['m01'] / m1['m00'], 0])
-        
-    #     queryImgName2 = 'symbol_resistor'
-    #     queryImg2 = bf.BasicFunctions.loadImage(imagesDir + queryImgName2 + '.png')
-        
-    #     m2 = cv2.moments(queryImg2)
-    #     centroid2 = np.array([m2['m10'] / m2['m00'], m2['m01'] / m2['m00'], 0])
+        calculatedClass = self.__recognizer.setImage(queryImg).getClass(True)
 
-    #     recognizer.setFeatures([{
-    #                                 'name': 'num_contours',
-    #                                 'arguments': {
-    #                                     'img': queryImg1
-    #                                 }
-    #                             }])
-        
-    #     f1 = recognizer.setImage(queryImg1).recognize(True).getCalculatedFeature()
-        
-    #     recognizer.setFeatures([{
-    #                                 'name': 'num_contours',
-    #                                 'arguments': {
-    #                                     'img': queryImg2
-    #                                 }
-    #                             }])
-        
-    #     f2 = recognizer.setImage(queryImg2).recognize(True).getCalculatedFeature()
-        
-    #     print "Num contours feature: %s: %s %s: %s" % (queryImgName1, str(np.linalg.norm(f1)), queryImgName2, str(np.linalg.norm(f2)))
-        
-    #     self.assertTrue(True)
+        self.assertEqual(expectedClass, calculatedClass)
     
-    
-    
-    # def test_gearness_feature(self):
-    #     recognizer = rf.RecognizerFactory.create('free_features_using')
-        
-    #     imagesDir = 'D:\\Thesis\\Recognizer\\training_set\\'
+    def test_small_capacitor_recognized(self):
+        expectedClass = 'capacitor'
+        queryImgName = 'symbol_capacitor_small'
+        queryImg = bf.BasicFunctions.loadImage(self.__imagesDir + queryImgName + '.png')
 
-    #     queryImgName1 = 'test_002'
-    #     queryImg1 = bf.BasicFunctions.loadImage(imagesDir + queryImgName1 + '.png')
-        
-    #     m1 = cv2.moments(queryImg1)
-    #     centroid1 = np.array([m1['m10'] / m1['m00'], m1['m01'] / m1['m00'], 0])
-        
-    #     queryImgName2 = 'test_001'
-    #     queryImg2 = bf.BasicFunctions.loadImage(imagesDir + queryImgName2 + '.png')
-        
-    #     m2 = cv2.moments(queryImg2)
-    #     centroid2 = np.array([m2['m10'] / m2['m00'], m2['m01'] / m2['m00'], 0])
+        calculatedClass = self.__recognizer.setImage(queryImg).getClass(True)
 
-    #     recognizer.setFeatures([{
-    #                                 'name': 'gearness',
-    #                                 'arguments': {
-    #                                     'centroid': centroid1,
-    #                                     'img': queryImg1,
-    #                                     'area': m1['m00']
-    #                                 }
-    #                             }])
-        
-    #     f1 = recognizer.setImage(queryImg1).recognize(True).getCalculatedFeature()
-        
-    #     recognizer.setFeatures([{
-    #                                 'name': 'gearness',
-    #                                 'arguments': {
-    #                                     'centroid': centroid2,
-    #                                     'img': queryImg2,
-    #                                     'area': m2['m00']
-    #                                 }
-    #                             }])
-        
-    #     f2 = recognizer.setImage(queryImg2).recognize(True).getCalculatedFeature()
-        
-    #     print "Gearness feature: %s: %s %s: %s" % (queryImgName1, str(np.linalg.norm(f1)), queryImgName2, str(np.linalg.norm(f2)))
-        
-    #     self.assertTrue(True)
+        self.assertEqual(expectedClass, calculatedClass)
     
-    def test_feature_using_recognizer_recognition(self):
-        imagesDir = 'D:\\Thesis\\Recognizer\\training_set\\'
+    def test_tilted_thin_diode_recognized(self):
+        expectedClass = 'diode'
+        queryImgName = 'diode2'
+        queryImg = bf.BasicFunctions.loadImage(self.__imagesDir + queryImgName + '.jpg')
+
+        calculatedClass = self.__recognizer.setImage(queryImg).getClass(True)
+
+        self.assertEqual(expectedClass, calculatedClass)
+    
+    def test_tilted_thick_diode_recognized(self):
+        expectedClass = 'diode'
+        queryImgName = 'symbol_diode2'
+        queryImg = bf.BasicFunctions.loadImage(self.__imagesDir + queryImgName + '.png')
+
+        calculatedClass = self.__recognizer.setImage(queryImg).getClass(True)
+
+        self.assertEqual(expectedClass, calculatedClass)
         
-        classesImagesMap = {
-            'inductor': imagesDir + 'symbol_inductor.png',
-            'resistor': imagesDir + 'symbol_resistor.png',
-            'diode': imagesDir + 'symbol_diode.png',
-            'capacitor': imagesDir + 'symbol_capacitor.png',
-            'voltage_source': imagesDir + 'symbol_voltage_source.png',
-        }
+    def test_upside_down_inductor_recognized(self):
+        expectedClass = 'inductor'
+        queryImgName = 'inductor'
+        queryImg = bf.BasicFunctions.loadImage(self.__imagesDir + queryImgName + '.png')
+
+        calculatedClass = self.__recognizer.setImage(queryImg).getClass(True)
+
+        self.assertEqual(expectedClass, calculatedClass)
+   
+    def test_tilted_inductor_recognized(self):
+        expectedClass = 'inductor'
+        queryImgName = 'inductor2'
+        queryImg = bf.BasicFunctions.loadImage(self.__imagesDir + queryImgName + '.png')
+
+        calculatedClass = self.__recognizer.setImage(queryImg).getClass(True)
+
+        self.assertEqual(expectedClass, calculatedClass)
+    
+    def test_thin_small_resistor_recognized(self):
+        expectedClass = 'resistor'
+        queryImgName = 'resistor'
+        queryImg = bf.BasicFunctions.loadImage(self.__imagesDir + queryImgName + '.jpg')
+
+        calculatedClass = self.__recognizer.setImage(queryImg).getClass(True)
+
+        self.assertEqual(expectedClass, calculatedClass)
+    
+    def test_thin_large_resistor_recognized(self):
+        expectedClass = 'resistor'
+        queryImgName = 'resistor'
+        queryImg = bf.BasicFunctions.loadImage(self.__imagesDir + queryImgName + '.png')
+
+        calculatedClass = self.__recognizer.setImage(queryImg).getClass(True)
+
+        self.assertEqual(expectedClass, calculatedClass)
         
-        for className, imgName in classesImagesMap.iteritems():
-            gray = bf.BasicFunctions.loadImage(imgName)
-            classesImagesMap[className] = gray
-        
-        recognizer = rf.RecognizerFactory.create('features_using')
-        recognizer.train(classesImagesMap)
-        
+    def test_thick_medium_tilted_resistor_recognized(self):
+        expectedClass = 'resistor'
         queryImgName = 'resistor2'
-        queryImg = bf.BasicFunctions.loadImage(imagesDir + queryImgName + '.png')
+        queryImg = bf.BasicFunctions.loadImage(self.__imagesDir + queryImgName + '.png')
 
-        print "Calculating %s features" % (queryImgName)
-        calculatedClass = recognizer.setImage(queryImg).getClass(True)
-        
-        print "%s matched with %s! Match percentage is %lf." % (queryImgName, calculatedClass, recognizer.getMatchPercentage())
-        
-        self.assertEqual(queryImgName, calculatedClass)
-        
+        calculatedClass = self.__recognizer.setImage(queryImg).getClass(True)
+
+        self.assertEqual(expectedClass, calculatedClass)
+    
+    def test_capacitor_like_voltage_source_recognized(self):
+        expectedClass = 'voltage_source'
+        queryImgName = 'symbol_voltage_source3'
+        queryImg = bf.BasicFunctions.loadImage(self.__imagesDir + queryImgName + '.png')
+
+        calculatedClass = self.__recognizer.setImage(queryImg).getClass(True)
+
+        self.assertEqual(expectedClass, calculatedClass)
+
 def runtests():
     unittest.main()
 

@@ -13,4 +13,4 @@ class FURAbsoluteMagnitudeDifferenceSolver(flds.FeaturesListDistanceSolver):
         
         ave_mag = f1_mag + f2_mag / 2
         
-        return (abs(f1_mag - f2_mag) * 100) / ave_mag
+        return 100 - (abs(f1_mag - f2_mag) * 100) / ave_mag

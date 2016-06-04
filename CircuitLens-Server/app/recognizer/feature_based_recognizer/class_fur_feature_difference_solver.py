@@ -10,5 +10,6 @@ class FURFeatureDifferenceSolver(flds.FeaturesListDistanceSolver):
     def solve(self, f1, f2):
         r = f1 - f2
         ave_vector = (f1 + f2) / 2
-
-        return (np.linalg.norm(r) * 100) / np.linalg.norm(ave_vector)
+        diff = r - ave_vector
+        
+        return ((np.linalg.norm(diff) * 100) / np.linalg.norm(ave_vector))

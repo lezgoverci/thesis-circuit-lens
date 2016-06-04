@@ -181,20 +181,34 @@ public class RendererTransformations extends OpenGLRenderer {
     }
 
     private void renderImageOrientation() {
+
+        double rawRoll = MathUtil.radiansToDegrees(mRoll);
+        double rawYaw = MathUtil.radiansToDegrees(mYaw);
+        double rawPitch = MathUtil.radiansToDegrees(mPitch);
+
+        double diffRoll = mInitRoll - rawRoll;
+        double diffYaw = mInitYaw - rawYaw;
+        double diffPitch = mInitPitch - rawPitch;
+
+        double roll = circuit3D.getOrientation().getRoll() + diffRoll;
+        double yaw = circuit3D.getOrientation().getYaw() + diffYaw;
+        double pitch = circuit3D.getOrientation().getPitch() + diffPitch;
+
         Quaternion orient = new Quaternion();
-        double roll = MathUtil.radiansToDegrees(mRoll);
-        double yaw = MathUtil.radiansToDegrees(mYaw);
-        double pitch = MathUtil.radiansToDegrees(mPitch);
         orient.fromEuler(yaw,pitch,roll);
         circuit3D.setOrientation(orient);
     }
 
     private void renderImageTranslation() {
-        // TODO render translation
+        circuit3D.setX(mPosX);
+        circuit3D.setY(mPosY);
+        circuit3D.setZ(mPosZ);
     }
 
     private void renderImageScaling() {
-        // TODO render scaling
+        circuit3D.setScaleX(mScaleX);
+        circuit3D.setScaleY(mScaleY);
+        circuit3D.setScaleZ(mScaleZ);
     }
 
     private void useTransformationValues() {

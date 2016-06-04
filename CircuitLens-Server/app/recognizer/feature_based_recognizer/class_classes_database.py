@@ -23,3 +23,7 @@ class ClassesDatabase(object):
     @abstractmethod
     def train(self, classesImagesMap):
         pass
+    
+    @abstractmethod
+    def load(self):
+        pass

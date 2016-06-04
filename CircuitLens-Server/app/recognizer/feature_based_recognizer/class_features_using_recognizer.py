@@ -19,17 +19,19 @@ class FeaturesUsingRecognizer(r.Recognizer):
 
     def setImage(self, img):
         if img is None:
-            return
+            return self
         
-        before = img.copy()
+        self.__img = img
+             
+        # before = img.copy()
         
-        scaleVector = db.instance.getScaleVectorWRTNearestRes(img.shape[:2])
-        scaled = scaleVector * img.shape[:2]
-        self.__img = cv2.resize(img, (int(scaled[0]), int(scaled[1])))
+        # scaleVector = db.instance.getScaleVectorWRTNearestRes(img.shape[:2])
+        # scaled = scaleVector * img.shape[:2]
+        # self.__img = cv2.resize(img, (int(scaled[0]), int(scaled[1])))
         
-        cv2.imshow("before", before)
-        cv2.imshow("result", self.__img)
-        cv2.waitKey()
+        # cv2.imshow("before", before)
+        # cv2.imshow("result", self.__img)
+        # cv2.waitKey()
         return self
     
     #-----------------------------------------
@@ -68,40 +70,89 @@ class FeaturesUsingRecognizer(r.Recognizer):
         
         centroid = np.array([m['m10'] / m['m00'], m['m01'] / m['m00'], 0])
         
+        origImg = self.__img.copy()
+        
         features = [{
-                        'name': 'disperseness_from_centroid',
+                    #     'name': 'disperseness_from_centroid',
+                    #     'arguments': {
+                    #         'centroid': centroid,
+                    #         'img': self.__img,
+                    #         'area': m['m00']
+                    #     }
+                    # },
+                    # {
+                    #     'name': 'gearness',
+                    #     'arguments': {
+                    #         'centroid': centroid,
+                    #         'img': self.__img,
+                    #         'area': m['m00']
+                    #     }
+                    # },
+                    # {
+                    #     'name': 'corner_distance',
+                    #     'arguments': {
+                    #         'centroid': centroid,
+                    #         'img': self.__img,
+                    #         'area': m['m00']
+                    #     }
+                    # },
+                    # {
+                    #     'name': 'corner_density',
+                    #     'arguments': {
+                    #         'centroid': centroid,
+                    #         'img': self.__img,
+                    #         'area': m['m00']
+                    #     }
+                    # },
+                    # {
+                    #     'name': 'hu_moments',
+                    #     'arguments': {
+                    #         'moments': m
+                    #     }
+                    # },
+                    # {
+                        'name': 'symmetrical',
                         'arguments': {
                             'centroid': centroid,
                             'img': self.__img,
-                            'area': m['m00']
                         }
                     },
+                    # {
+                    #     'name': 'roundness',
+                    #     'arguments': {
+                    #         'area': m['m00'],
+                    #         'img': self.__img,
+                    #         'centroid': centroid
+                    #     }
+                    # },
                     {
-                        'name': 'gearness',
+                        'name': 'num_contours',
                         'arguments': {
-                            'centroid': centroid,
-                            'img': self.__img
+                            'img': origImg.copy()
                         }
                     },
+                    # {
+                    #     'name': 'eccentricity',
+                    #     'arguments': {
+                    #         'moments': m
+                    #     }
+                    # },
+                    # {
+                    #     'name': 'minor_major_axes',
+                    #     'arguments': {
+                    #         'moments': m
+                    #     }
+                    # },
+                    # {
+                    #     'name': 'constellationness',
+                    #     'arguments': {
+                    #         'img': origImg.copy()
+                    #     }
+                    # },
                     {
-                        'name': 'corner_distance',
+                        'name': 'black_white',
                         'arguments': {
-                            'centroid': centroid,
-                            'img': self.__img,
-                            'area': m['m00']
-                        }
-                    },
-                    {
-                        'name': 'corner_density',
-                        'arguments': {
-                            'centroid': centroid,
-                            'img': self.__img,
-                            'area': m['m00']
-                        }
-                    },
-                    {
-                        'name': 'hu_moments',
-                        'arguments': {
+                            'img': origImg,
                             'moments': m
                         }
                     }]

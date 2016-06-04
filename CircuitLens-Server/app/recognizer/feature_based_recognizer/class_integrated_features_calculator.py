@@ -1,5 +1,5 @@
-import class_feature_factory as ff
-import class_feature_data_extractor_factory as fdef
+import features.class_feature_factory as ff
+import feature_data_extractors.class_feature_data_extractor_factory as fdef
 import numpy as np
 
 class IntegratedFeaturesCalculator:

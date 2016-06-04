@@ -182,26 +182,39 @@ public class RendererTransformations extends OpenGLRenderer {
 
     private void renderImageOrientation() {
 
-        double rawRoll = mRoll;
-        double rawYaw = mYaw;
-        double rawPitch = mPitch;
+        if(true){       // turn this to false to use raw orientation data
 
-        double diffRoll = mInitRoll - rawRoll;
-        double diffYaw = mInitYaw - rawYaw;
-        double diffPitch = mInitPitch - rawPitch;
+            double rawRoll = mRoll;
+            double rawYaw = mYaw;
+            double rawPitch = mPitch;
 
-        double roll = MathUtil.radiansToDegrees(circuit3D.getOrientation().getRoll() + diffRoll);
-        double yaw = MathUtil.radiansToDegrees(circuit3D.getOrientation().getYaw() + diffYaw);
-        double pitch = MathUtil.radiansToDegrees(circuit3D.getOrientation().getPitch() + diffPitch);
+            double diffRoll = mInitRoll - rawRoll;
+            double diffYaw = mInitYaw - rawYaw;
+            double diffPitch = mInitPitch - rawPitch;
 
-        Quaternion orient = new Quaternion();
-        orient.fromEuler(yaw,pitch,roll);
-        circuit3D.setOrientation(orient);
+            double roll = MathUtil.radiansToDegrees(circuit3D.getOrientation().getRoll() + diffRoll);
+            double yaw = MathUtil.radiansToDegrees(circuit3D.getOrientation().getYaw() + diffYaw);
+            double pitch = MathUtil.radiansToDegrees(circuit3D.getOrientation().getPitch() + diffPitch);
+
+            Quaternion orient = new Quaternion();
+            orient.fromEuler(yaw,pitch,roll);
+            circuit3D.setOrientation(orient);
+
+        } else{
+
+            Quaternion orient = new Quaternion();
+            orient.fromEuler(mYaw,mPitch,mRoll);
+            circuit3D.setOrientation(orient);
+        }
+
+
+
+
     }
 
     private void renderImageTranslation() {
-        if(true){
-            // turn this to true for debugging
+        if(true){       // turn this to false to use raw position data
+
             double rawPosX = mPosX;
             double rawPosY = mPosY;
             double rawPosZ = mPosZ;

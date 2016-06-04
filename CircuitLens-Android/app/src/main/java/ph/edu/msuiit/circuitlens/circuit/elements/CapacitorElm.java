@@ -136,6 +136,9 @@ public class CapacitorElm extends CircuitElm {
         color1Material.setColor(color1);
         int color2 = getVoltageColor(volts[1]);
         color2Material.setColor(color2);
+
+        //updateDotCount();
+        doDots(circuitElm3D);
     }
 
     Material color1Material, color2Material;
@@ -162,8 +165,8 @@ public class CapacitorElm extends CircuitElm {
 //
         updateDotCount();
         if (sim.getDragElm() != this) {
-            //drawDots(capacitor3D, point1, lead1, curcount);
-            //drawDots(capacitor3D, point2, lead2, -curcount);
+            drawDots(capacitor3D, point1, lead1, curcount);
+            drawDots(capacitor3D, point2, lead2, -curcount);
         }
         drawPosts(capacitor3D);
         if (sim.isShowingValues()) {

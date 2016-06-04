@@ -14,7 +14,9 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickCircle;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getCurrentText;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getVoltageText;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint2;
 
@@ -264,21 +266,21 @@ public class VoltageElm extends CircuitElm {
                 arr[0] = "triangle gen";
                 break;
         }
-//        arr[1] = "I = " + getCurrentText(getCurrent());
-//        arr[2] = ((this instanceof RailElm) ? "V = " : "Vd = ")
-//                + getVoltageText(getVoltageDiff());
-//        if (waveform != WF_DC && waveform != WF_VAR) {
-//            arr[3] = "f = " + getUnitText(frequency, "Hz");
-//            arr[4] = "Vmax = " + getVoltageText(maxVoltage);
-//            int i = 5;
-//            if (bias != 0) {
-//                arr[i++] = "Voff = " + getVoltageText(bias);
-//            } else if (frequency > 500) {
-//                arr[i++] = "wavelength = "
-//                        + getUnitText(2.9979e8 / frequency, "m");
-//            }
-//            arr[i++] = "P = " + getUnitText(getPower(), "W");
-//        }
+        arr[1] = "I = " + getCurrentText(getCurrent(), shortFormat);
+        arr[2] = ((this instanceof RailElm) ? "V = " : "Vd = ")
+                + getVoltageText(getVoltageDiff(), shortFormat);
+        if (waveform != WF_DC && waveform != WF_VAR) {
+            arr[3] = "f = " + getUnitText(frequency, "Hz");
+            arr[4] = "Vmax = " + getVoltageText(maxVoltage, shortFormat);
+            int i = 5;
+            if (bias != 0) {
+                arr[i++] = "Voff = " + getVoltageText(bias, shortFormat);
+                arr[i++] = "Voff = " + getVoltageText(bias, shortFormat);
+                arr[i++] = "wavelength = "
+                        + getUnitText(2.9979e8 / frequency, "m");
+            }
+            arr[i++] = "P = " + getUnitText(getPower(), "W");
+        }
     }
 
     Material color1Material, color2Material;
@@ -305,16 +307,17 @@ public class VoltageElm extends CircuitElm {
             interpPoint(lead1, lead2, ps1, .5);
             drawWaveform(voltage3D, ps1);
         }
-        updateDotCount();
+        //updateDotCount();
         if (sim.getDragElm() != this) {
             if (waveform == WF_DC) {
-                //drawDots(voltage3D, point1, point2, curcount);
+                drawDots(voltage3D, point1, point2, curcount);
             } else {
-                //drawDots(voltage3D, point1, lead1, curcount);
-                //drawDots(voltage3D, point2, lead2, -curcount);
+                drawDots(voltage3D, point1, lead1, curcount);
+                drawDots(voltage3D, point2, lead2, -curcount);
             }
         }
         drawPosts(voltage3D);
+        drawBoundingBox(voltage3D);
 
         return voltage3D;
     }
@@ -329,6 +332,14 @@ public class VoltageElm extends CircuitElm {
         color1Material.setColor(color1);
         int color2 =  getVoltageColor(volts[1]);
         color2Material.setColor(color2);
+
+        updateDotCount();
+        if (waveform == WF_DC) {
+            drawDots(circuitElm3D, point1, point2, curcount);
+        } else {
+            drawDots(circuitElm3D, point1, lead1, curcount);
+            drawDots(circuitElm3D, point2, lead2, -curcount);
+        }
     }
 
 }

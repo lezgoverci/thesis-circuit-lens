@@ -104,6 +104,7 @@ public class WireElm extends CircuitElm {
         }
         int color = getVoltageColor(volts[0]);
         wireMaterial.setColor(color);
+        doDots(circuitElm3D);
     }
 
     public Object3D generateObject3D() {
@@ -119,7 +120,6 @@ public class WireElm extends CircuitElm {
 //            drawValues(g, s, 4);
 //        }
         drawPosts(wire3D);
-        doDots(wire3D);
         return wire3D;
     }
 }

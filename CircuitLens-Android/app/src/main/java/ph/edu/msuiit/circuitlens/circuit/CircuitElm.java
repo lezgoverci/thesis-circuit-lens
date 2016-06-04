@@ -4,17 +4,19 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.Log;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Cube;
+import org.rajawali3d.primitives.Line3D;
 import org.rajawali3d.primitives.Plane;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Stack;
 
 import ph.edu.msuiit.circuitlens.circuit.elements.RailElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.VoltageElm;
@@ -22,7 +24,8 @@ import ph.edu.msuiit.circuitlens.ui.gl.Circle3D;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static ph.edu.msuiit.circuitlens.circuit.Graphics.draw3DText;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getCurrentDText;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getVoltageDText;
 
 public abstract class CircuitElm {
 
@@ -47,8 +50,7 @@ public abstract class CircuitElm {
     public static final NumberFormat showFormat, shortFormat, noCommaFormat;
 
     static {
-        int i;
-        for (i = 0; i != colorScaleCount; i++) {
+        for (int i = 0; i < colorScaleCount; i++) {
             double v = i * 2. / colorScaleCount - 1;
             if (v < 0) {
                 int n1 = (int) (128 * -v) + 100;
@@ -110,6 +112,7 @@ public abstract class CircuitElm {
         boundingBox = new Rect();
         boundingBox.set(min(x, x2), min(y, y2),
                 abs(x2 - x) + 1, abs(y2 - y) + 1);
+
     }
 
     public void allocNodes() {
@@ -123,8 +126,7 @@ public abstract class CircuitElm {
         int ny = y + dy;
         int nx2 = x2 + dx;
         int ny2 = y2 + dy;
-        int i;
-        for (i = 0; i != sim.elmListSize(); i++) {
+        for (int i = 0; i < sim.elmListSize(); i++) {
             CircuitElm ce = sim.getElm(i);
             if (ce.x == nx && ce.y == ny && ce.x2 == nx2 && ce.y2 == ny2) {
                 return false;
@@ -143,8 +145,7 @@ public abstract class CircuitElm {
     }
 
     public void reset() {
-        int i;
-        for (i = 0; i != getPostCount() + getInternalNodeCount(); i++) {
+        for (int i = 0; i < getPostCount() + getInternalNodeCount(); i++) {
             volts[i] = 0;
         }
         curcount = 0;
@@ -246,8 +247,7 @@ public abstract class CircuitElm {
     }
 
     public void drawPosts(Object3D object3D) {
-        int i;
-        for (i = 0; i != getPostCount(); i++) {
+        for (int i = 0; i < getPostCount(); i++) {
             Point p = getPost(i);
             drawPost(object3D, p.x, p.y, nodes[i]);
         }
@@ -322,10 +322,15 @@ public abstract class CircuitElm {
     }
 
     public void setBbox(Point p1, Point p2, double w) {
+        int iw = (int) Math.floor(w);
+        boundingBox.set(p1.x - iw, p1.y - iw, p2.x + iw, p2.y + iw);
+        /*
         setBbox(p1.x, p1.y, p2.x, p2.y);
+        int gx = p2.y - p1.y;
+        int gy = p1.x - p2.x;
         int dpx = (int) (dpx1 * w);
         int dpy = (int) (dpy1 * w);
-        adjustBbox(p1.x + dpx, p1.y + dpy, p1.x - dpx, p1.y - dpy);
+        adjustBbox(p1.x + dpx, p1.y + dpy, p1.x - dpx, p1.y - dpy);*/
     }
 
     public void adjustBbox(int x1, int y1, int x2, int y2) {
@@ -358,8 +363,22 @@ public abstract class CircuitElm {
         //Graphics.draw3DText(object3D, s, x, y, cx);
     }
 
+    public void drawBoundingBox(Object3D object3D) {
+        Material material = new Material();
+        material.setColor(Color.RED);
+        Stack<Vector3> boxPts = new Stack<>();
+        boxPts.add(new Vector3(boundingBox.left, boundingBox.top, 0));
+        boxPts.add(new Vector3(boundingBox.left, boundingBox.bottom, 0));
+        boxPts.add(new Vector3(boundingBox.right, boundingBox.bottom, 0));
+        boxPts.add(new Vector3(boundingBox.right, boundingBox.top, 0));
+        boxPts.add(new Vector3(boundingBox.left, boundingBox.top, 0));
+
+        Line3D boundingBox = new Line3D(boxPts, 3);
+        boundingBox.setMaterial(material);
+        object3D.addChild(boundingBox);
+    }
+
     public void drawValues(Object3D object3D, String s, double hs) {
-        Log.d(getClass().getSimpleName(), "drawValues(object3d,"+s+","+hs+")");
         if (s == null) {
             return;
         }
@@ -367,7 +386,7 @@ public abstract class CircuitElm {
         Bitmap rasterText = Graphics.textAsBitmap(s, 12, Color.WHITE);
         Material textMaterial = new Material();
         textMaterial.setColor(Color.TRANSPARENT);
-        Texture texture = new Texture("text",rasterText);
+        Texture texture = new Texture("text", rasterText);
 
         int w = rasterText.getWidth();
 
@@ -378,7 +397,7 @@ public abstract class CircuitElm {
         }
         Plane textPlane = new Plane(w, rasterText.getHeight(), 2, 2);
         textPlane.setDoubleSided(true);
-        textPlane.setScale(-1,-1,1);
+        textPlane.setScale(-1, -1, 1);
         textPlane.setTransparent(true);
         textPlane.setMaterial(textMaterial);
         object3D.addChild(textPlane);
@@ -402,9 +421,9 @@ public abstract class CircuitElm {
             //g.drawString(s, xc - w / 2, yc - abs(dpy) - 2);
             textPlane.setPosition(xc, yc - abs(dpy) - 12, 5);
         } else {
-            int xx = xc + abs(dpx) + w/2;
+            int xx = xc + abs(dpx) + w / 2;
             if (this instanceof VoltageElm || (x < x2 && y > y2)) {
-                xx = xc - (w/2 + abs(dpx) + 2);
+                xx = xc - (w / 2 + abs(dpx) + 2);
             }
             //g.drawString(s, xx, yc + dpy + ya);
             textPlane.setPosition(xx, yc, 5);
@@ -413,10 +432,7 @@ public abstract class CircuitElm {
 
     public void updateCoil(double v1, double v2, Material[] materials) {
         int segments = 30;
-        int i;
-        double segf = 1. / segments;
-
-        for (i = 0; i != segments; i++) {
+        for (int i = 0; i < segments; i++) {
             double v = v1 + (v2 - v1) * i / segments;
             int color = getVoltageColor(v);
             materials[i].setColor(color);
@@ -440,16 +456,66 @@ public abstract class CircuitElm {
     public void doDots(Object3D object3D) {
         updateDotCount();
         //if (sim.getDragElm() != this) {
-        //drawDots(object3D, point1, point2, curcount);
+        drawDots(object3D, point1, point2, curcount);
         //}
+    }
+
+    Object3D dots;
+
+    public void drawDots(Object3D object3D, Point pa, Point pb, double pos) {
+        if (sim.isStopped() || pos == 0 || !sim.isShowingCurrent()) {
+            return;
+        }
+        int dx = pb.x - pa.x;
+        int dy = pb.y - pa.y;
+        double dn = Math.sqrt(dx * dx + dy * dy);
+        int ds = 16;
+        pos %= ds;
+        if (pos < 0) {
+            pos += ds;
+        }
+        int count = 0;
+        for (double di = pos; di < dn; di += ds) {
+            int x0 = (int) (pa.x + di * dx / dn);
+            int y0 = (int) (pa.y + di * dy / dn);
+
+            if (count == 0) {
+                if (dots == null) {
+                    Material material = new Material();
+                    material.setColor(Color.YELLOW);
+                    dots = new Cube(4);
+                    dots.setMaterial(material);
+                    dots.setRenderChildrenAsBatch(true);
+                    object3D.addChild(dots);
+                }
+                dots.setPosition(x0, y0, 5);
+            } else if (dots.getNumChildren() == 0) {
+                Object3D dot = dots.clone();
+                dots.addChild(dot);
+                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 5);
+            } else {
+                Object3D dot;
+                if (count < dots.getNumChildren()) {
+                    dot = dots.getChildAt(count - 1);
+                } else {
+                    dot = dots.getChildAt(0).clone();
+                    dots.addChild(dot);
+                }
+                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 5);
+            }
+            count++;
+            //g.setColor(Color.yellow);
+            //g.fillOval(x0 - 1, y0 - 1, 4, 4);
+        }
+
     }
 
     public void getInfo(String arr[]) {
     }
 
     public int getBasicInfo(String arr[]) {
-        //arr[1] = "I = " + getCurrentDText(getCurrent());
-        //arr[2] = "Vd = " + getVoltageDText(getVoltageDiff());
+        arr[1] = "I = " + getCurrentDText(getCurrent(), showFormat);
+        arr[2] = "Vd = " + getVoltageDText(getVoltageDiff(), showFormat);
         return 3;
     }
 
@@ -475,50 +541,34 @@ public abstract class CircuitElm {
         }
     }
 
-    /*
-    public void setPowerColor(Graphics g, boolean yellow) {
-        if (conductanceCheckItem.getState()) {
-         setConductanceColor(g, current/getVoltageDiff());
-         return;
-         
-        if (!sim.isShowingPowerDissipation()) {
-            return;
-        }
-        setPowerColor(g, getPower());
-    }*/
-
-    /*
-    public void setPowerColor(Graphics g, double w0) {
+    public int getPowerColor(double w0) {
+        int color;
         w0 *= sim.getPowerMult();
-        //System.out.println(w);
         double w = (w0 < 0) ? -w0 : w0;
         if (w > 1) {
             w = 1;
         }
         int rg = 128 + (int) (w * 127);
         int b = (int) (128 * (1 - w));
-        if (yellow)
-         g.setColor(new Color(rg, rg, b));
-         else
         if (w0 > 0) {
-            g.setColor(new Color(rg, b, b));
+            color = Color.rgb(rg, b, b);
         } else {
-            g.setColor(new Color(b, rg, b));
+            color = Color.rgb(b, rg, b);
         }
-    }*/
+        return color;
+    }
 
-/*
-    public void setConductanceColor(Graphics g, double w0) {
+    public int getConductanceColor(double w0) {
         w0 *= sim.getPowerMult();
-        sim.getPowerMult()
+        sim.getPowerMult();
         //System.out.println(w);
         double w = (w0 < 0) ? -w0 : w0;
         if (w > 1) {
             w = 1;
         }
         int rg = (int) (w * 255);
-        g.setColor(new Color(rg, rg, rg));
-    }*/
+        return Color.rgb(rg, rg, rg);
+    }
 
     public double getPower() {
         return getVoltageDiff() * current;

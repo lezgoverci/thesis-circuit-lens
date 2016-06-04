@@ -1,10 +1,8 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
-//import java.awt.Checkbox;
-//import java.awt.Graphics;
-//import java.awt.Point;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.util.Log;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.RotateAnimation3D;
@@ -106,7 +104,6 @@ public class SwitchElm extends CircuitElm {
         if (position >= posCount) {
             position = 0;
         }
-
     }
 
     public void setPosition(int i) {
@@ -161,12 +158,10 @@ public class SwitchElm extends CircuitElm {
             circuitElm3D = generateObject3D();
         }
         update2Leads();
-
+        updateDotCount();
         if (position == 0) {
-            //doDots(circuitElm3D);
+            doDots(circuitElm3D);
         }
-
-        //thickLine.rotateAround(thickLine.getPosition().divide(thickLine.getPosition().normalize()),10);
     }
 
     public Object3D generateObject3D() {
@@ -175,6 +170,8 @@ public class SwitchElm extends CircuitElm {
         int hs1 = (position == 1) ? 0 : 2;
         int hs2 = (position == 1) ? openhs : 2;
         setBbox(point1, point2, openhs);
+
+        drawBoundingBox(switch3d);
 
         draw2Leads(switch3d);
 
@@ -191,6 +188,7 @@ public class SwitchElm extends CircuitElm {
         points.add(new Vector3(ps2.x,ps2.y,0));
         thickLine = new Line3D(points,6);
         thickLine.setMaterial(material);
+
         switch3d.addChild(thickLine);
 
         return switch3d;

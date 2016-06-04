@@ -7,6 +7,7 @@ class IntegratedFeaturesCalculator:
         self.__features = features
         self.__featureDataExtractors = {}
         self.__calculatedFeature = None
+        self.__storedFeatures = {}
     
     def setFeatures(self, features):
         self.__features = features
@@ -25,7 +26,12 @@ class IntegratedFeaturesCalculator:
         calculatedFeature = []
         
         for featureStr in self.__features:
-            feature = ff.FeatureFactory.create(featureStr['name'])
+            if None == self.__storedFeatures.get(featureStr['name'], None):
+                feature = ff.FeatureFactory.create(featureStr['name'])
+                self.__storedFeatures[featureStr['name']] = feature
+            else:
+                feature = self.__storedFeatures[featureStr['name']]
+            
             featureDataExtractors = feature.getNeededFeatureDataExtractors()
             
             featureArgs = featureStr['arguments']
@@ -43,7 +49,7 @@ class IntegratedFeaturesCalculator:
                 
                 featureArgs['feature_data_extractors'][featureDataExtractorStr] = featureDataExtractor
 
-            calculatedFeature.append(feature.setArguments(featureArgs).getCalculatedFeature())
+            calculatedFeature.append(feature.setArguments(featureArgs).getCalculatedFeature(recalculate))
         
         self.__calculatedFeature = np.array(calculatedFeature)
         

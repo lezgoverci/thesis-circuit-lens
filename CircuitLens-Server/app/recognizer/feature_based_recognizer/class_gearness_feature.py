@@ -6,8 +6,8 @@ import class_feature_processable_data_extractor as fpde
 class GearnessFeature(f.Feature):
     def __init__(self):
         self.__arguments = None
-        self.__neededArguments = ['centroid', 'img', 'feature_data_extractors']
-        self.__neededFeatureDataExtractors = ['central_angles', 'keypoints']
+        self.__neededArguments = ['area', 'centroid', 'img', 'feature_data_extractors']
+        self.__neededFeatureDataExtractors = ['central_angles', 'corners_keypoints']
         self.__calculatedFeature = None
     
     #-----------------------------------------
@@ -24,8 +24,8 @@ class GearnessFeature(f.Feature):
     #-----------------------------------------
     
     def getCalculatedFeature(self, recalculate=False):
-        if not self.__calculatedFeature or recalculate:
-            self.calculate()
+        if self.__calculatedFeature is None or recalculate:
+            self.calculate(True)
         
         return self.__calculatedFeature
     
@@ -36,28 +36,26 @@ class GearnessFeature(f.Feature):
     # Other Functions
     #-----------------------------------------
 
-    def calculate(self):
+    def calculate(self, recalculate=False):
         if not self.argumentsMet():
             return None
         
         centralAnglesExtractor = self.__arguments['feature_data_extractors']['central_angles']
-        keyPointsExtractor = self.__arguments['feature_data_extractors']['keypoints']
+        keyPointsExtractor = self.__arguments['feature_data_extractors']['corners_keypoints']
         
-        if not keyPointsExtractor.argumentsMet():
-            keyPointsExtractor.setArguments({
-                'centroid': self.__arguments['centroid'],
-                'img': self.__arguments['img']
-            })
+        keyPointsExtractor.setArguments({
+            'centroid': self.__arguments['centroid'],
+            'img': self.__arguments['img']
+        })
         
-        corners, _ = keyPointsExtractor.getExtractedData()
+        corners, _ = keyPointsExtractor.getExtractedData(recalculate)
         
-        if not centralAnglesExtractor.argumentsMet():
-            centralAnglesExtractor.setArguments({
-                'corners': corners,
-                'centroid': self.__arguments['centroid'] 
-            })
+        centralAnglesExtractor.setArguments({
+            'corners': corners,
+            'centroid': self.__arguments['centroid'] 
+        })
         
-        centralAngles, angleVectorMap = centralAnglesExtractor.getExtractedData()
+        centralAngles, angleVectorMap = centralAnglesExtractor.getExtractedData(recalculate)
 
         gearness = np.array([0.0, 0.0, 0.0])
     
@@ -74,10 +72,7 @@ class GearnessFeature(f.Feature):
                 rB = prevVector - currentVector
                 rA = nextVector - currentVector
 
-                normalizer = bf.BasicFunctions.calculatePointsDistance(rB, rA)
-
-                if 0 != normalizer:
-                    gearness += np.cross(rB, rA) / normalizer
+                gearness += np.cross(rB, rA)
                 
             except Exception as e:
                 print e
@@ -86,7 +81,7 @@ class GearnessFeature(f.Feature):
             
             i += 1
         
-        self.__calculatedFeature = gearness
+        self.__calculatedFeature = gearness / self.__arguments['area']
         
         return self
 

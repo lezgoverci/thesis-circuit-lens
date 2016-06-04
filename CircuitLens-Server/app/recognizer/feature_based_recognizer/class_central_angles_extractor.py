@@ -33,7 +33,7 @@ class CentralAnglesExtractor(fpde.FeatureProcessableDataExtractor):
     #-----------------------------------------
 
     def extract(self):
-        if not self.__arguments or not self.argumentsMet():
+        if not self.argumentsMet():
             return None
         
         corners = self.__arguments['corners']

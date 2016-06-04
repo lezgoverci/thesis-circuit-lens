@@ -7,7 +7,7 @@ class DispersenessFromCentroidFeature(f.Feature):
     def __init__(self):
         self.__arguments = None
         self.__neededArguments = ['area', 'centroid', 'img', 'feature_data_extractors']
-        self.__neededFeatureDataExtractors = ['central_angles', 'keypoints']
+        self.__neededFeatureDataExtractors = ['central_angles', 'edges_keypoints']
         self.__calculatedFeature = None
     
     #-----------------------------------------
@@ -24,8 +24,8 @@ class DispersenessFromCentroidFeature(f.Feature):
     #-----------------------------------------
     
     def getCalculatedFeature(self, recalculate=False):
-        if not self.__calculatedFeature or recalculate:
-            self.calculate()
+        if self.__calculatedFeature is None or recalculate:
+            self.calculate(True)
         
         return self.__calculatedFeature
     
@@ -36,7 +36,7 @@ class DispersenessFromCentroidFeature(f.Feature):
     # Other Functions
     #-----------------------------------------
 
-    def calculate(self):
+    def calculate(self, recalculate=False):
         if not self.argumentsMet():
             return None
             
@@ -44,23 +44,21 @@ class DispersenessFromCentroidFeature(f.Feature):
             return np.array([0.0, 0.0, 0.0])
         
         centralAnglesExtractor = self.__arguments['feature_data_extractors']['central_angles']
-        keyPointsExtractor = self.__arguments['feature_data_extractors']['keypoints']
+        keyPointsExtractor = self.__arguments['feature_data_extractors']['edges_keypoints']
         
-        if not keyPointsExtractor.argumentsMet():
-            keyPointsExtractor.setArguments({
-                'centroid': self.__arguments['centroid'],
-                'img': self.__arguments['img']
-            })
+        keyPointsExtractor.setArguments({
+            'centroid': self.__arguments['centroid'],
+            'img': self.__arguments['img']
+        })
         
-        corners, _ = keyPointsExtractor.getExtractedData()
+        corners, _ = keyPointsExtractor.getExtractedData(recalculate)
+
+        centralAnglesExtractor.setArguments({
+            'corners': corners,
+            'centroid': self.__arguments['centroid'] 
+        })
         
-        if not centralAnglesExtractor.argumentsMet():
-            centralAnglesExtractor.setArguments({
-                'corners': corners,
-                'centroid': self.__arguments['centroid'] 
-            })
-        
-        centralAngles, angleVectorMap = centralAnglesExtractor.getExtractedData()
+        centralAngles, angleVectorMap = centralAnglesExtractor.getExtractedData(recalculate)
 
         dispersenessFromCentroid = 0
 
@@ -71,14 +69,14 @@ class DispersenessFromCentroidFeature(f.Feature):
             try:
                 currentVector = angleVectorMap[centralAngles[i]]
 
-                dispersenessFromCentroid += currentVector / self.__arguments['area']
+                dispersenessFromCentroid += currentVector
                 
             except Exception as e:
                 print e
 
             i += 1
 
-        self.__calculatedFeature = dispersenessFromCentroid
+        self.__calculatedFeature = dispersenessFromCentroid / self.__arguments['area']
         
         return self
 

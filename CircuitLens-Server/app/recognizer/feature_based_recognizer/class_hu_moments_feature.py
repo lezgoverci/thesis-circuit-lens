@@ -25,8 +25,8 @@ class HuMomentsFeature(f.Feature):
     #-----------------------------------------
     
     def getCalculatedFeature(self, recalculate=False):
-        if not self.__calculatedFeature or recalculate:
-            self.calculate()
+        if self.__calculatedFeature is None or recalculate:
+            self.calculate(True)
         
         return self.__calculatedFeature
     
@@ -37,12 +37,14 @@ class HuMomentsFeature(f.Feature):
     # Other Functions
     #-----------------------------------------
 
-    def calculate(self):
+    def calculate(self, recalculate=False):
         if not self.argumentsMet():
             return None
         
         # self.__calculatedFeature = cv2.HuMoments(self.__arguments['moments']).flatten()
-        self.__calculatedFeature = np.array([np.linalg.norm(cv2.HuMoments(self.__arguments['moments']).flatten()), 0.0, 0.0])
+        rawHuMoments = cv2.HuMoments(self.__arguments['moments']).flatten()[:6]
+        # self.__calculatedFeature = np.array([np.linalg.norm(), 0.0, 0.0])
+        self.__calculatedFeature = np.array([np.linalg.norm(rawHuMoments), 0.0, 0.0])
         
         return self
 

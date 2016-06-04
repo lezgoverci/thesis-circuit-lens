@@ -6,7 +6,7 @@ class CornerDensityFeature(f.Feature):
     def __init__(self):
         self.__arguments = None
         self.__neededArguments = ['area', 'centroid', 'img', 'feature_data_extractors']
-        self.__neededFeatureDataExtractors = ['keypoints']
+        self.__neededFeatureDataExtractors = ['corners_keypoints', 'central_angles']
         self.__calculatedFeature = None
     
     #-----------------------------------------
@@ -23,8 +23,8 @@ class CornerDensityFeature(f.Feature):
     #-----------------------------------------
     
     def getCalculatedFeature(self, recalculate=False):
-        if not self.__calculatedFeature or recalculate:
-            self.calculate()
+        if self.__calculatedFeature is None or recalculate:
+            self.calculate(True)
         
         return self.__calculatedFeature
     
@@ -35,24 +35,28 @@ class CornerDensityFeature(f.Feature):
     # Other Functions
     #-----------------------------------------
 
-    def calculate(self):
+    def calculate(self, recalculate=False):
         if not self.argumentsMet():
             return None
+
+        centralAnglesExtractor = self.__arguments['feature_data_extractors']['central_angles']
+        keyPointsExtractor = self.__arguments['feature_data_extractors']['corners_keypoints']
+
+        keyPointsExtractor.setArguments({
+            'centroid': self.__arguments['centroid'],
+            'img': self.__arguments['img']
+        })
         
-        if 0 == self.__arguments['area']:
-            return np.array([0.0, 0.0, 0.0])
+        corners, _ = keyPointsExtractor.getExtractedData(recalculate)
         
-        keyPointsExtractor = self.__arguments['feature_data_extractors']['keypoints']
+        centralAnglesExtractor.setArguments({
+            'corners': corners,
+            'centroid': self.__arguments['centroid'] 
+        })
         
-        if not keyPointsExtractor.argumentsMet():
-            keyPointsExtractor.setArguments({
-                'centroid': self.__arguments['centroid'],
-                'img': self.__arguments['img']
-            })
+        centralAngles, angleVectorMap = centralAnglesExtractor.getExtractedData(recalculate)
         
-        corners, _ = keyPointsExtractor.getExtractedData()
-        
-        self.__calculatedFeature = np.array([len(corners) * 10 / self.__arguments['area'], 0.0, 0.0])
+        self.__calculatedFeature = np.array([(len(centralAngles)) / self.__arguments['area'], 0.0, 0.0])
         
         return self
 

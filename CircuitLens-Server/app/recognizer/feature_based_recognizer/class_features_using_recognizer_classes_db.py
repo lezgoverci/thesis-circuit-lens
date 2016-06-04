@@ -7,8 +7,8 @@ import numpy as np
 class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
     def __init__(self):
         super(FeaturesUsingRecognizerClassesDB, self).__init__()
-        # self.__featuresDistanceSolver = famd.FURAbsoluteMagnitudeDifferenceSolver()
-        self.__featuresDistanceSolver = ffds.FURFeatureDifferenceSolver()
+        self.__featuresDistanceSolver = famd.FURAbsoluteMagnitudeDifferenceSolver()
+        # self.__featuresDistanceSolver = ffds.FURFeatureDifferenceSolver()
         
     #-----------------------------------------
     # Getters
@@ -46,8 +46,12 @@ class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
         minClass = None
         minMatchPercentage = float('inf')
         
+        self.__print('Query Image', calculatedFeature)
+        
         for className, (storedFeature, _) in self._classesValuesMap.iteritems():
             d = self.__featuresDistanceSolver.solve(storedFeature, calculatedFeature)
+            
+            self.__print(className, storedFeature)
             
             if minMatchPercentage > d:
                 minMatchPercentage = d
@@ -63,8 +67,15 @@ class FeaturesUsingRecognizerClassesDB(cdb.ClassesDatabase):
         recognizer = fur.FeaturesUsingRecognizer()
         
         for classStr, img in classesImagesMap.iteritems():
+            print "Calculating %s features" % (classStr)
             self._classesValuesMap[classStr] = (recognizer.setImage(img).getCalculatedFeature(True), img.shape)
         
         return self
+    
+    def __print(self, label, feature):
+        print 'label: ' + label
+        print 'raw value: \n' + str(feature)
+        print 'magnitude: ' + str(np.linalg.norm(feature))
+        print '---------------------------------------'
 
 instance = FeaturesUsingRecognizerClassesDB()

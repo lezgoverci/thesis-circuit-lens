@@ -71,7 +71,9 @@ class SymmetricalFeature(f.Feature):
 
             i += 1
         
-        self.__calculatedFeature = symmetrical / len(centralAngles)
+        bias = 15
+        
+        self.__calculatedFeature = bias * symmetrical / len(centralAngles)
         
         return self
 

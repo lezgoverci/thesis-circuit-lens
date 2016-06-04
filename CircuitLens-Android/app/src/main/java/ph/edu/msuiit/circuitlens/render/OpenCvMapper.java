@@ -30,11 +30,11 @@ public class OpenCvMapper implements Mapper {
 
     private static MatOfPoint2f mCurrentFrameBoxPoints2D = new MatOfPoint2f();
 
-    private static double[] mRotation = new double[3];
+    private static double[] mOrientation = new double[3];
     private static double[] mTranslation = new double[3];
     private static double[] mScaling = new double[3];
 
-    private static MatOfDouble   mRVec = new MatOfDouble();                                  // The Euler angles of the detected target.
+    private static MatOfDouble   mRVec = new MatOfDouble();     // The Euler angles of the detected target.
     private static MatOfDouble   mTVec = new MatOfDouble();
 
 
@@ -104,27 +104,32 @@ public class OpenCvMapper implements Mapper {
         }
     }
 
+
     @Override
-    public double[] getRotation() {
-        mRotation[0] = mRVec.toArray()[0];
-        mRotation[1] = mRVec.toArray()[1];
-        mRotation[2] = mRVec.toArray()[2];
-        return mRotation;
+    public double[] getOrientation() {
+        //TODO check if elements correspond to correct roll, yaw, pitch
+        mOrientation[0] = mRVec.toArray()[0];
+        mOrientation[1] = mRVec.toArray()[1];
+        mOrientation[2] = mRVec.toArray()[2];
+        return mOrientation;
     }
 
     @Override
-    public double getAxisRotationX() {
-        return mRotation[0] = mRVec.toArray()[0];
+    public double getOrientationRoll() {
+        //TODO check if first element is for roll
+        return mOrientation[0] = mRVec.toArray()[0];
     }
 
     @Override
-    public double getAxisRotationY() {
-        return mRotation[1] = mRVec.toArray()[1];
+    public double getOrientationYaw() {
+        //TODO check if second element is for yaw
+        return mOrientation[1] = mRVec.toArray()[1];
     }
 
     @Override
-    public double getAxisRotationZ() {
-        return mRotation[2] = mRVec.toArray()[2];
+    public double getOrientationPitch() {
+        //TODO check if third element is for pitch
+        return mOrientation[2] = mRVec.toArray()[2];
     }
 
     @Override

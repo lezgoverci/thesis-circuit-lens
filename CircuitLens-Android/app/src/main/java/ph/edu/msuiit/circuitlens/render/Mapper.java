@@ -8,10 +8,10 @@ public interface Mapper {
 
 
     // Rotation
-    double[] getRotation();
-    double getAxisRotationX();
-    double getAxisRotationY();
-    double getAxisRotationZ();
+    double[] getOrientation();
+    double getOrientationRoll();
+    double getOrientationYaw();
+    double getOrientationPitch();
 
     // Translation
     double[] getTranslation();

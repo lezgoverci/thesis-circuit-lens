@@ -70,7 +70,7 @@ public class CircuitLensController{
 
         // Reset mapper values
         mMapper = new OpenCvMapper();
-        mMapper.setCamera(mCameraAdapter.getCameraProjectionMatrix(),mCameraAdapter.getDistortion());
+        mMapper.setCamera(mCameraAdapter.getCameraProjectionMatrix(),mCameraAdapter.getDistortion()); //TODO check if projection matrix is right parameter
         //mMapper.reset(); //TODO create a reset function?
 
     }
@@ -81,9 +81,9 @@ public class CircuitLensController{
         mMapper.map(isTakePhoto);
         mMapper.drawDebug(); // turn on debug drawing
 
-        mArView.setRotationX(mMapper.getAxisRotationX());
-        mArView.setRotationY(mMapper.getAxisRotationY());
-        mArView.setRotationZ(mMapper.getAxisRotationZ());
+        mArView.setOrientationRoll(mMapper.getOrientationRoll());       // Roll
+        mArView.setOrientationYaw(mMapper.getOrientationYaw());       // Yaw
+        mArView.setOrientationPitch(mMapper.getOrientationPitch());       // Pitch
 
         mArView.setTranslationX(mMapper.getTranslationX());
         mArView.setTranslationY(mMapper.getTranslationY());

@@ -7,22 +7,15 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
-
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfDouble;
-import org.rajawali3d.surface.RajawaliSurfaceView;
-
 import ph.edu.msuiit.circuitlens.CircuitLensController;
 import ph.edu.msuiit.circuitlens.R;
-import ph.edu.msuiit.circuitlens.ui.gl.OpenGLRenderer;
 
 
 public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
@@ -54,7 +47,6 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
                 case LoaderCallbackInterface.SUCCESS:
                 {
                     Log.d(TAG, "OpenCV loaded successfully");
-                    mOpenCvCameraView.enableView();
                     mController.onResume();
                 } break;
                 default:
@@ -88,33 +80,15 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         String serverUri = preferences.getString("server_uri","ws://127.0.0.1:8080/ws");
         boolean rotate = preferences.getBoolean("rotate",false);
 
-//        mSurface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-//        mSurface.setOnTouchListener(touchListener);
         mController = new CircuitLensController(serverUri);
         mController.onCreate();
-        initializeViews();
-//        initializeRenderer();
-    }
-
-//    private void initializeRenderer() {
-//        mRenderer = new OpenGLRenderer(this);
-//        mSurface.setTransparent(true);
-//        mSurface.setSurfaceRenderer(mRenderer);
-//        mSurface.setZOrderMediaOverlay(true);
-//    }
-
-    private void initializeViews(){
-        mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.surfaceView);
-        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-        mOpenCvCameraView.setCvCameraViewListener(this);
     }
 
     @Override
     public void onPause()
     {
         super.onPause();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
+
     }
 
     @Override
@@ -134,8 +108,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
     public void onDestroy() {
         super.onDestroy();
         mController.onDestroy();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
+
     }
 
     public void onCameraViewStarted(int width, int height) {

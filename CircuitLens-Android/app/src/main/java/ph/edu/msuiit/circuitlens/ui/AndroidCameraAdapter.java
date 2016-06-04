@@ -98,7 +98,6 @@ public class AndroidCameraAdapter implements CameraAdapter {
         mWidthPx = mImageSize.width;
 
         mAspectRatio = (double) mWidthPx / (double) mHeightPx;
-
     }
 
 

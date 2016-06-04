@@ -4,13 +4,12 @@ import org.opencv.core.MatOfDouble;
 
 public interface CircuitLensView {
     void showMessage(String message);
-    void updateRendererCameraPose(MatOfDouble rVec, MatOfDouble tVec, int[] floats);
 
-    // Set rotation
-    void setRotation(double xAxisRotation, double yAxisRotation, double zAxisRotation);
-    void setRotationX(double xAxisRotation);
-    void setRotationY(double yAxisRotation);
-    void setRotationZ(double zAxisRotation);
+    // Set orientation
+    void setOrientation(double roll, double yaw, double pitch);
+    void setOrientationRoll(double roll);
+    void setOrientationYaw(double yaw);
+    void setOrientationPitch(double pitch);
 
     // Set translation
     void setTranslation(double x, double y, double z);

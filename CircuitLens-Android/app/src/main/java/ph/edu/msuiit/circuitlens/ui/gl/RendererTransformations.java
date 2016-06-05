@@ -57,14 +57,17 @@ public class RendererTransformations extends OpenGLRenderer {
          *  Rotate -> Translate -> Scale
          **/
 
+        Log.d("renderInit1","entering init scene");
         setInitCircuitProjectionValues();       // set default projection values
         setInitViewingTransformation();         // Set viewing transformation
         setInitModellingTransformation();       // Set modelling transformation
         setInitProjectionTransformation();      // Set Projection transformation
         setInitViewportTransformation();        // Set Viewport transformation
 
-        circuit3D.setZ(500);
-
+        //getCurrentCamera().setZ();
+        //getCurrentCamera().setFarPlane(300);
+        circuit3D.drawBounds(circuit3D);
+        Log.d("renderInit2","done init scene");
     }
 
     private void setInitCircuitProjectionValues() {
@@ -152,9 +155,9 @@ public class RendererTransformations extends OpenGLRenderer {
         // if camera matrix is not yet set, do not render
         if (!mCameraValuesDirty) {
             // proceed to rendering
-            renderImageOrientation();
+            //renderImageOrientation();
             renderImageTranslation();
-            renderImageScaling();
+            //renderImageScaling();
         }
     }
 
@@ -219,6 +222,7 @@ public class RendererTransformations extends OpenGLRenderer {
     }
 
     public void setCameraValues(int width, int height, double verticalFOV, double horizontalFOV, double aspectRatio) {
+        //TODO check if this comes first before rendering
         mCameraHeight = height;
         mCameraWidth = width;
         mVerticalFOV = verticalFOV;

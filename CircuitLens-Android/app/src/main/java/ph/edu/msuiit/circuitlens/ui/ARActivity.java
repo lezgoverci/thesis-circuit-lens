@@ -89,8 +89,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         String serverUri = preferences.getString("server_uri","ws://127.0.0.1:8080/ws");
         boolean rotate = preferences.getBoolean("rotate",false);
 
-        mSurface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-        mSurface.setOnTouchListener(mTouchListener);
+
 
         mController = new CircuitLensController(this,serverUri);
         mController.onCreate();
@@ -111,6 +110,8 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
     private void initializeRenderer(){
         mRenderer = new RendererTransformations(this);
+        mSurface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
+        mSurface.setOnTouchListener(mTouchListener);
         mSurface.setTransparent(true);
         mSurface.setSurfaceRenderer(mRenderer);
         mSurface.setZOrderMediaOverlay(true);

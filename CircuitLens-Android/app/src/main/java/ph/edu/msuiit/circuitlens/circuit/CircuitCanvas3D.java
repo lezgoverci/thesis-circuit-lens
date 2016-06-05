@@ -82,8 +82,8 @@ public class CircuitCanvas3D extends Object3D{
         material.setColor(Color.BLUE);
 
         Stack<Vector3> points = new Stack<>();
-        points.add(new Vector3(x,y,5));
-        points.add(new Vector3(x2,y2,5));
+        points.add(new Vector3(x,y,0));
+        points.add(new Vector3(x2,y2,0));
         Line3D thickLine = new Line3D(points,10);
         thickLine.setMaterial(material);
 

@@ -6,10 +6,10 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.MatOfPoint3f;
 import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,30 +17,39 @@ import java.util.List;
  */
 public class OpenCvMapper implements Mapper {
 
-    private static ReferenceTracker mReference = new ReferenceTracker();
+    private static ReferenceTracker mReference;
 
     private static Mat mImg;
     private static Mat mHomography;
-    private static Mat mCurrentFrameBoxCorners = new Mat(4,1, CvType.CV_32FC2);
+    private static Mat mCurrentFrameBoxCorners;
     private static boolean isSetTracking = false;
     private static boolean isHomographyFound = false;
 
     private MatOfDouble mProjectionMatrix;      // A 4x4 transformation matrix
     private boolean mProjectionMatrixDirty = true;
 
-    private static MatOfPoint2f mCurrentFrameBoxPoints2D = new MatOfPoint2f();
+    private static MatOfPoint2f mCurrentFrameBoxPoints2D;
 
     private static double[] mOrientation = new double[3];
     private static double[] mTranslation = new double[3];
     private static double[] mScaling = new double[3];
 
-    private static MatOfDouble   mRVec = new MatOfDouble();     // The Euler angles of the detected target.
-    private static MatOfDouble   mTVec = new MatOfDouble();
+    private static MatOfDouble   mRVec;     // The Euler angles of the detected target.
+    private static MatOfDouble   mTVec;
 
 
     private int mPixelDensity;
     private static MatOfDouble mCameraMatrix;
     private static MatOfDouble mDistortion;
+
+
+    public void onResume(){
+        mReference = new ReferenceTracker();
+        mCurrentFrameBoxCorners = new Mat(4,1, CvType.CV_32FC2);
+        mCurrentFrameBoxPoints2D = new MatOfPoint2f();
+        mRVec = new MatOfDouble();
+        mTVec = new MatOfDouble();
+    }
 
     public void setImg(Mat img){
         mImg = img;
@@ -51,10 +60,18 @@ public class OpenCvMapper implements Mapper {
         mDistortion = distortion;
     }
 
+    public boolean isHomographyFound(){
+        return isHomographyFound;
+    }
+
     public static void map(boolean isTakePhoto) {
         if(mImg != null){
             Mat mProcessedImg = ImagePreprocessor.getProcessedImage(mImg);                  // preprocess img
             MatOfPoint2f approxHullPoints = PointsExtractor.getPoints2D(mProcessedImg);     // find approx convex hull points in 2D
+            if(approxHullPoints.empty()){
+                return;
+            }
+            drawConvexHull(approxHullPoints); //for debug purposes
 
             if(isTakePhoto){ // update the tracking reference
                 mReference.setConvexHullPoints(PointsExtractor.getConvexHullPoints());      // setting the raw convex hull
@@ -74,6 +91,14 @@ public class OpenCvMapper implements Mapper {
             }
 
         }
+    }
+
+    private static void drawConvexHull(MatOfPoint2f approxHullPoints) {
+        List<Point> points = approxHullPoints.toList();
+        for(int i =0; i < points.size() - 1; i++){
+            Imgproc.line(mImg,points.get(i),points.get(i + 1),new Scalar(0,255,0),5);
+        }
+        Imgproc.line(mImg,points.get(points.size() - 1),points.get(0),new Scalar(0,255,0),5);
     }
 
     private static void updateTransformations() {
@@ -98,6 +123,7 @@ public class OpenCvMapper implements Mapper {
     }
 
     private static void updateHomography(MatOfPoint2f approxHullPoints) {
+        //TODO check if the reference points and the current frame points correspond
         if(mReference.getApproxConvexHullPoints2D().toList().size() == approxHullPoints.toList().size()){
             mHomography = Calib3d.findHomography(mReference.getApproxConvexHullPoints2D(),approxHullPoints,Calib3d.RANSAC,50.0);
             isHomographyFound = true;

@@ -35,28 +35,13 @@ public class RendererTransformations extends OpenGLRenderer {
     private Quaternion mQuaternionOrientation;
     private Quaternion mInitQuaternionOrientation;
 
-    private float[] mGLpose;
-    private boolean isSetProjectionValues = false;
-    private boolean isSetInitCameraValues = false;
-
-    private double testValue = 0.0;
-    private boolean isSetInitialValues = false;
-    private int mTargetCircuitWidth = 0;
-    private int mTargetCircuitHeight = 0;
-    private int mTargetCircuitX;
-    private int mTargetCircuitY;
-    private double mSize;
-
     private int mCameraWidth;
     private int mCameraHeight;
-    private double mScaleInit;
-    private double mRatio;
-    private double mScale = 1.0;
+
     private double mVerticalFOV;
     private double mHorizontalFOV;
     private double mAspectRatio;
     private boolean mCameraValuesDirty = true;
-
 
 
     public RendererTransformations(Context context) {
@@ -72,20 +57,13 @@ public class RendererTransformations extends OpenGLRenderer {
          *  Rotate -> Translate -> Scale
          **/
 
-        // set default projection values
-        setInitCircuitProjectionValues();
+        setInitCircuitProjectionValues();       // set default projection values
+        setInitViewingTransformation();         // Set viewing transformation
+        setInitModellingTransformation();       // Set modelling transformation
+        setInitProjectionTransformation();      // Set Projection transformation
+        setInitViewportTransformation();        // Set Viewport transformation
 
-        // Set viewing transformation
-        setInitViewingTransformation();
-
-        // Set modelling transformation
-        setInitModellingTransformation();
-
-        // Set Projection transformation
-        setInitProjectionTransformation();
-
-        // Set Viewport transformation
-        setInitViewportTransformation();
+        circuit3D.setZ(500);
 
     }
 
@@ -103,13 +81,13 @@ public class RendererTransformations extends OpenGLRenderer {
         // Default camera (right hand rule).
         // Anchor point is in the center
 
-        // Before setting camera position
+        // Before setting camera position to center of circuit
         // x = 0.0
         // y = 0.0
         // z = 4.0
         // looking towards the negative z
 
-        // set camera to look at the center of the circuit
+        // set camera center to the center of the circuit
         double circuitCenterX = circuit3D.getCircuitCenterX();
         double circuitCenterY = circuit3D.getCircuitCenterY();
 
@@ -121,8 +99,8 @@ public class RendererTransformations extends OpenGLRenderer {
         // y = y coordinate of the center point of the circuit
         // z = 4.0
 
-        Log.d(getClass().getSimpleName(),"width: "+ getViewportWidth());
-        Log.d(getClass().getSimpleName(),"height: "+ getViewportHeight());
+        Log.d(getClass().getSimpleName(), "width: " + getViewportWidth());
+        Log.d(getClass().getSimpleName(), "height: " + getViewportHeight());
     }
 
     private void setInitModellingTransformation() {
@@ -147,8 +125,8 @@ public class RendererTransformations extends OpenGLRenderer {
         mInitPosY = circuit3D.getY();
         mInitPosZ = circuit3D.getZ();
 
-        Log.d("InitOrient","Yaw: " + mInitQuaternionOrientation.getYaw() + "Pitch: " + mInitQuaternionOrientation.getPitch() + "Roll: " + mInitQuaternionOrientation.getRoll() + "");
-        Log.d("InitPos","X: " + mInitPosX + "Y: " + mInitPosY + "Z: " + mInitPosZ + "");
+        Log.d("InitOrient", "Yaw: " + mInitQuaternionOrientation.getYaw() + "Pitch: " + mInitQuaternionOrientation.getPitch() + "Roll: " + mInitQuaternionOrientation.getRoll() + "");
+        Log.d("InitPos", "X: " + mInitPosX + "Y: " + mInitPosY + "Z: " + mInitPosZ + "");
     }
 
     private void setInitProjectionTransformation() {
@@ -156,8 +134,8 @@ public class RendererTransformations extends OpenGLRenderer {
         // default far plane z = 120.0
         // default FOV = 45.0
 
-        getCurrentCamera().updatePerspective(mHorizontalFOV,mVerticalFOV);
-        getCurrentCamera().setProjectionMatrix(mCameraWidth,mCameraHeight);
+        getCurrentCamera().updatePerspective(mHorizontalFOV, mVerticalFOV);
+        getCurrentCamera().setProjectionMatrix(mCameraWidth, mCameraHeight);
     }
 
     private void setInitViewportTransformation() {
@@ -172,7 +150,7 @@ public class RendererTransformations extends OpenGLRenderer {
 
     private void renderImage() {
         // if camera matrix is not yet set, do not render
-        if(!mCameraValuesDirty){
+        if (!mCameraValuesDirty) {
             // proceed to rendering
             renderImageOrientation();
             renderImageTranslation();
@@ -182,7 +160,7 @@ public class RendererTransformations extends OpenGLRenderer {
 
     private void renderImageOrientation() {
 
-        if(true){       // turn this to false to use raw orientation data
+        if (true) {       // turn this to false to use raw orientation data
 
             double rawRoll = mRoll;
             double rawYaw = mYaw;
@@ -197,23 +175,19 @@ public class RendererTransformations extends OpenGLRenderer {
             double pitch = MathUtil.radiansToDegrees(circuit3D.getOrientation().getPitch() + diffPitch);
 
             Quaternion orient = new Quaternion();
-            orient.fromEuler(yaw,pitch,roll);
+            orient.fromEuler(yaw, pitch, roll);
             circuit3D.setOrientation(orient);
 
-        } else{
+        } else {
 
             Quaternion orient = new Quaternion();
-            orient.fromEuler(mYaw,mPitch,mRoll);
+            orient.fromEuler(mYaw, mPitch, mRoll);
             circuit3D.setOrientation(orient);
         }
-
-
-
-
     }
 
     private void renderImageTranslation() {
-        if(true){       // turn this to false to use raw position data
+        if (true) {       // turn this to false to use raw position data
 
             double rawPosX = mPosX;
             double rawPosY = mPosY;
@@ -231,124 +205,17 @@ public class RendererTransformations extends OpenGLRenderer {
             circuit3D.setY(posY);
             circuit3D.setZ(posZ);
 
-        }else{
+        } else {
             circuit3D.setX(mPosX);
             circuit3D.setY(mPosY);
             circuit3D.setZ(mPosZ);
         }
-
     }
 
     private void renderImageScaling() {
         circuit3D.setScaleX(mScaleX);
         circuit3D.setScaleY(mScaleY);
         circuit3D.setScaleZ(mScaleZ);
-    }
-
-    private void useTransformationValues() {
-
-        if(isSetInitialValues){
-
-            circuit3D.setX(mPosX);
-            circuit3D.setY(mPosY);
-            circuit3D.setZ(mPosZ);
-            //circuit3D.setZ(circuit3D.getZ() - 1.0);
-
-            // Orientation
-            Quaternion orient = new Quaternion();
-
-            // Yaw, Pitch, Roll
-            double yaw = MathUtil.radiansToDegrees(mYaw);
-            double pitch = MathUtil.radiansToDegrees(mRoll);
-            double roll = MathUtil.radiansToDegrees(mPitch);
-            orient.fromEuler(yaw,pitch,roll);
-            circuit3D.setOrientation(orient);
-        }
-    }
-
-    // After homography is found
-    public void setProjectionValues(MatOfDouble rVec, MatOfDouble tVec, int[] dimens) {
-        // Raw rotation values in degrees
-        double orientRawRoll = MathUtil.radiansToDegrees(rVec.toArray()[0]);
-        double orientRawYaw = MathUtil.radiansToDegrees(rVec.toArray()[1]);
-        double orientRawPitch = MathUtil.radiansToDegrees(rVec.toArray()[2]);
-
-        // Raw translation values
-        double posXraw = tVec.toArray()[0];
-        double posYraw = tVec.toArray()[1];
-        double posZraw = tVec.toArray()[2];
-
-        // If target circuit dimension is not set
-        if(!isSetInitialValues){
-            // initial position
-            mTargetCircuitX = dimens[0];
-            mTargetCircuitY = dimens[1];
-
-            // target dimension
-            mTargetCircuitWidth = dimens[2];
-            mTargetCircuitHeight = dimens[3];
-
-
-
-
-//            Log.d("scaleInit",mScaleInit + "");
-//            Log.d("scaleRatio1",mRatio + "");
-//            Log.d("scaleX1",circuit3D.getScaleX() + "");
-//            Log.d("scaleY1",circuit3D.getScaleY() + "");
-//            Log.d("scaleZ1",circuit3D.getScaleZ() + "");
-            mRatio = (double) circuit3D.getCircuitHeight() / (double) mTargetCircuitHeight;
-            mScale = mScaleInit * mRatio;
-//            circuit3D.setScale(mScale,-mScale,mScale);
-//            Log.d("scaleX2",circuit3D.getScaleX() + "");
-//            Log.d("scaleRatio2",mRatio + "");
-//            Log.d("scaleX1",circuit3D.getScaleX() + "");
-//            Log.d("scaleY1",circuit3D.getScaleY() + "");
-//            Log.d("scaleZ1",circuit3D.getScaleZ() + "");
-
-            //TODO find the center of the target using points from the refererne tracker and translate it to 3D using the homography
-
-            double initX =  (circuit3D.getCircuitBottomLeftX() + (circuit3D.getCircuitWidth() / 2)) * mScale;
-            double initY = (circuit3D.getCircuitBottomLeftY() + (circuit3D.getCircuitHeight()/ 2)) * mScale;
-
-
-            mPosX = initX * -1.0;
-            mPosY = initY * -1.0;
-            mPosZ = 0.0;
-
-            mInitPosX = mPosX;
-            mInitPosY = mPosY;
-            mInitPosZ = mPosZ;
-
-            circuit3D.setX(mInitPosX);
-            circuit3D.setY(mInitPosY);
-            circuit3D.setZ(mInitPosZ);
-
-
-
-            isSetInitialValues = true;
-
-
-
-        }
-        else{
-            mPosX = /*circuit3D.getX() + */(mInitPosX - posXraw) ;
-            mPosY = /*circuit3D.getY() + */(mInitPosY - posYraw) ;
-            mPosZ = /*circuit3D.getZ() + */(mInitPosZ - posZraw) ;
-        }
-
-        mRoll = /*circuit3D.getOrientation().getPitch() +*/ (mInitRoll - orientRawRoll);
-        mYaw = /*circuit3D.getOrientation().getYaw() + */( mInitYaw - orientRawYaw);
-        mPitch = /*circuit3D.getOrientation().getRoll() +*/ (mInitPitch - orientRawPitch);
-
-        // Projection values are set
-        isSetProjectionValues = true;
-
-        Log.d("scalePosX",mPosX +"");
-        Log.d("scalePosY",mPosY +"");
-        Log.d("scalePosZ",mPosZ +"");
-        Log.d("scaleInitPosX",mInitPosX +"");
-        Log.d("scaleInitPosY",mInitPosY +"");
-        Log.d("scaleInitPosZ",mInitPosZ +"");
     }
 
     public void setCameraValues(int width, int height, double verticalFOV, double horizontalFOV, double aspectRatio) {
@@ -362,7 +229,6 @@ public class RendererTransformations extends OpenGLRenderer {
 
 
     public void setOrientation(double roll, double yaw, double pitch) {
-        // TODO extract values from Quaternion orientation
         mRoll = roll;
         mYaw = yaw;
         mPitch = pitch;
@@ -381,17 +247,14 @@ public class RendererTransformations extends OpenGLRenderer {
     }
 
     public void setOrientationRoll(double roll) {
-        // TODO extract pitch from Quaternion orientation
         mRoll = roll;
     }
 
     public void setOrientationYaw(double yaw) {
-        // TODO extract yaw from Quaternion orientation
         mYaw = yaw;
     }
 
     public void setOrientationPitch(double pitch) {
-        // TODO extract roll from Quaternion orientation
         mPitch = pitch;
     }
 
@@ -427,7 +290,7 @@ public class RendererTransformations extends OpenGLRenderer {
         double inputZ = 45;
 
         Quaternion quat = new Quaternion();
-        quat.fromEuler(inputY,inputX,inputZ);
+        quat.fromEuler(inputY, inputX, inputZ);
 
         double x00 = circuit3D.getRotX();
         double y00 = circuit3D.getRotY();

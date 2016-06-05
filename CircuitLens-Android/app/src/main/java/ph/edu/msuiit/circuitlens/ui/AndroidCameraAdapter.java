@@ -29,7 +29,6 @@ public class AndroidCameraAdapter implements CameraAdapter {
     private Camera.Size mImageSize;
     private List<Camera.Size> mSupportedImageSizes; // The image sizes supported by the active camera.
     private MatOfDouble mCameraMatrix;          // A 3x3 camera matrix
-    private final MatOfDouble   mDistCoeffs = new MatOfDouble(0.0, 0.0, 0.0, 0.0);          // Assume no distortion
 
 
     public AndroidCameraAdapter() {
@@ -196,7 +195,7 @@ public class AndroidCameraAdapter implements CameraAdapter {
     }
 
     public MatOfDouble getDistortion(){
-        return mDistCoeffs;
+        return new MatOfDouble(0.0, 0.0, 0.0, 0.0);
     }
 
 

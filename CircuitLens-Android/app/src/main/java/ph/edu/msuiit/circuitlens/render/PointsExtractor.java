@@ -34,6 +34,7 @@ public class PointsExtractor {
         mImageGray = new Mat(); //TODO is this necessary?
         mImageGray = img;
 
+        //TODO warning of memory usage
         mApproxHullPoints2D = new MatOfPoint2f();
         mApproxHullCorners = new MatOfPoint2f();
 
@@ -59,7 +60,13 @@ public class PointsExtractor {
         findContours();             // Find all contours
         findLargestContour();       // Find the largest contour
         findConvexHull();           // Find the convex hull of the largest contour
-        approximateConvexHull();    // Approximate convex hull to 2D points
+        if(!mConvexHullIndices.empty()){
+            approximateConvexHull();    // Approximate convex hull to 2D points
+        }
+        else {
+            return;
+        }
+
 
     }
 
@@ -104,17 +111,21 @@ public class PointsExtractor {
     private static MatOfPoint convertHullToMatOfPoint(MatOfInt mConvexHullIndices) {
         List<Point> hullPointsList = new ArrayList<>();
 
-        int[] hullIntList = mConvexHullIndices.toArray();
         MatOfPoint result = new MatOfPoint();
+        if(!mConvexHullIndices.empty()){
+            int[] hullIntList = mConvexHullIndices.toArray();
 
-        List<Point> largestContourPointsList = mLargestContour.toList();
 
-        for(int i=0; i < hullIntList.length; i++){
-            hullPointsList.add(largestContourPointsList.get(hullIntList[i]));
+            List<Point> largestContourPointsList = mLargestContour.toList();
+
+            for(int i=0; i < hullIntList.length; i++){
+                hullPointsList.add(largestContourPointsList.get(hullIntList[i]));
+            }
+
+            result.fromList(hullPointsList);
+            hullPointsList.clear();
         }
 
-        result.fromList(hullPointsList);
-        hullPointsList.clear();
 
         return result;
     }
@@ -128,6 +139,7 @@ public class PointsExtractor {
         double epsilon = 0.01 * arcLength;
 
         Imgproc.approxPolyDP(curve,result,epsilon,true);
+
 
         return result;
     }

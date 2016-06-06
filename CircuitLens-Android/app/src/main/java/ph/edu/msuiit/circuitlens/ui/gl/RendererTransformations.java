@@ -104,9 +104,6 @@ public class RendererTransformations extends OpenGLRenderer {
         // x = x coordinate of the center point of the circuit
         // y = y coordinate of the center point of the circuit
         // z = 4.0
-
-        Log.d(getClass().getSimpleName(), "width: " + getViewportWidth());
-        Log.d(getClass().getSimpleName(), "height: " + getViewportHeight());
     }
 
     private void setInitModellingTransformation() {
@@ -139,27 +136,31 @@ public class RendererTransformations extends OpenGLRenderer {
         // default near plane z = 1.0
         // default far plane z = 120.0
         // default FOV = 45.0
-
+        Log.d("checkCameraParameters"," going to use parameters values in renderer");
         getCurrentCamera().updatePerspective(mHorizontalFOV, mVerticalFOV);
         getCurrentCamera().setProjectionMatrix(mCameraWidth, mCameraHeight);
+        //Log.d("rendererValues","Horizontal FOV: " + getCurrentCamera().get);
+        //TODO use camera values set in camera parameter values
+        Log.d("checkCameraParameters"," parameters values are used in renderer");
     }
 
     private void setInitViewportTransformation() {
         //TODO initial scaling here
-
+        circuit3D.setScaleZ(-1);
     }
 
     @Override
     public void onRender(long elapsedTime, double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
         renderImage();
+        Log.d("checkDimensions", getViewportWidth() + " x " + getViewportHeight());
     }
 
     private void renderImage() {
         // if camera matrix is not yet set, do not render
         if (!mCameraValuesDirty) {
             // proceed to rendering
-            //renderImageOrientation();
+            renderImageOrientation();
             renderImageTranslation();
             //renderImageScaling();
         }
@@ -173,24 +174,22 @@ public class RendererTransformations extends OpenGLRenderer {
             double rawYaw = mYaw;
             double rawPitch = mPitch;
 
-            double diffRoll = mInitRoll - rawRoll;
-            double diffYaw = mInitYaw - rawYaw;
-            double diffPitch = mInitPitch - rawPitch;
+            double diffRoll = rawRoll - mInitRoll;
+            double diffYaw = rawYaw - mInitYaw;
+            double diffPitch = rawPitch - mInitPitch;
 
             double roll = MathUtil.radiansToDegrees(/*circuit3D.getOrientation().getRoll() + */diffRoll);
             double yaw = MathUtil.radiansToDegrees(/*circuit3D.getOrientation().getYaw() + */diffYaw);
             double pitch = MathUtil.radiansToDegrees(/*circuit3D.getOrientation().getPitch() +*/ diffPitch);
 
             Quaternion orient = new Quaternion();
-            //orient.fromEuler((int)-yaw, 0, 0);
-            //orient.fromEuler(0, (int)pitch, 0);
-            orient.fromEuler(0, 0, (int)-roll);
+            orient.fromEuler(-yaw,pitch,roll);
             circuit3D.setOrientation(orient);
 
         } else {
 
             Quaternion orient = new Quaternion();
-            orient.fromEuler((int)mYaw, (int)mPitch, (int)mRoll);
+            orient.fromEuler(mYaw,mPitch,mRoll);
             circuit3D.setOrientation(orient);
         }
     }
@@ -240,12 +239,14 @@ public class RendererTransformations extends OpenGLRenderer {
 
     public void setCameraValues(int width, int height, double verticalFOV, double horizontalFOV, double aspectRatio) {
         //TODO check if this comes first before rendering
+        Log.d("checkCameraParameters"," going to save parameters values in renderer");
         mCameraHeight = height;
         mCameraWidth = width;
         mVerticalFOV = verticalFOV;
         mHorizontalFOV = horizontalFOV;
         mAspectRatio = aspectRatio;
         mCameraValuesDirty = false;
+        Log.d("checkCameraParameters"," parameters values are set in renderer");
     }
 
 

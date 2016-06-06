@@ -2,6 +2,7 @@ package ph.edu.msuiit.circuitlens.ui;
 
 import android.hardware.Camera;
 import android.os.Build;
+import android.util.Log;
 
 import org.opencv.core.CvType;
 import org.opencv.core.MatOfDouble;
@@ -90,6 +91,7 @@ public class AndroidCameraAdapter implements CameraAdapter {
 
     // Call this function on the Activity's onResume function
     public void setCameraParameters(){
+        Log.d("checkCameraParameters"," going to save parameters values in camera adapter");
         mHorizontalFOV = mCameraParameters.getHorizontalViewAngle();
         mVerticalFOV = mCameraParameters.getVerticalViewAngle();
 
@@ -97,6 +99,7 @@ public class AndroidCameraAdapter implements CameraAdapter {
         mWidthPx = mImageSize.width;
 
         mAspectRatio = (double) mWidthPx / (double) mHeightPx;
+        Log.d("checkCameraParameters"," parameters are set in camera adapter");
     }
 
 

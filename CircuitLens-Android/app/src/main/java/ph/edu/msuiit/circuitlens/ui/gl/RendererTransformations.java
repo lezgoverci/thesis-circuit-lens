@@ -67,7 +67,7 @@ public class RendererTransformations extends OpenGLRenderer {
         setInitProjectionTransformation();      // Set Projection transformation
         setInitViewportTransformation();        // Set Viewport transformation
 
-        //getCurrentCamera().setZ(500);
+        getCurrentCamera().setZ(500);
         getCurrentCamera().setFarPlane(5000);
         circuit3D.drawBounds(circuit3D);
         Log.d("renderInit2","done init scene");
@@ -146,6 +146,7 @@ public class RendererTransformations extends OpenGLRenderer {
 
     private void setInitViewportTransformation() {
         //TODO initial scaling here
+
     }
 
     @Override
@@ -216,12 +217,13 @@ public class RendererTransformations extends OpenGLRenderer {
                 double posY = /*circuit3D.getY() +*/ diffPosY;
                 double posZ = /*circuit3D.getZ() +*/ diffPosZ;
 
-                circuit3D.setX(posX * -1);
-                circuit3D.setY(posY);
+                circuit3D.setX(posX);
+                circuit3D.setY(posY * -1);
+                circuit3D.setZ(posZ * -1);
             }
 
             //circuit3D.setZ(posZ);
-            Log.d("rendererValues","X: " + circuit3D.getX() + "Y: " + circuit3D.getY()  + "Z: " + circuit3D.getZ() + "");
+            Log.d("rendererValues","X: " + circuit3D.getX() + " Y: " + circuit3D.getY()  + " Z: " + circuit3D.getZ() + "");
 
         } else {
             circuit3D.setX(mPosX);

@@ -97,8 +97,9 @@ public class CircuitLensController{
             mMapper.map(isTakePhoto);
             Log.d("checkMapMapping","is done");
             mMapper.drawDebug(); // turn on debug drawing
-
+            //Log.d("rendererValues",mMapper.isHomographyFound() + "");
             if(mMapper.isHomographyFound()){
+                mViewRenderer.setTrigger(isTakePhoto);
                 mViewRenderer.setOrientationRoll(mMapper.getOrientationRoll());       // Roll
                 mViewRenderer.setOrientationYaw(mMapper.getOrientationYaw());       // Yaw
                 mViewRenderer.setOrientationPitch(mMapper.getOrientationPitch());       // Pitch
@@ -106,11 +107,13 @@ public class CircuitLensController{
                 mViewRenderer.setTranslationX(mMapper.getTranslationX());
                 mViewRenderer.setTranslationY(mMapper.getTranslationY());
                 mViewRenderer.setTranslationZ(mMapper.getTranslationZ());
+
+
             }
 
 
 
-            Log.d("checkMapRendertoView","is done");
+
         }
 
     }

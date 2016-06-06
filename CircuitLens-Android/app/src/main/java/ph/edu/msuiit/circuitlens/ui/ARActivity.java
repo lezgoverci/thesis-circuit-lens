@@ -36,8 +36,10 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
             if(event.getAction() == MotionEvent.ACTION_DOWN)
             {
                 // this needs to be defined on the renderer:
-                Log.d(this.getClass().getSimpleName(),": " + event.getX()+ "," + event.getY());
+                //Log.d(this.getClass().getSimpleName(),": " + event.getX()+ "," + event.getY());
                 //mRenderer.onTouchEvent(event);
+                mTakePhoto = true;
+                Log.d("touch", "touched in Rajawali");
             }
             return true;
         }
@@ -182,7 +184,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean ret = super.onTouchEvent(event);
-        mTakePhoto = true;
+        Log.d("touch", "touched in Opencv");
         return ret;
     }
 
@@ -269,4 +271,10 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
     public void setProjectionMatrix(double[] projectionMatrix) {
 
     }
+
+    @Override
+    public void setTrigger(boolean isTakePhoto) {
+        mRenderer.setTrigger(isTakePhoto);
+    }
+
 }

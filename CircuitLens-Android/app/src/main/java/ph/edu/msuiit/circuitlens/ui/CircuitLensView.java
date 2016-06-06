@@ -27,5 +27,5 @@ public interface CircuitLensView {
     void setCameraMatrix(double[] cameraMatrix);
     void setProjectionMatrix(double[] projectionMatrix);
 
-
+    void setTrigger(boolean isTakePhoto);
 }

@@ -74,6 +74,7 @@ public class OpenGLRenderer extends RajawaliRenderer implements OnObjectPickedLi
         cirsim.readSetup(expectedNetlist);
         cirsim.updateCircuit();
 
+
         circuit3D = cirsim.getCircuitCanvas();
 
         //circuit3D.drawBounds(circuit3D);
@@ -85,7 +86,7 @@ public class OpenGLRenderer extends RajawaliRenderer implements OnObjectPickedLi
     @Override
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
-        cirsim.updateCircuit();
+        //cirsim.updateCircuit();
     }
 
     public void onOffsetsChanged(float x, float y, float z, float w, int i, int j) {

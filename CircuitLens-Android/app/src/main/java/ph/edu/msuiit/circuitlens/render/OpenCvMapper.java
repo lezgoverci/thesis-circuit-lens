@@ -136,7 +136,7 @@ public class OpenCvMapper implements Mapper {
     private static void updateHomography(MatOfPoint2f approxHullPoints) {
         //TODO check if the reference points and the current frame points correspond
         if(mReference.getApproxConvexHullPoints2D().toList().size() == approxHullPoints.toList().size()){
-            mHomography = Calib3d.findHomography(mReference.getApproxConvexHullPoints2D(),approxHullPoints,Calib3d.RANSAC,20.0);
+            mHomography = Calib3d.findHomography(mReference.getApproxConvexHullPoints2D(),approxHullPoints,Calib3d.RANSAC,150.0);
             isHomographyFound = true;
         }
     }

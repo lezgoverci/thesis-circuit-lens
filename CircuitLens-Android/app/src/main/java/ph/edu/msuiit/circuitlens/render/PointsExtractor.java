@@ -136,7 +136,7 @@ public class PointsExtractor {
         MatOfPoint2f result = new MatOfPoint2f();
 
         double arcLength = Imgproc.arcLength(curve,true);
-        double epsilon = 0.01 * arcLength;
+        double epsilon = 0.015 * arcLength;
 
         Imgproc.approxPolyDP(curve,result,epsilon,true);
 

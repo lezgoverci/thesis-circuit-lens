@@ -75,15 +75,15 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
 
         // If the Android version is lower than Jellybean, use this call to hide
         // the status bar.
-        if (Build.VERSION.SDK_INT < 16) {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        } else{
-            View decorView = getWindow().getDecorView();
-            // Hide the status bar in Jellybean up
-            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-            decorView.setSystemUiVisibility(uiOptions);
-        }
+//        if (Build.VERSION.SDK_INT < 16) {
+//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        } else{
+//            View decorView = getWindow().getDecorView();
+//            // Hide the status bar in Jellybean up
+//            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+//            decorView.setSystemUiVisibility(uiOptions);
+//        }
 
         setContentView(R.layout.activity_ar);
 
@@ -91,7 +91,7 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         String serverUri = preferences.getString("server_uri","ws://127.0.0.1:8080/ws");
         boolean rotate = preferences.getBoolean("rotate",false);
 
-
+        mRenderer = new RendererTransformations(this);
 
         mController = new CircuitLensController(this,serverUri);
         mController.onCreate();
@@ -111,13 +111,14 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
     }
 
     private void initializeRenderer(){
-        mRenderer = new RendererTransformations(this);
         mSurface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         mSurface.setOnTouchListener(mTouchListener);
         mSurface.setTransparent(true);
         mSurface.setSurfaceRenderer(mRenderer);
         mSurface.setZOrderMediaOverlay(true);
-        Log.d("checkRenderer"," is bound to surface view");
+        Log.d("checkViewport","initial surface h: " + mSurface.getHeight() + " w: " + mSurface.getWidth());
+        Log.d("checkViewport","initial renderer h: " + mRenderer.getViewportHeight()+ "w: " + mRenderer.getViewportWidth());
+        Log.d("checkViewport","initial camera h: " + mOpenCvCameraView.getHeight()+ " w: " + mOpenCvCameraView.getWidth());
     }
 
     @Override
@@ -177,6 +178,10 @@ public class ARActivity extends Activity implements CameraBridgeViewBase.CvCamer
         // Update renderer using the current frame
         mController.map(frame,mTakePhoto); //TODO use AsyncTask?
         mTakePhoto = false;
+
+        Log.d("checkViewport","surface h: " + mSurface.getHeight() + " w: " + mSurface.getWidth());
+        Log.d("checkViewport","renderer h: " + mRenderer.getViewportHeight()+ " w: " + mRenderer.getViewportWidth());
+        Log.d("checkViewport","camera h: " + mOpenCvCameraView.getHeight()+ " w: " + mOpenCvCameraView.getWidth());
 
         return frame;
     }

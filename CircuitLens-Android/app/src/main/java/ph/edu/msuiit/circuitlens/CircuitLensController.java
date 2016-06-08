@@ -30,11 +30,18 @@ public class CircuitLensController{
     public void onCreate(){
         mNetlistGenerator.connect();
         mCameraAdapter = new AndroidCameraAdapter();
-        //mCameraAdapter = new AndroidCameraAdapter();       // Only use this if you want to use new and updated camera parameters
         // TODO transfer to oncreate?
         // get height, width, camera matrix  from camera adapter
         mCameraAdapter.setCameraParameters();       // This will update camera parameters based on the recent camera parameters
 
+        // set height, width, camera matrix to ARView
+        mViewRenderer.setCameraMatrix(new double[]{
+                mCameraAdapter.getCameraWidth(),
+                mCameraAdapter.getCameraHeight(),
+                mCameraAdapter.getVerticalFOV(),
+                mCameraAdapter.getHorizontalFOV(),
+                mCameraAdapter.getAspectRatio()
+        });
     }
 
     public void onFocus(CvCameraViewFrame frame){
@@ -65,19 +72,6 @@ public class CircuitLensController{
     public void onResume(){
 
         if(!isSetupDone){
-
-
-
-            // set height, width, camera matrix to ARView
-            mViewRenderer.setCameraMatrix(new double[]{
-                    mCameraAdapter.getCameraWidth(),
-                    mCameraAdapter.getCameraHeight(),
-                    mCameraAdapter.getVerticalFOV(),
-                    mCameraAdapter.getHorizontalFOV(),
-                    mCameraAdapter.getAspectRatio()
-            });
-            Log.d("checkRendererCamMatrix"," is bound");
-
             // Reset mapper values
 
             mMapper = new OpenCvMapper();

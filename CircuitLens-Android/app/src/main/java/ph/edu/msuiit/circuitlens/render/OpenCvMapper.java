@@ -1,5 +1,7 @@
 package ph.edu.msuiit.circuitlens.render;
 
+import android.util.Log;
+
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -134,7 +136,7 @@ public class OpenCvMapper implements Mapper {
     private static void updateHomography(MatOfPoint2f approxHullPoints) {
         //TODO check if the reference points and the current frame points correspond
         if(mReference.getApproxConvexHullPoints2D().toList().size() == approxHullPoints.toList().size()){
-            mHomography = Calib3d.findHomography(mReference.getApproxConvexHullPoints2D(),approxHullPoints,Calib3d.RANSAC,40.0);
+            mHomography = Calib3d.findHomography(mReference.getApproxConvexHullPoints2D(),approxHullPoints,Calib3d.RANSAC,20.0);
             isHomographyFound = true;
         }
     }

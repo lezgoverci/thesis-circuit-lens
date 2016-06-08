@@ -1,6 +1,7 @@
 package ph.edu.msuiit.circuitlens.render;
 
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
@@ -11,7 +12,7 @@ public class ImagePreprocessor {
 
     private static Mat mGrayImg;
     private static Size blurKernel = new Size(5,5);
-    private static Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT,new Size(5.0,5.0));
+    private static Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT,new Size(7.0,7.0));
 
     public static Mat getProcessedImage(Mat img){
 

@@ -152,18 +152,20 @@ public class RendererTransformations extends OpenGLRenderer {
     @Override
     public void onRender(long elapsedTime, double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
-        renderImage();
-        Log.d("checkDimensions", getViewportWidth() + " x " + getViewportHeight());
+
+        // if camera matrix is not yet set, do not render
+        //if (!mCameraValuesDirty) {
+            renderImage();
+        //}
+        Log.d("checkDimensions","Viewport: " + getViewportWidth() + " x " + getViewportHeight());
     }
 
     private void renderImage() {
-        // if camera matrix is not yet set, do not render
-        if (!mCameraValuesDirty) {
-            // proceed to rendering
-            renderImageOrientation();
-            renderImageTranslation();
-            //renderImageScaling();
-        }
+        // proceed to rendering
+        renderImageOrientation();
+        renderImageTranslation();
+        //renderImageScaling();
+
     }
 
     private void renderImageOrientation() {
@@ -216,9 +218,9 @@ public class RendererTransformations extends OpenGLRenderer {
                 double posY = /*circuit3D.getY() +*/ diffPosY;
                 double posZ = /*circuit3D.getZ() +*/ diffPosZ;
 
-                circuit3D.setX(posX);
-                circuit3D.setY(posY * -1);
-                circuit3D.setZ(posZ * -1);
+                circuit3D.setX((int)posX);
+                circuit3D.setY((int)posY * -1);
+                circuit3D.setZ((int)posZ * -1);
             }
 
             //circuit3D.setZ(posZ);
@@ -246,7 +248,8 @@ public class RendererTransformations extends OpenGLRenderer {
         mHorizontalFOV = horizontalFOV;
         mAspectRatio = aspectRatio;
         mCameraValuesDirty = false;
-        Log.d("checkCameraParameters"," parameters values are set in renderer");
+        setViewPort(mCameraWidth,mCameraHeight);
+        Log.d("checkViewport"," view renderer: h" + getViewportHeight() + " w: " + getViewportWidth() );
     }
 
 

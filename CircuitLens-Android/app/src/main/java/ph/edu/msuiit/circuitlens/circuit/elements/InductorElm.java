@@ -7,6 +7,10 @@ import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
+import ph.edu.msuiit.circuitlens.circuit.Graphics;
+
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawCoil;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
 
 public class InductorElm extends CircuitElm {
 
@@ -19,7 +23,7 @@ public class InductorElm extends CircuitElm {
     }
 
     public InductorElm(int xa, int ya, int xb, int yb, int f,
-            StringTokenizer st) {
+                       StringTokenizer st) {
         super(xa, ya, xb, yb, f);
         inductance = new Double(st.nextToken()).doubleValue();
         current = new Double(st.nextToken()).doubleValue();
@@ -45,23 +49,6 @@ public class InductorElm extends CircuitElm {
         calcLeads(32);
     }
 
-//    public void draw(Graphics g) {
-//        double v1 = volts[0];
-//        double v2 = volts[1];
-//        int i;
-//        int hs = 8;
-//        setBbox(point1, point2, hs);
-//        draw2Leads(g);
-//        setPowerColor(g, false);
-//        drawCoil(g, 8, lead1, lead2, v1, v2);
-//        if (sim.isShowingValues()) {
-//            String s = getShortUnitText(inductance, "H");
-//            drawValues(g, s, hs);
-//        }
-//        doDots(g);
-//        drawPosts(g);
-//    }
-
     public void reset() {
         current = volts[0] = volts[1] = curcount = 0;
         ind.reset();
@@ -80,15 +67,17 @@ public class InductorElm extends CircuitElm {
     }
 
     Material[] coilMaterials;
+
     @Override
     public void updateObject3D() {
-        if(circuitElm3D == null) {
+        if (circuitElm3D == null) {
             circuitElm3D = generateObject3D();
         }
         update2Leads();
         double v1 = volts[0];
         double v2 = volts[1];
-        updateCoil(v1,v2,coilMaterials);
+        updateCoil(v1, v2, coilMaterials);
+        doDots(circuitElm3D);
     }
 
     public void calculateCurrent() {
@@ -100,26 +89,6 @@ public class InductorElm extends CircuitElm {
         double voltdiff = volts[0] - volts[1];
         ind.doStep(voltdiff);
     }
-
-//    public void getInfo(String arr[]) {
-//        arr[0] = "inductor";
-//        getBasicInfo(arr);
-//        arr[3] = "L = " + getUnitText(inductance, "H");
-//        arr[4] = "P = " + getUnitText(getPower(), "W");
-//    }
-
-//    public EditInfo getEditInfo(int n) {
-//        if (n == 0) {
-//            return new EditInfo("Inductance (H)", inductance, 0, 0);
-//        }
-//        if (n == 1) {
-//            EditInfo ei = new EditInfo("", 0, -1, -1);
-//            ei.checkbox = new Checkbox("Trapezoidal Approximation",
-//                    ind.isTrapezoidal());
-//            return ei;
-//        }
-//        return null;
-//    }
 
     public double getInductance() {
         return inductance;
@@ -133,13 +102,12 @@ public class InductorElm extends CircuitElm {
 //        setPowerColor(g, false);
         coilMaterials = new Material[30];
         drawCoil(inductor3d, 8, lead1, lead2, coilMaterials);
-//        if (sim.isShowingValues()) {
-//            String s = getShortUnitText(inductance, "H");
-//            drawValues(g, s, hs);
-//        }
+        if (sim.isShowingValues()) {
+            String s = getShortUnitText(inductance, "H", shortFormat);
+            drawValues(inductor3d, s, hs);
+        }
 
         drawPosts(inductor3d);
-
         return inductor3d;
     }
 }

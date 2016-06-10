@@ -11,6 +11,11 @@ import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
+import ph.edu.msuiit.circuitlens.circuit.Graphics;
+
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawTriangle;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint2;
 
 public class DiodeElm extends CircuitElm {
 
@@ -77,38 +82,10 @@ public class DiodeElm extends CircuitElm {
         rectPoints = new Point[]{ pa[0], pa[1], lead2 };
     }
 
-    /*
-    public void draw(Graphics g) {
-        drawDiode(g);
-        doDots(g);
-        drawPosts(g);
-    }
-    */
-
     public void reset() {
         diode.reset();
         volts[0] = volts[1] = curcount = 0;
     }
-
-    /*
-    void drawDiode(Graphics g) {
-        setBbox(point1, point2, hs);
-
-        double v1 = volts[0];
-        double v2 = volts[1];
-
-        draw2Leads(g);
-
-        // draw arrow thingy
-        setPowerColor(g, true);
-        setVoltageColor(g, v1);
-        g.fillPolygon(poly);
-
-        // draw thing arrow is pointing to
-        setVoltageColor(g, v2);
-        drawThickLine(g, cathode[0], cathode[1]);
-    }
-    */
 
     public void stamp() {
         diode.stamp(nodes[0], nodes[1]);
@@ -139,7 +116,7 @@ public class DiodeElm extends CircuitElm {
         int color2 = getVoltageColor(volts[1]);
         lineMaterial.setColor(color2);
 
-        //doDots(circuitElm3D);
+        doDots(circuitElm3D);
     }
 
     @Override

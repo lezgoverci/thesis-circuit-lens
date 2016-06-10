@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-import common.class_ports as p
+import netlist_generator.class_ports as p
 
 class CircuitElement(object):
     __metaclass__ = ABCMeta

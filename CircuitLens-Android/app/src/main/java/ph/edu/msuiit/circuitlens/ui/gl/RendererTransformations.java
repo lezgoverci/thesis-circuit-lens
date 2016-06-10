@@ -161,10 +161,25 @@ public class RendererTransformations extends OpenGLRenderer {
     }
 
     private void renderImage() {
-        // proceed to rendering
-        renderImageOrientation();
-        renderImageTranslation();
-        //renderImageScaling();
+
+        if(mIsTakePhoto){
+            mInitQuaternionOrientation = circuit3D.getOrientation();
+            mInitYaw = mInitQuaternionOrientation.getYaw();
+            mInitPitch = mInitQuaternionOrientation.getPitch();
+            mInitRoll = mInitQuaternionOrientation.getRoll();
+
+            mInitPosX = mPosX;
+            mInitPosY = mPosY;
+            mInitPosZ = mPosZ;
+            isSetInitialValues = true;
+        }
+
+        if(isSetInitialValues) {
+            // proceed to rendering
+            renderImageOrientation();
+            renderImageTranslation();
+            //renderImageScaling();
+        }
 
     }
 
@@ -198,30 +213,22 @@ public class RendererTransformations extends OpenGLRenderer {
 
     private void renderImageTranslation() {
         if (true) {       // turn this to false to use raw position data
-            if(mIsTakePhoto){
-                mInitPosX = mPosX;
-                mInitPosY = mPosY;
-                mInitPosZ = mPosZ;
-                isSetInitialValues = true;
-            }
 
-            if(isSetInitialValues){
-                double rawPosX = mPosX;
-                double rawPosY = mPosY;
-                double rawPosZ = mPosZ;
+            double rawPosX = mPosX;
+            double rawPosY = mPosY;
+            double rawPosZ = mPosZ;
 
-                double diffPosX = rawPosX - mInitPosX;
-                double diffPosY = rawPosY - mInitPosY;
-                double diffPosZ = rawPosZ - mInitPosZ;
+            double diffPosX = rawPosX - mInitPosX;
+            double diffPosY = rawPosY - mInitPosY;
+            double diffPosZ = rawPosZ - mInitPosZ;
 
-                double posX = /*circuit3D.getX() +*/ diffPosX;
-                double posY = /*circuit3D.getY() +*/ diffPosY;
-                double posZ = /*circuit3D.getZ() +*/ diffPosZ;
+            double posX = /*circuit3D.getX() +*/ diffPosX;
+            double posY = /*circuit3D.getY() +*/ diffPosY;
+            double posZ = /*circuit3D.getZ() +*/ diffPosZ;
 
-                circuit3D.setX((int)posX);
-                circuit3D.setY((int)posY * -1);
-                circuit3D.setZ((int)posZ * -1);
-            }
+            circuit3D.setX((int)posX);
+            circuit3D.setY((int)posY * -1);
+            //circuit3D.setZ((int)posZ * 1);
 
             //circuit3D.setZ(posZ);
             Log.d("rendererValues","X: " + circuit3D.getX() + " Y: " + circuit3D.getY()  + " Z: " + circuit3D.getZ() + "");

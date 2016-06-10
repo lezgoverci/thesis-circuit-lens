@@ -1,34 +1,48 @@
 package ph.edu.msuiit.circuitlens.circuit;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 
-import org.opencv.core.Mat;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
+import org.rajawali3d.materials.textures.ATexture;
+import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.Cube;
 import org.rajawali3d.primitives.Line3D;
+import org.rajawali3d.primitives.Plane;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Stack;
 
+import ph.edu.msuiit.circuitlens.circuit.elements.RailElm;
+import ph.edu.msuiit.circuitlens.circuit.elements.VoltageElm;
 import ph.edu.msuiit.circuitlens.ui.gl.Circle3D;
-import ph.edu.msuiit.circuitlens.ui.gl.Triangle3D;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getCurrentDText;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getVoltageDText;
 
 public abstract class CircuitElm {
 
     protected Object3D circuitElm3D;
     private static final int colorScaleCount = 32;
     private static final int colorScale[] = new int[colorScaleCount];
-    public static int whiteColor, selectColor, lightGrayColor;
-    //protected static final Font unitsFont;
+    public static int whiteColor;
+
+    protected int x, y, x2, y2, flags, nodes[], voltSource;
+    protected int dx, dy, dsign;
+    protected double dn, dpx1, dpy1;
+    protected Point point1, point2, lead1, lead2;
+    protected double volts[];
+    protected double current, curcount;
+    protected Rect boundingBox;
+    public boolean selected;
+    protected CircuitSimulator sim;
 
     protected Point ps1 = new Point();
     protected Point ps2 = new Point();
@@ -36,8 +50,7 @@ public abstract class CircuitElm {
     public static final NumberFormat showFormat, shortFormat, noCommaFormat;
 
     static {
-        int i;
-        for (i = 0; i != colorScaleCount; i++) {
+        for (int i = 0; i < colorScaleCount; i++) {
             double v = i * 2. / colorScaleCount - 1;
             if (v < 0) {
                 int n1 = (int) (128 * -v) + 100;
@@ -52,8 +65,6 @@ public abstract class CircuitElm {
             }
         }
 
-        //unitsFont = new Font("SansSerif", 0, 10);
-
         showFormat = DecimalFormat.getInstance();
         showFormat.setMaximumFractionDigits(2);
         shortFormat = DecimalFormat.getInstance();
@@ -62,17 +73,6 @@ public abstract class CircuitElm {
         noCommaFormat.setMaximumFractionDigits(10);
         noCommaFormat.setGroupingUsed(false);
     }
-
-    protected int x, y, x2, y2, flags, nodes[], voltSource;
-    protected int dx, dy, dsign;
-    protected double dn, dpx1, dpy1;
-    protected Point point1, point2, lead1, lead2;
-    protected double volts[];
-    protected double current, curcount;
-    protected Rect boundingBox;
-    protected boolean noDiagonal;
-    public boolean selected;
-    protected CircuitSimulator sim;
 
     public CircuitSimulator getCS() {
         return sim;
@@ -112,13 +112,30 @@ public abstract class CircuitElm {
         boundingBox = new Rect();
         boundingBox.set(min(x, x2), min(y, y2),
                 abs(x2 - x) + 1, abs(y2 - y) + 1);
+
     }
 
     public void allocNodes() {
         nodes = new int[getPostCount() + getInternalNodeCount()];
         volts = new double[getPostCount() + getInternalNodeCount()];
-        templateDot = new Object3D();
-        drawSquare(templateDot, 0, 0, 5, Color.YELLOW);
+    }
+
+    // determine if moving this element by (dx,dy) will put it on top of another element
+    public boolean allowMove(int dx, int dy) {
+        int nx = x + dx;
+        int ny = y + dy;
+        int nx2 = x2 + dx;
+        int ny2 = y2 + dy;
+        for (int i = 0; i < sim.elmListSize(); i++) {
+            CircuitElm ce = sim.getElm(i);
+            if (ce.x == nx && ce.y == ny && ce.x2 == nx2 && ce.y2 == ny2) {
+                return false;
+            }
+            if (ce.x == nx2 && ce.y == ny2 && ce.x2 == nx && ce.y2 == ny) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public String dump() {
@@ -128,8 +145,7 @@ public abstract class CircuitElm {
     }
 
     public void reset() {
-        int i;
-        for (i = 0; i != getPostCount() + getInternalNodeCount(); i++) {
+        for (int i = 0; i < getPostCount() + getInternalNodeCount(); i++) {
             volts[i] = 0;
         }
         curcount = 0;
@@ -185,63 +201,20 @@ public abstract class CircuitElm {
             lead2 = point2;
             return;
         }
-        lead1 = interpPoint(point1, point2, (dn - len) / (2 * dn));
-        lead2 = interpPoint(point1, point2, (dn + len) / (2 * dn));
-    }
-
-
-    public Point interpPoint(Point a, Point b, double f) {
-        Point p = new Point();
-        interpPoint(a, b, p, f);
-        return p;
-    }
-
-    public void interpPoint(Point a, Point b, Point c, double f) {
-        int xpd = b.x - a.x;
-        int ypd = b.y - a.y;
-        double q = (a.x*(1-f)+b.x*f+.48);
-         System.out.println(q + " " + (int) q);
-        c.x = (int) Math.floor(a.x * (1 - f) + b.x * f + .48);
-        c.y = (int) Math.floor(a.y * (1 - f) + b.y * f + .48);
-    }
-
-    public void interpPoint(Point a, Point b, Point c, double f, double g) {
-        int xpd = b.x - a.x;
-        int ypd = b.y - a.y;
-        int gx = b.y - a.y;
-        int gy = a.x - b.x;
-        g /= Math.sqrt(gx * gx + gy * gy);
-        c.x = (int) Math.floor(a.x * (1 - f) + b.x * f + g * gx + .48);
-        c.y = (int) Math.floor(a.y * (1 - f) + b.y * f + g * gy + .48);
-    }
-
-    public Point interpPoint(Point a, Point b, double f, double g) {
-        Point p = new Point();
-        interpPoint(a, b, p, f, g);
-        return p;
-    }
-
-    public void interpPoint2(Point a, Point b, Point c, Point d, double f, double g) {
-        int xpd = b.x - a.x;
-        int ypd = b.y - a.y;
-        int gx = b.y - a.y;
-        int gy = a.x - b.x;
-        g /= Math.sqrt(gx * gx + gy * gy);
-        c.x = (int) Math.floor(a.x * (1 - f) + b.x * f + g * gx + .48);
-        c.y = (int) Math.floor(a.y * (1 - f) + b.y * f + g * gy + .48);
-        d.x = (int) Math.floor(a.x * (1 - f) + b.x * f - g * gx + .48);
-        d.y = (int) Math.floor(a.y * (1 - f) + b.y * f - g * gy + .48);
+        lead1 = Graphics.interpPoint(point1, point2, (dn - len) / (2 * dn));
+        lead2 = Graphics.interpPoint(point1, point2, (dn + len) / (2 * dn));
     }
 
     Material lead1Material, lead2Material;
+
     public void draw2Leads(Object3D object3D) {
         // draw first lead
         lead1Material = new Material();
-        drawThickLine(object3D, point1, lead1, lead1Material);
+        Graphics.drawThickLine(object3D, point1, lead1, lead1Material);
 
         // draw second lead
         lead2Material = new Material();
-        drawThickLine(object3D, lead2, point2, lead2Material);
+        Graphics.drawThickLine(object3D, lead2, point2, lead2Material);
     }
 
     public void update2Leads() {
@@ -262,157 +235,6 @@ public abstract class CircuitElm {
         return a;
     }
 
-    public void drawTriangle(Object3D object3D, Point[] points, Material material) {
-        Stack<Vector3> points3D = new Stack<>();
-        for(int i=0;i<3;i++)
-            points3D.add(new Vector3(points[i].x,points[i].y,0));
-
-        Triangle3D triangle = new Triangle3D(points3D,1);
-        triangle.setMaterial(material);
-        object3D.addChild(triangle);
-    }
-
-    static Object3D templateDot;
-    Object3D dots;
-
-    public void drawDots(Object3D object3D, Point pa, Point pb, double pos) {
-        if (sim.isStopped() || pos == 0 || !sim.isShowingCurrent()) {
-            return;
-        }
-        int dx = pb.x - pa.x;
-        int dy = pb.y - pa.y;
-        double dn = Math.sqrt(dx * dx + dy * dy);
-        int ds = 16;
-        pos %= ds;
-        if (pos < 0) {
-            pos += ds;
-        }
-        double di = 0;
-        int i = 0;
-        if(dots == null) {
-            dots = new Object3D();
-            dots.setRenderChildrenAsBatch(true);
-            object3D.addChild(dots);
-        }
-        for (di = pos; di < dn; di += ds) {
-            int x0 = (int) (pa.x + di * dx / dn);
-            int y0 = (int) (pa.y + di * dy / dn);
-            Object3D dot3D;
-            if(dots.getNumChildren() <= i) {
-                dot3D = templateDot.clone();
-                dots.addChild(dot3D);
-            } else{
-                dot3D = dots.getChildAt(i);
-            }
-            dot3D.setPosition(x0, y0, 5);
-            dot3D.setVisible(true);
-            i++;
-        }
-        int numChildren = dots.getNumChildren();
-        if(i < numChildren){
-            while(i < numChildren){
-                dots.getChildAt(i).setVisible(false);
-            }
-        }
-    }
-
-
-    private void drawSquare(Object3D object3D, int x0, int y0, int side, int color) {
-        Material material = new Material();
-        material.setColor(color);
-        Cube cube = new Cube(side);
-        cube.setX(x0);
-        cube.setY(y0);
-        cube.setZ(3);
-        cube.setMaterial(material);
-        object3D.addChild(cube);
-    }
-
-    /*
-    public Polygon calcArrow(Point a, Point b, double al, double aw) {
-        Polygon poly = new Polygon();
-        Point p1 = new Point();
-        Point p2 = new Point();
-        int adx = b.x - a.x;
-        int ady = b.y - a.y;
-        double l = Math.sqrt(adx * adx + ady * ady);
-        poly.addPoint(b.x, b.y);
-        interpPoint2(a, b, p1, p2, 1 - al / l, aw);
-        poly.addPoint(p1.x, p1.y);
-        poly.addPoint(p2.x, p2.y);
-        return poly;
-    }
-
-    public Polygon createPolygon(Point a, Point b, Point c) {
-        Polygon p = new Polygon();
-        p.addPoint(a.x, a.y);
-        p.addPoint(b.x, b.y);
-        p.addPoint(c.x, c.y);
-        return p;
-    }
-
-    public Polygon createPolygon(Point a, Point b, Point c, Point d) {
-        Polygon p = new Polygon();
-        p.addPoint(a.x, a.y);
-        p.addPoint(b.x, b.y);
-        p.addPoint(c.x, c.y);
-        p.addPoint(d.x, d.y);
-        return p;
-    }
-
-    public Polygon createPolygon(Point a[]) {
-        Polygon p = new Polygon();
-        int i;
-        for (i = 0; i != a.length; i++) {
-            p.addPoint(a[i].x, a[i].y);
-        }
-        return p;
-    }*/
-
-    public void drag(int xx, int yy) {
-        xx = sim.snapGrid(xx);
-        yy = sim.snapGrid(yy);
-        if (noDiagonal) {
-            if (Math.abs(x - xx) < Math.abs(y - yy)) {
-                xx = x;
-            } else {
-                yy = y;
-            }
-        }
-        x2 = xx;
-        y2 = yy;
-        setPoints();
-    }
-
-    /*
-    public void move(int dx, int dy) {
-        x += dx;
-        y += dy;
-        x2 += dx;
-        y2 += dy;
-        boundingBox.move(dx, dy);
-        setPoints();
-    }*/
-
-    // determine if moving this element by (dx,dy) will put it on top of another element
-    public boolean allowMove(int dx, int dy) {
-        int nx = x + dx;
-        int ny = y + dy;
-        int nx2 = x2 + dx;
-        int ny2 = y2 + dy;
-        int i;
-        for (i = 0; i != sim.elmListSize(); i++) {
-            CircuitElm ce = sim.getElm(i);
-            if (ce.x == nx && ce.y == ny && ce.x2 == nx2 && ce.y2 == ny2) {
-                return false;
-            }
-            if (ce.x == nx2 && ce.y == ny2 && ce.x2 == nx && ce.y2 == ny) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public void movePoint(int n, int dx, int dy) {
         if (n == 0) {
             x += dx;
@@ -424,10 +246,8 @@ public abstract class CircuitElm {
         setPoints();
     }
 
-
     public void drawPosts(Object3D object3D) {
-        int i;
-        for (i = 0; i != getPostCount(); i++) {
+        for (int i = 0; i < getPostCount(); i++) {
             Point p = getPost(i);
             drawPost(object3D, p.x, p.y, nodes[i]);
         }
@@ -477,23 +297,12 @@ public abstract class CircuitElm {
     }
 
     public void drawPost(Object3D object3D, int x0, int y0, int n) {
-        if (sim.getDragElm() == null && !needsHighlight()
-                && sim.getCircuitNode(n) != null && sim.getCircuitNode(n).links.size() == 2) {
+        if (sim.getCircuitNode(n) != null && sim.getCircuitNode(n).links.size() == 2) {
             return;
         }
-        /*
-        if (sim.mouseMode == CircuitController.MODE_DRAG_ROW
-                || sim.mouseMode == CircuitController.MODE_DRAG_COLUMN) {
-            return;
-}*/
-
-        drawPost(object3D, x0, y0);
-        }
-
-    public void drawPost(Object3D object3D, int x0, int y0) {
         Material material = new Material();
         material.setColor(Color.WHITE);
-        Circle3D circle = new Circle3D(new Vector3(x0,y0,1),3, 1, true);
+        Circle3D circle = new Circle3D(new Vector3(x0, y0, 1), 3, 1, true);
         circle.setMaterial(material);
         object3D.addChild(circle);
     }
@@ -509,16 +318,19 @@ public abstract class CircuitElm {
             y1 = y2;
             y2 = q;
         }
-        boundingBox.set(x1,y1,x2-x1+1,y2-y1+1);
+        boundingBox.set(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
     }
 
     public void setBbox(Point p1, Point p2, double w) {
+        int iw = (int) Math.floor(w);
+        boundingBox.set(p1.x - iw, p1.y - iw, p2.x + iw, p2.y + iw);
+        /*
         setBbox(p1.x, p1.y, p2.x, p2.y);
-        //int gx = p2.y - p1.y;
-        //int gy = p1.x - p2.x;
+        int gx = p2.y - p1.y;
+        int gy = p1.x - p2.x;
         int dpx = (int) (dpx1 * w);
         int dpy = (int) (dpy1 * w);
-        adjustBbox(p1.x + dpx, p1.y + dpy, p1.x - dpx, p1.y - dpy);
+        adjustBbox(p1.x + dpx, p1.y + dpy, p1.x - dpx, p1.y - dpy);*/
     }
 
     public void adjustBbox(int x1, int y1, int x2, int y2) {
@@ -541,34 +353,62 @@ public abstract class CircuitElm {
 
     public void adjustBbox(Point p1, Point p2) {
         adjustBbox(p1.x, p1.y, p2.x, p2.y);
-    }/*
+    }
 
     public boolean isCenteredText() {
         return false;
     }
 
-    public void drawCenteredText(Graphics g, String s, int x, int y, boolean cx) {
-        FontMetrics fm = g.getFontMetrics();
-        int w = fm.stringWidth(s);
-        if (cx) {
-            x -= w / 2;
-        }
-        g.drawString(s, x, y + fm.getAscent() / 2);
-        adjustBbox(x, y - fm.getAscent() / 2,
-                x + w, y + fm.getAscent() / 2 + fm.getDescent());
+    public void drawCenteredText(Object3D object3D, String s, int x, int y, boolean cx) {
+        //Graphics.draw3DText(object3D, s, x, y, cx);
     }
 
-    public void drawValues(Graphics g, String s, double hs) {
+    public void drawBoundingBox(Object3D object3D) {
+        Material material = new Material();
+        material.setColor(Color.RED);
+        Stack<Vector3> boxPts = new Stack<>();
+        boxPts.add(new Vector3(boundingBox.left, boundingBox.top, 0));
+        boxPts.add(new Vector3(boundingBox.left, boundingBox.bottom, 0));
+        boxPts.add(new Vector3(boundingBox.right, boundingBox.bottom, 0));
+        boxPts.add(new Vector3(boundingBox.right, boundingBox.top, 0));
+        boxPts.add(new Vector3(boundingBox.left, boundingBox.top, 0));
+
+        Line3D boundingBox = new Line3D(boxPts, 3);
+        boundingBox.setMaterial(material);
+        object3D.addChild(boundingBox);
+    }
+
+    public void drawValues(Object3D object3D, String s, double hs) {
         if (s == null) {
             return;
         }
-        g.setFont(unitsFont);
+
+        Bitmap rasterText = Graphics.textAsBitmap(s, 12, Color.WHITE);
+        Material textMaterial = new Material();
+        textMaterial.setColor(Color.TRANSPARENT);
+        Texture texture = new Texture("text", rasterText);
+
+        int w = rasterText.getWidth();
+
+        try {
+            textMaterial.addTexture(texture);
+        } catch (ATexture.TextureException e) {
+            e.printStackTrace();
+        }
+        Plane textPlane = new Plane(w, rasterText.getHeight(), 2, 2);
+        textPlane.setDoubleSided(true);
+        textPlane.setScale(-1, -1, 1);
+        textPlane.setTransparent(true);
+        textPlane.setMaterial(textMaterial);
+        object3D.addChild(textPlane);
+
+        /*g.setFont(unitsFont);
         FontMetrics fm = g.getFontMetrics();
-        int w = fm.stringWidth(s);
         g.setColor(whiteColor);
-        int ya = fm.getAscent() / 2;
+        int ya = fm.getAscent() / 2;*/
+
         int xc, yc;
-        if (this instanceof RailElm || this instanceof SweepElm) {
+        if (this instanceof RailElm /*|| this instanceof SweepElm*/) {
             xc = x2;
             yc = y2;
         } else {
@@ -578,174 +418,27 @@ public abstract class CircuitElm {
         int dpx = (int) (dpx1 * hs);
         int dpy = (int) (dpy1 * hs);
         if (dpx == 0) {
-            g.drawString(s, xc - w / 2, yc - abs(dpy) - 2);
+            //g.drawString(s, xc - w / 2, yc - abs(dpy) - 2);
+            textPlane.setPosition(xc, yc - abs(dpy) - 12, 5);
         } else {
-            int xx = xc + abs(dpx) + 2;
+            int xx = xc + abs(dpx) + w / 2;
             if (this instanceof VoltageElm || (x < x2 && y > y2)) {
-                xx = xc - (w + abs(dpx) + 2);
+                xx = xc - (w / 2 + abs(dpx) + 2);
             }
-            g.drawString(s, xx, yc + dpy + ya);
-        }
-    }
-    }*/
-
-    public void drawCoil(Object3D object3D, int hs, Point p1, Point p2,
-                         Material[] coilMaterials) {
-        double len = distance(p1, p2);
-        int segments = 30; // 10*(int) (len/10);
-        int i;
-        double segf = 1. / segments;
-
-        ps1.set(p1.x, p1.y);
-        for (i = 0; i != segments; i++) {
-            double cx = (((i + 1) * 6. * segf) % 2) - 1;
-            double hsx = Math.sqrt(1 - cx * cx);
-            if (hsx < 0)
-                hsx = -hsx;
-            interpPoint(p1, p2, ps2, i * segf, hsx * hs);
-            coilMaterials[i] = new Material();
-            drawThickLine(object3D, ps1, ps2, coilMaterials[i]);
-            ps1.set(ps2.x,ps2.y);
+            //g.drawString(s, xx, yc + dpy + ya);
+            textPlane.setPosition(xx, yc, 5);
         }
     }
 
     public void updateCoil(double v1, double v2, Material[] materials) {
-        int segments = 30; // 10*(int) (len/10);
-        int i;
-        double segf = 1. / segments;
-
-        for (i = 0; i != segments; i++) {
+        int segments = 30;
+        for (int i = 0; i < segments; i++) {
             double v = v1 + (v2 - v1) * i / segments;
             int color = getVoltageColor(v);
             materials[i].setColor(color);
         }
     }
 
-    protected void drawThickLine(Object3D object3D, Point pa, Point pb, Material material) {
-        drawThickLine(object3D, pa.x, pa.y, pb.x, pb.y, material);
-    }
-
-    public static void drawThickLine(Object3D object3D, int x, int y, int x2, int y2) {
-        Material material = new Material();
-        material.setColor(Color.WHITE);
-        drawThickLine(object3D, x, y, x2, y2, material);
-    }
-
-    public static void drawThickLine(Object3D object3D, int x, int y, int x2, int y2, Material material) {
-        Stack<Vector3> points = new Stack<>();
-        points.add(new Vector3(x,y,0));
-        points.add(new Vector3(x2,y2,0));
-        Line3D thickLine = new Line3D(points,6);
-        thickLine.setMaterial(material);
-
-        object3D.addChild(thickLine);
-    }
-
-    public static void drawThickLine(Object3D object3D, Point pa, Point pb) {
-        drawThickLine(object3D, pa.x, pa.y, pb.x, pb.y);
-    }
-
-    /*
-    public static void drawThickPolygon(Graphics g, int xs[], int ys[], int c) {
-        int i;
-        for (i = 0; i != c - 1; i++) {
-            drawThickLine(g, xs[i], ys[i], xs[i + 1], ys[i + 1]);
-        }
-        drawThickLine(g, xs[i], ys[i], xs[0], ys[0]);
-    }
-
-    public static void drawThickPolygon(Graphics g, Polygon p) {
-        drawThickPolygon(g, p.xpoints, p.ypoints, p.npoints);
-    }*/
-
-    public static Material drawThickCircle(Object3D object3D, int cx, int cy, int ri) {
-        Material material = new Material();
-        material.setColor(Color.WHITE);
-        drawThickCircle(object3D, cx, cy, ri, material);
-        return material;
-    }
-
-    public static void drawThickCircle(Object3D object3D, int cx, int cy, int ri, Material material) {
-        Circle3D circle = new Circle3D(new Vector3(cx,cy,1),ri, 5);
-        circle.setMaterial(material);
-        object3D.addChild(circle);
-    }
-
-
-    /*
-    public static String getVoltageDText(double v) {
-        return getUnitText(Math.abs(v), "V");
-    }
-
-    public static String getVoltageText(double v) {
-        return getUnitText(v, "V");
-    }
-
-    public synchronized static String getUnitText(double v, String u) {
-        double va = Math.abs(v);
-        if (va < 1e-14) {
-            return "0 " + u;
-        }
-        if (va < 1e-9) {
-            return showFormat.format(v * 1e12) + " p" + u;
-        }
-        if (va < 1e-6) {
-            return showFormat.format(v * 1e9) + " n" + u;
-        }
-        if (va < 1e-3) {
-            return showFormat.format(v * 1e6) + " " + CircuitSimulator.muString + u;
-        }
-        if (va < 1) {
-            return showFormat.format(v * 1e3) + " m" + u;
-        }
-        if (va < 1e3) {
-            return showFormat.format(v) + " " + u;
-        }
-        if (va < 1e6) {
-            return showFormat.format(v * 1e-3) + " k" + u;
-        }
-        if (va < 1e9) {
-            return showFormat.format(v * 1e-6) + " M" + u;
-        }
-        return showFormat.format(v * 1e-9) + " G" + u;
-    }
-
-    public static String getShortUnitText(double v, String u) {
-        double va = Math.abs(v);
-        if (va < 1e-13) {
-            return null;
-        }
-        if (va < 1e-9) {
-            return shortFormat.format(v * 1e12) + "p" + u;
-        }
-        if (va < 1e-6) {
-            return shortFormat.format(v * 1e9) + "n" + u;
-        }
-        if (va < 1e-3) {
-            return shortFormat.format(v * 1e6) + CircuitSimulator.muString + u;
-        }
-        if (va < 1) {
-            return shortFormat.format(v * 1e3) + "m" + u;
-        }
-        if (va < 1e3) {
-            return shortFormat.format(v) + u;
-        }
-        if (va < 1e6) {
-            return shortFormat.format(v * 1e-3) + "k" + u;
-        }
-        if (va < 1e9) {
-            return shortFormat.format(v * 1e-6) + "M" + u;
-        }
-        return shortFormat.format(v * 1e-9) + "G" + u;
-    }
-
-    public static String getCurrentText(double i) {
-        return getUnitText(i, "A");
-    }
-
-    public static String getCurrentDText(double i) {
-        return getUnitText(Math.abs(i), "A");
-    }*/
 
     public void updateDotCount() {
         curcount = updateDotCount(current, curcount);
@@ -763,29 +456,70 @@ public abstract class CircuitElm {
     public void doDots(Object3D object3D) {
         updateDotCount();
         //if (sim.getDragElm() != this) {
-            drawDots(object3D, point1, point2, curcount);
+        drawDots(object3D, point1, point2, curcount);
         //}
     }
 
-    public void doAdjust() {
-    }
+    Object3D dots;
 
-    public void setupAdjust() {
+    public void drawDots(Object3D object3D, Point pa, Point pb, double pos) {
+        if (sim.isStopped() || pos == 0 || !sim.isShowingCurrent()) {
+            return;
+        }
+        int dx = pb.x - pa.x;
+        int dy = pb.y - pa.y;
+        double dn = Math.sqrt(dx * dx + dy * dy);
+        int ds = 16;
+        pos %= ds;
+        if (pos < 0) {
+            pos += ds;
+        }
+        int count = 0;
+        for (double di = pos; di < dn; di += ds) {
+            int x0 = (int) (pa.x + di * dx / dn);
+            int y0 = (int) (pa.y + di * dy / dn);
+
+            if (count == 0) {
+                if (dots == null) {
+                    Material material = new Material();
+                    material.setColor(Color.YELLOW);
+                    dots = new Cube(4);
+                    dots.setMaterial(material);
+                    dots.setRenderChildrenAsBatch(true);
+                    object3D.addChild(dots);
+                }
+                dots.setPosition(x0, y0, 5);
+            } else if (dots.getNumChildren() == 0) {
+                Object3D dot = dots.clone();
+                dots.addChild(dot);
+                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 5);
+            } else {
+                Object3D dot;
+                if (count < dots.getNumChildren()) {
+                    dot = dots.getChildAt(count - 1);
+                } else {
+                    dot = dots.getChildAt(0).clone();
+                    dots.addChild(dot);
+                }
+                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 5);
+            }
+            count++;
+            //g.setColor(Color.yellow);
+            //g.fillOval(x0 - 1, y0 - 1, 4, 4);
+        }
+
     }
 
     public void getInfo(String arr[]) {
     }
 
     public int getBasicInfo(String arr[]) {
-        //arr[1] = "I = " + getCurrentDText(getCurrent());
-        //arr[2] = "Vd = " + getVoltageDText(getVoltageDiff());
+        arr[1] = "I = " + getCurrentDText(getCurrent(), showFormat);
+        arr[2] = "Vd = " + getVoltageDText(getVoltageDiff(), showFormat);
         return 3;
     }
 
     public int getVoltageColor(double volts) {
-        if (needsHighlight()) {
-            return selectColor;
-        }
         if (!sim.isShowingVoltage()) {
             if (!sim.isShowingPowerDissipation()) // && !conductanceCheckItem.getState())
             {
@@ -802,58 +536,39 @@ public abstract class CircuitElm {
         }
         if (sim.isStopped()) {
             return Color.parseColor("#3E80BD");
-            //g.setColor(Color.decode("#3E80BD"));//blue
-            //g.setColor(Color.white);//blue
         } else {
             return colorScale[c];
-            //g.setColor(colorScale[c]);
         }
     }
 
-    /*
-    public void setPowerColor(Graphics g, boolean yellow) {
-        if (conductanceCheckItem.getState()) {
-         setConductanceColor(g, current/getVoltageDiff());
-         return;
-         
-        if (!sim.isShowingPowerDissipation()) {
-            return;
-        }
-        setPowerColor(g, getPower());
-    }*/
-
-    /*
-    public void setPowerColor(Graphics g, double w0) {
+    public int getPowerColor(double w0) {
+        int color;
         w0 *= sim.getPowerMult();
-        //System.out.println(w);
         double w = (w0 < 0) ? -w0 : w0;
         if (w > 1) {
             w = 1;
         }
         int rg = 128 + (int) (w * 127);
         int b = (int) (128 * (1 - w));
-        if (yellow)
-         g.setColor(new Color(rg, rg, b));
-         else
         if (w0 > 0) {
-            g.setColor(new Color(rg, b, b));
+            color = Color.rgb(rg, b, b);
         } else {
-            g.setColor(new Color(b, rg, b));
+            color = Color.rgb(b, rg, b);
         }
-    }*/
+        return color;
+    }
 
-/*
-    public void setConductanceColor(Graphics g, double w0) {
+    public int getConductanceColor(double w0) {
         w0 *= sim.getPowerMult();
-        sim.getPowerMult()
+        sim.getPowerMult();
         //System.out.println(w);
         double w = (w0 < 0) ? -w0 : w0;
         if (w > 1) {
             w = 1;
         }
         int rg = (int) (w * 255);
-        g.setColor(new Color(rg, rg, rg));
-    }*/
+        return Color.rgb(rg, rg, rg);
+    }
 
     public double getPower() {
         return getVoltageDiff() * current;
@@ -866,13 +581,6 @@ public abstract class CircuitElm {
     public String getScopeUnits(int x) {
         return (x == 1) ? "W" : "V";
     }
-
-//    public EditInfo getEditInfo(int n) {
-//        return null;
-//    }
-
-//    public void setEditValue(int n, EditInfo ei) {
-//    }
 
     public boolean getConnection(int n1, int n2) {
         return true;
@@ -894,11 +602,6 @@ public abstract class CircuitElm {
         return ((x1 == y1 && x2 == y2) || (x1 == y2 && x2 == y1));
     }
 
-    public boolean needsHighlight() {
-        //return sim.mouseElm == this || selected;
-        return false;
-    }
-
     public boolean isSelected() {
         return selected;
     }
@@ -913,12 +616,6 @@ public abstract class CircuitElm {
 
     public static int sign(int x) {
         return (x < 0) ? -1 : (x == 0) ? 0 : 1;
-    }
-
-    public static double distance(Point p1, Point p2) {
-        double x = p1.x - p2.x;
-        double y = p1.y - p2.y;
-        return Math.sqrt(x * x + y * y);
     }
 
     public boolean needsShortcut() {

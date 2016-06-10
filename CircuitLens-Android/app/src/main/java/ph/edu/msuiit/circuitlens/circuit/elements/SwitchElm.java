@@ -1,12 +1,11 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
-//import java.awt.Checkbox;
-//import java.awt.Graphics;
-//import java.awt.Point;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.util.Log;
 
 import org.rajawali3d.Object3D;
+import org.rajawali3d.animation.RotateAnimation3D;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.Line3D;
@@ -15,6 +14,9 @@ import java.util.Stack;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
+
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
 
 public class SwitchElm extends CircuitElm {
 
@@ -75,28 +77,6 @@ public class SwitchElm extends CircuitElm {
         ps2 = new Point();
     }
 
-//    public void draw(Graphics g) {
-//        int openhs = 16;
-//        int hs1 = (position == 1) ? 0 : 2;
-//        int hs2 = (position == 1) ? openhs : 2;
-//        setBbox(point1, point2, openhs);
-//
-//        draw2Leads(g);
-//
-//        if (position == 0) {
-//            doDots(g);
-//        }
-//
-//        if (!needsHighlight()) {
-//            g.setColor(whiteColor);
-//        }
-//        interpPoint(lead1, lead2, ps, 0, hs1);
-//        interpPoint(lead1, lead2, ps2, 1, hs2);
-//
-//        drawThickLine(g, ps, ps2);
-//        drawPosts(g);
-//    }
-
     public void calculateCurrent() {
         if (position == 1) {
             current = 0;
@@ -124,7 +104,6 @@ public class SwitchElm extends CircuitElm {
         if (position >= posCount) {
             position = 0;
         }
-
     }
 
     public void setPosition(int i) {
@@ -175,13 +154,13 @@ public class SwitchElm extends CircuitElm {
 
     @Override
     public void updateObject3D() {
-        if(circuitElm3D == null) {
+        if (circuitElm3D == null) {
             circuitElm3D = generateObject3D();
         }
         update2Leads();
-
+        updateDotCount();
         if (position == 0) {
-            //doDots(circuitElm3D);
+            doDots(circuitElm3D);
         }
     }
 
@@ -192,6 +171,8 @@ public class SwitchElm extends CircuitElm {
         int hs2 = (position == 1) ? openhs : 2;
         setBbox(point1, point2, openhs);
 
+        drawBoundingBox(switch3d);
+
         draw2Leads(switch3d);
 
 //        if (!needsHighlight()) {
@@ -200,8 +181,15 @@ public class SwitchElm extends CircuitElm {
         interpPoint(lead1, lead2, ps, 0, hs1);
         interpPoint(lead1, lead2, ps2, 1, hs2);
 //
+        Material material = new Material();
+        material.setColor(Color.WHITE);
+        Stack<Vector3> points = new Stack<>();
+        points.add(new Vector3(ps.x,ps.y,0));
+        points.add(new Vector3(ps2.x,ps2.y,0));
+        thickLine = new Line3D(points,6);
+        thickLine.setMaterial(material);
 
-        drawThickLine(switch3d, ps, ps2);
+        switch3d.addChild(thickLine);
 
         return switch3d;
     }

@@ -11,7 +11,7 @@ import class_wires_remover2 as wr2
 import class_wires_remover as wr
 
 # img = cv2.imread('D://Thesis//test_images//img//b_rot.jpg')
-img = cv2.imread('D://Thesis//CircuitLens//test_images//test_004.jpg')
+img = cv2.imread('D://Thesis//old circuit lens//test_images//test_004.jpg')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 noise_remover = pcnr.PrintedCircuitNoiseRemover()
@@ -42,9 +42,10 @@ circuit_elements = circuit_elements_finder.find(cropped_gray, cropped_img)
 # im_with_keypoints = cv2.drawKeypoints(cropped_img, circuit_elements, np.array([]), (0,255,0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
 # cropped_img = bf.crop(img, circuit)
-bf.contourMarker(cropped_img, circuit_elements)
+# bf.contourMarker(cropped_img, circuit_elements)
 
-cv2.imshow("circuit", cropped_img)
+
+cv2.imshow("circuit", img)
 
 cv2.waitKey(0)
 

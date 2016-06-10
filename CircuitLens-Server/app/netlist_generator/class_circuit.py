@@ -1,4 +1,4 @@
-from class_queue import Queue
+from common.class_queue import Queue
 
 class Circuit:
     def __init__(self, root=None):

@@ -1,18 +1,18 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
-import android.graphics.Color;
 import android.graphics.Point;
 
-import org.opencv.core.Mat;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
-import org.rajawali3d.math.vector.Vector3;
-import org.rajawali3d.primitives.Line3D;
 
-import java.util.Stack;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
+
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint2;
 
 public class CapacitorElm extends CircuitElm {
 
@@ -27,7 +27,7 @@ public class CapacitorElm extends CircuitElm {
     }
 
     public CapacitorElm(int xa, int ya, int xb, int yb, int f,
-            StringTokenizer st) {
+                        StringTokenizer st) {
         super(xa, ya, xb, yb, f);
         capacitance = new Double(st.nextToken()).doubleValue();
         voltdiff = new Double(st.nextToken()).doubleValue();
@@ -36,7 +36,7 @@ public class CapacitorElm extends CircuitElm {
     public double getCapacitance() {
         return capacitance;
     }
-    
+
     boolean isTrapezoidal() {
         return (flags & FLAG_BACK_EULER) == 0;
     }
@@ -73,37 +73,6 @@ public class CapacitorElm extends CircuitElm {
         interpPoint2(point1, point2, plate2[0], plate2[1], 1 - f, 12);
     }
 
-//    public void draw(Graphics g) {
-//        int hs = 12;
-//        setBbox(point1, point2, hs);
-//
-//        // draw first lead and plate
-//        setVoltageColor(g, volts[0]);
-//        drawThickLine(g, point1, lead1);
-//        setPowerColor(g, false);
-//        drawThickLine(g, plate1[0], plate1[1]);
-//        if (sim.isShowingPowerDissipation()) {
-//            g.setColor(Color.gray);
-//        }
-//
-//        // draw second lead and plate
-//        setVoltageColor(g, volts[1]);
-//        drawThickLine(g, point2, lead2);
-//        setPowerColor(g, false);
-//        drawThickLine(g, plate2[0], plate2[1]);
-//
-//        updateDotCount();
-//        if (sim.getDragElm() != this) {
-//            drawDots(g, point1, lead1, curcount);
-//            drawDots(g, point2, lead2, -curcount);
-//        }
-//        drawPosts(g);
-//        if (sim.isShowingValues()) {
-//            String s = getShortUnitText(capacitance, "F");
-//            drawValues(g, s, hs);
-//        }
-//    }
-
     public void stamp() {
         // capacitor companion model using trapezoidal approximation
         // (Norton equivalent) consists of a current source in
@@ -138,6 +107,7 @@ public class CapacitorElm extends CircuitElm {
             current = voltdiff / compResistance + curSourceValue;
         }
     }
+
     double curSourceValue;
 
     public void doStep() {
@@ -159,13 +129,16 @@ public class CapacitorElm extends CircuitElm {
 
     @Override
     public void updateObject3D() {
-        if(circuitElm3D == null) {
+        if (circuitElm3D == null) {
             circuitElm3D = generateObject3D();
         }
         int color1 = getVoltageColor(volts[0]);
         color1Material.setColor(color1);
         int color2 = getVoltageColor(volts[1]);
         color2Material.setColor(color2);
+
+        //updateDotCount();
+        doDots(circuitElm3D);
     }
 
     Material color1Material, color2Material;
@@ -179,7 +152,7 @@ public class CapacitorElm extends CircuitElm {
         color1Material = new Material();
         drawThickLine(capacitor3D, point1, lead1, color1Material);
 //        setPowerColor(g, false);
-        drawThickLine(capacitor3D,plate1[0], plate1[1], color1Material);
+        drawThickLine(capacitor3D, plate1[0], plate1[1], color1Material);
 //        if (sim.isShowingPowerDissipation()) {
 //            g.setColor(Color.gray);
 //        }
@@ -196,10 +169,10 @@ public class CapacitorElm extends CircuitElm {
             drawDots(capacitor3D, point2, lead2, -curcount);
         }
         drawPosts(capacitor3D);
-//        if (sim.isShowingValues()) {
-//            String s = getShortUnitText(capacitance, "F");
-//            drawValues(g, s, hs);
-//        }
+        if (sim.isShowingValues()) {
+            String s = getShortUnitText(capacitance, "F", shortFormat);
+            drawValues(capacitor3D, s, hs);
+        }
 
         return capacitor3D;
     }

@@ -1,5 +1,5 @@
-import class_iterable as i
-import class_list_iterable_iterator as lii
+import common.class_iterable as i
+import common.class_list_iterable_iterator as lii
 
 class Node(i.Iterable):
     def __init__(self):

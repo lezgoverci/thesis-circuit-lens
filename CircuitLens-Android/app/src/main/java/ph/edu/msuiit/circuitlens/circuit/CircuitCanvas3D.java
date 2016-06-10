@@ -10,6 +10,8 @@ import org.rajawali3d.primitives.Line3D;
 
 import java.util.Stack;
 
+import ph.edu.msuiit.circuitlens.circuit.elements.SwitchElm;
+
 public class CircuitCanvas3D extends Object3D{
     private final CircuitSimulator sim;
     private int x1;
@@ -90,7 +92,13 @@ public class CircuitCanvas3D extends Object3D{
         object3D.addChild(thickLine);
     }
 
-    public void init() {
-
+    public void onTouch(int x, int y){
+        CircuitElm elm = sim.getElmAtPosition(x, y);
+        if(elm != null) {
+            Log.d(getClass().getSimpleName(), "touched element: " + elm.getClass().getSimpleName());
+            if (elm instanceof SwitchElm) {
+                sim.doSwitch((SwitchElm) elm);
+            }
+        }
     }
 }

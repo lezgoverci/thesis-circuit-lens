@@ -1,6 +1,6 @@
 import common.class_iterable as i
 import class_port as p
-import class_list_iterable_iterator as lii
+import common.class_list_iterable_iterator as lii
 
 class Ports(i.Iterable):
     def __init__(self, size):

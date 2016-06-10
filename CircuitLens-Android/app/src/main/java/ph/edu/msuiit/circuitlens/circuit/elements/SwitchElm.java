@@ -15,6 +15,7 @@ import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.distance;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
 
@@ -161,14 +162,16 @@ public class SwitchElm extends CircuitElm {
         updateDotCount();
         if (position == 0) {
             doDots(circuitElm3D);
+            thickLine.setRotation(Vector3.Axis.Z,0);
+        }
+        else{
+            thickLine.setRotation(Vector3.Axis.Z,20);
         }
     }
 
     public Object3D generateObject3D() {
         Object3D switch3d = new Object3D();
         int openhs = 16;
-        int hs1 = (position == 1) ? 0 : 2;
-        int hs2 = (position == 1) ? openhs : 2;
         setBbox(point1, point2, openhs);
 
         drawBoundingBox(switch3d);
@@ -178,15 +181,16 @@ public class SwitchElm extends CircuitElm {
 //        if (!needsHighlight()) {
 //            g.setColor(whiteColor);
 //        }
-        interpPoint(lead1, lead2, ps, 0, hs1);
-        interpPoint(lead1, lead2, ps2, 1, hs2);
-//
+        interpPoint(lead1, lead2, ps, 0, 2);
+        interpPoint(lead1, lead2, ps2, 1, 2);
+
         Material material = new Material();
         material.setColor(Color.WHITE);
         Stack<Vector3> points = new Stack<>();
-        points.add(new Vector3(ps.x,ps.y,0));
-        points.add(new Vector3(ps2.x,ps2.y,0));
+        points.add(new Vector3(0,0,0));
+        points.add(new Vector3(32,0,0));
         thickLine = new Line3D(points,6);
+        thickLine.setPosition(ps.x,ps.y,0);
         thickLine.setMaterial(material);
 
         switch3d.addChild(thickLine);

@@ -8,6 +8,8 @@ import java.util.StringTokenizer;
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getCurrentDText;
+import static ph.edu.msuiit.circuitlens.circuit.Graphics.getVoltageText;
 
 public class WireElm extends CircuitElm {
 
@@ -38,11 +40,11 @@ public class WireElm extends CircuitElm {
         return 1;
     }
 
-//    public void getInfo(String arr[]) {
-//        arr[0] = "wire";
-//        arr[1] = "I = " + getCurrentDText(getCurrent());
-//        arr[2] = "V = " + getVoltageText(volts[0]);
-//    }
+    public void getInfo(String arr[]) {
+        arr[0] = "wire";
+        arr[1] = "I = " + getCurrentDText(getCurrent(), showFormat);
+        arr[2] = "V = " + getVoltageText(volts[0], showFormat);
+    }
 
     public int getDumpType() {
         return 'w';

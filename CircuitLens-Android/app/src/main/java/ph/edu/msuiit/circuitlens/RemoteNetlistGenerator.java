@@ -49,7 +49,7 @@ public class RemoteNetlistGenerator {
         client.close();
     }
 
-    public void requestNetlist(final CvCameraViewFrame frame, final RPCallback<String> callback) {
+    public void requestNetlist(final CvCameraViewFrame frame, final RpCallback<String> callback) {
         Log.d("onFocus", "FrameSize: " + frame.gray().size());
         final String serializedImage = "";
         // TODO: serialize frame

@@ -3,14 +3,13 @@ package ph.edu.msuiit.circuitlens.ui.gl;
 import android.content.Context;
 import android.util.Log;
 
-import org.opencv.core.MatOfDouble;
 import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.Quaternion;
 
 /**
  * Created by vercillius on 6/3/2016.
  */
-public class RendererTransformations extends OpenGLRenderer {
+public class RendererTransformations extends OpenGlRenderer {
 
     private double mPosX;
     private double mPosY;
@@ -61,6 +60,8 @@ public class RendererTransformations extends OpenGLRenderer {
          **/
 
         Log.d("renderInit1","entering init scene");
+
+        /*
         //setInitCircuitProjectionValues();       // set default projection values
         setInitViewingTransformation();         // Set viewing transformation
         setInitModellingTransformation();       // Set modelling transformation
@@ -69,8 +70,8 @@ public class RendererTransformations extends OpenGLRenderer {
 
         getCurrentCamera().setZ(500);
         getCurrentCamera().setFarPlane(5000);
-        circuit3D.drawBounds(circuit3D);
-        Log.d("renderInit2","done init scene");
+        getCurrentCamera().setPosition(0,0,500);
+        Log.d("renderInit2","done init scene");*/
     }
 
     private void setInitCircuitProjectionValues() {
@@ -97,8 +98,8 @@ public class RendererTransformations extends OpenGLRenderer {
         double circuitCenterX = circuit3D.getCircuitCenterX();
         double circuitCenterY = circuit3D.getCircuitCenterY();
 
-        getCurrentCamera().setX(circuitCenterX);
-        getCurrentCamera().setY(circuitCenterY);
+        getCurrentCamera().setX(0);
+        getCurrentCamera().setY(0);
 
         // After setting camera position
         // x = x coordinate of the center point of the circuit

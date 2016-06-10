@@ -4,7 +4,6 @@ import android.util.Log;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
 import ph.edu.msuiit.circuitlens.render.OpenCvMapper;
-import ph.edu.msuiit.circuitlens.ui.ARActivity;
 import ph.edu.msuiit.circuitlens.ui.ARView;
 import ph.edu.msuiit.circuitlens.ui.AndroidCameraAdapter;
 import ph.edu.msuiit.circuitlens.ui.CircuitLensView;
@@ -53,7 +52,7 @@ public class CircuitLensController{
         mNetlistGenerator.disconnect();
     }
 
-    RPCallback<String> mCallback = new RPCallback<String>() {
+    RpCallback<String> mCallback = new RpCallback<String>() {
         @Override
         public void onResult(String netlist) {
             // TODO: display netlist

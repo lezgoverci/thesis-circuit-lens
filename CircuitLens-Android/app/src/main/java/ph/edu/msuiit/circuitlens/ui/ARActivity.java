@@ -22,8 +22,8 @@ import ph.edu.msuiit.circuitlens.R;
 import ph.edu.msuiit.circuitlens.ui.gl.RendererTransformations;
 
 
-public class ARActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2,CircuitLensView {
-    private static final String TAG = "CircuitLens::ARActivity";
+public class ArActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2,CircuitLensView {
+    private static final String TAG = "CircuitLens::ArActivity";
     private long startTime;
     protected CircuitLensController mController;
     protected CameraBridgeViewBase mOpenCvCameraView;

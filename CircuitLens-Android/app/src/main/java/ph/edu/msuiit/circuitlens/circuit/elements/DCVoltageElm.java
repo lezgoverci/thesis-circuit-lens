@@ -1,8 +1,8 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
-public class DCVoltageElm extends VoltageElm {
+public class DcVoltageElm extends VoltageElm {
 
-    public DCVoltageElm(int xx, int yy) {
+    public DcVoltageElm(int xx, int yy) {
         super(xx, yy, WF_DC);
     }
 

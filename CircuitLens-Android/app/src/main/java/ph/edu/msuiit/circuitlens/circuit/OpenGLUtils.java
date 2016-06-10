@@ -1,12 +1,16 @@
 package ph.edu.msuiit.circuitlens.circuit;
 
+import org.rajawali3d.Geometry3D;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.cameras.Camera;
 import org.rajawali3d.math.Matrix4;
+import org.rajawali3d.math.Plane;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.util.GLU;
 
-public class OpenGLUtils {
+import java.nio.FloatBuffer;
+
+public class OpenGlUtils {
     public static void getWorldPosition(float x, float y, int[] viewPort, Camera camera, Object3D object3D, Vector3 position) {
         double[] nearPos = new double[4];
         double[] farPos = new double[4];
@@ -33,10 +37,10 @@ public class OpenGLUtils {
         position.multiply(factor);
         position.add(camera.getPosition());
 
-        /*
         Plane plane = new Plane();
-        plane.
-        Vector3 rayDir = Vector3.subtractAndCreate(nearVec, farVec);
+
+        /*
+        Vector3  rayDir = Vector3.subtractAndCreate(nearVec, farVec);
         double denorm = rayDir.dot(plane.getNormal());
         if (denorm != 0) {
             double t = -(rayStart.dot(plane.getNormal()) + plane.getD()) / denorm;
@@ -48,7 +52,6 @@ public class OpenGLUtils {
                 return true;
             } else {
                 return false;
-           }
-        */
+           }*/
     }
 }

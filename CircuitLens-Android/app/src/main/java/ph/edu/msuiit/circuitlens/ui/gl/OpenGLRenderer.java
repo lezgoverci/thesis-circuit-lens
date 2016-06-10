@@ -1,48 +1,24 @@
 package ph.edu.msuiit.circuitlens.ui.gl;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfDouble;
-import org.rajawali3d.Object3D;
-import org.rajawali3d.cameras.Camera;
-import org.rajawali3d.materials.Material;
-import org.rajawali3d.math.MathUtil;
-import org.rajawali3d.math.Matrix;
-import org.rajawali3d.math.Matrix4;
-import org.rajawali3d.math.Plane;
-import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
-import org.rajawali3d.primitives.Cube;
-import org.rajawali3d.primitives.Line3D;
 import org.rajawali3d.renderer.RajawaliRenderer;
-import org.rajawali3d.util.GLU;
-import org.rajawali3d.util.OnObjectPickedListener;
-import org.rajawali3d.util.RayPicker;
-
-import java.util.Stack;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitCanvas3D;
-import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
-import ph.edu.msuiit.circuitlens.circuit.elements.SwitchElm;
 
-import static ph.edu.msuiit.circuitlens.circuit.Graphics.draw3DText;
-import static ph.edu.msuiit.circuitlens.circuit.OpenGLUtils.getWorldPosition;
+import static ph.edu.msuiit.circuitlens.circuit.OpenGlUtils.getWorldPosition;
 
-public class OpenGLRenderer extends RajawaliRenderer{
+public class OpenGlRenderer extends RajawaliRenderer{
 
     public Context context;
-
-
     protected CircuitCanvas3D circuit3D;
-    private RayPicker mPicker;
     private CircuitSimulator cirsim;
 
-    public OpenGLRenderer(Context context) {
+    public OpenGlRenderer(Context context) {
         super(context);
         this.context = context;
         setFrameRate(60);
@@ -71,7 +47,6 @@ public class OpenGLRenderer extends RajawaliRenderer{
 
         cirsim.readSetup(expectedNetlist);
         cirsim.updateCircuit();
-
 
         circuit3D = cirsim.getCircuitCanvas();
 

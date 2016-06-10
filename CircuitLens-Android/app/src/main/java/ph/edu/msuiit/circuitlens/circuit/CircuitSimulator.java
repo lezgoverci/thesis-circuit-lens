@@ -20,7 +20,7 @@ import java.util.Vector;
 
 import ph.edu.msuiit.circuitlens.circuit.elements.CapacitorElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.CurrentElm;
-import ph.edu.msuiit.circuitlens.circuit.elements.DCVoltageElm;
+import ph.edu.msuiit.circuitlens.circuit.elements.DcVoltageElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.DiodeElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.GroundElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.InductorElm;
@@ -154,7 +154,7 @@ public class CircuitSimulator {
     public void init() {
         register(CapacitorElm.class);
         register(CurrentElm.class);
-        register(DCVoltageElm.class);
+        register(DcVoltageElm.class);
         register(DiodeElm.class);
         register(GroundElm.class);
         register(InductorElm.class);

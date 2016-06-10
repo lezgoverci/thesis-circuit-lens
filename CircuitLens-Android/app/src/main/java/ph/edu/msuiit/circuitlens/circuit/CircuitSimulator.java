@@ -14,9 +14,9 @@ import java.io.File;
 import java.io.FilterInputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 import ph.edu.msuiit.circuitlens.circuit.elements.CapacitorElm;
 import ph.edu.msuiit.circuitlens.circuit.elements.CurrentElm;
@@ -71,7 +71,7 @@ public class CircuitSimulator {
     int hintType = -1, hintItem1, hintItem2;
     String stopMessage;
     double timeStep;
-    public Vector<CircuitElm> elmList;
+    public ArrayList<CircuitElm> elmList;
     //    Vector setupList;
     CircuitElm dragElm, menuElm, mouseElm, stopElm;
     boolean didSwitch = false;
@@ -96,7 +96,7 @@ public class CircuitSimulator {
     private static String clipboard = "";
     Rect circuitArea;
     int circuitBottom;
-    Vector<String> undoStack, redoStack;
+    ArrayList<String> undoStack, redoStack;
 
     private boolean whiteBackground;//printable
     private boolean stopped = false;//stoppedCheckItemState
@@ -114,7 +114,7 @@ public class CircuitSimulator {
     String startLabel = null;
     public String startCircuitText = null;
     public CircuitCanvas3D cv;
-    Vector<CircuitNode> nodeList;
+    ArrayList<CircuitNode> nodeList;
     CircuitElm voltageSources[];
 
     private boolean unstable = false;
@@ -168,9 +168,9 @@ public class CircuitSimulator {
         currentMult = 1.7 * 10;
 
         setGrid();
-        elmList = new Vector<>();
-        undoStack = new Vector<>();
-        redoStack = new Vector<>();
+        elmList = new ArrayList<>();
+        undoStack = new ArrayList<>();
+        redoStack = new ArrayList<>();
 
         scopes = new Scope[20];
         scopeColCount = new int[20];
@@ -449,7 +449,6 @@ public class CircuitSimulator {
         }
     }
 
-
     public CircuitElm getElmAtPosition(int x, int y){
         int bestDist = 100000;
         int bestArea = 100000;
@@ -597,14 +596,14 @@ public class CircuitSimulator {
         if (nodeList == null || n >= nodeList.size()) {
             return null;
         }
-        return nodeList.elementAt(n);
+        return nodeList.get(n);
     }
 
     public CircuitElm getElm(int n) {
         if (n >= elmList.size()) {
             return null;
         }
-        return elmList.elementAt(n);
+        return elmList.get(n);
     }
 
     public void analyzeCircuit() {
@@ -617,7 +616,7 @@ public class CircuitSimulator {
         stopElm = null;
         int i, j;
         int vscount = 0;
-        nodeList = new Vector<>();
+        nodeList = new ArrayList<>();
         boolean gotGround = false;
         boolean gotRail = false;
         CircuitElm volt = null;
@@ -645,12 +644,12 @@ public class CircuitSimulator {
             Point pt = volt.getPost(0);
             cn.x = pt.x;
             cn.y = pt.y;
-            nodeList.addElement(cn);
+            nodeList.add(cn);
         } else {
             // otherwise allocate extra node for ground
             CircuitNode cn = new CircuitNode();
             cn.x = cn.y = -1;
-            nodeList.addElement(cn);
+            nodeList.add(cn);
         }
         //System.out.println("ac2");
 
@@ -680,7 +679,7 @@ public class CircuitSimulator {
                     cnl.elm = ce;
                     cn.links.addElement(cnl);
                     ce.setNode(j, nodeList.size());
-                    nodeList.addElement(cn);
+                    nodeList.add(cn);
                 } else {
                     CircuitNodeLink cnl = new CircuitNodeLink();
                     cnl.num = j;
@@ -703,7 +702,7 @@ public class CircuitSimulator {
                 cnl.elm = ce;
                 cn.links.addElement(cnl);
                 ce.setNode(cnl.num, nodeList.size());
-                nodeList.addElement(cn);
+                nodeList.add(cn);
             }
             vscount += ivs;
         }
@@ -1047,10 +1046,10 @@ public class CircuitSimulator {
             System.out.print("  " + circuitRightSide[j] + "\n");
         }
         System.out.print("\n");
-        // if a matrix is linear, we can do the lu_factor here instead of
+        // if a matrix is linear, we can do the luFactor here instead of
         // needing to do it every frame
         if (!circuitNonLinear) {
-            if (!lu_factor(circuitMatrix, circuitMatrixSize, circuitPermute)) {
+            if (!luFactor(circuitMatrix, circuitMatrixSize, circuitPermute)) {
                 stop("Singular matrix!", null);
                 return;
             }
@@ -1210,7 +1209,7 @@ public class CircuitSimulator {
         return disabled;
     }
 
-    public Vector<CircuitElm> getElmList() {
+    public ArrayList<CircuitElm> getElmList() {
         return elmList;
     }
 
@@ -1545,13 +1544,13 @@ public class CircuitSimulator {
                     if (converged && subiter > 0) {
                         break;
                     }
-                    if (!lu_factor(circuitMatrix, circuitMatrixSize,
+                    if (!luFactor(circuitMatrix, circuitMatrixSize,
                             circuitPermute)) {
                         stop("Singular matrix!", null);
                         return;
                     }
                 }
-                lu_solve(circuitMatrix, circuitMatrixSize, circuitPermute,
+                luSolve(circuitMatrix, circuitMatrixSize, circuitPermute,
                         circuitRightSide);
 
                 for (j = 0; j != circuitMatrixFullSize; j++) {
@@ -1754,7 +1753,7 @@ public class CircuitSimulator {
                 CircuitElm ce = getElm(i);
                 ce.delete();
             }
-            elmList.removeAllElements();
+            elmList.clear();
             hintType = -1;
             timeStep = 5e-6;
             showCurrent = false;
@@ -1842,7 +1841,7 @@ public class CircuitSimulator {
                     ce = (CircuitElm) cstr.newInstance(oarr);
                     ce.setSim(this);
                     ce.setPoints();
-                    elmList.addElement(ce);
+                    elmList.add(ce);
                 } catch (java.lang.reflect.InvocationTargetException ee) {
                     ee.getTargetException().printStackTrace();
                     break;
@@ -1952,7 +1951,7 @@ public class CircuitSimulator {
     public int locateElm(CircuitElm elm) {
         int i;
         for (i = 0; i != elmList.size(); i++) {
-            if (elm == elmList.elementAt(i)) {
+            if (elm == elmList.get(i)) {
                 return i;
             }
         }
@@ -2108,7 +2107,7 @@ public class CircuitSimulator {
         for (i = elmList.size() - 1; i >= 0; i--) {
             CircuitElm ce = getElm(i);
             if (ce.x == ce.x2 && ce.y == ce.y2) {
-                elmList.removeElementAt(i);
+                elmList.remove(i);
                 ce.delete();
                 changed = true;
             }
@@ -2160,10 +2159,10 @@ public class CircuitSimulator {
     }
 
     void pushUndo() {
-        redoStack.removeAllElements();
+        redoStack.clear();
         String s = dumpCircuit();
         if (undoStack.size() > 0) {
-            if (s.equals(undoStack.lastElement())) {
+            if (s.equals(undoStack.get(undoStack.size()-1))) {
                 return;
             }
         }
@@ -2205,7 +2204,7 @@ public class CircuitSimulator {
             CircuitElm ce = getElm(i);
             if (ce.isSelected()) {
                 ce.delete();
-                elmList.removeElementAt(i);
+                elmList.remove(i);
                 hasDeleted = true;
             }
         }
@@ -2215,7 +2214,7 @@ public class CircuitSimulator {
                 CircuitElm ce = getElm(i);
                 if (ce == mouseElm) {
                     ce.delete();
-                    elmList.removeElementAt(i);
+                    elmList.remove(i);
                     hasDeleted = true;
                     mouseElm = null;
                     break;
@@ -2259,8 +2258,8 @@ public class CircuitSimulator {
     // factors a matrix into upper and lower triangular matrices by
     // gaussian elimination.  On entry, a[0..n-1][0..n-1] is the
     // matrix to be factored.  ipvt[] returns an integer vector of pivot
-    // indices, used in the lu_solve() routine.
-    private boolean lu_factor(double a[][], int n, int ipvt[]) {
+    // indices, used in the luSolve() routine.
+    public static boolean luFactor(double a[][], int n, int ipvt[]) {
         double scaleFactors[];
         int i, j, k;
 
@@ -2342,9 +2341,9 @@ public class CircuitSimulator {
     }
 
     // Solves the set of n linear equations using a LU factorization
-    // previously performed by lu_factor.  On input, b[0..n-1] is the right
+    // previously performed by luFactor.  On input, b[0..n-1] is the right
     // hand side of the equations, and on output, contains the solution.
-    private void lu_solve(double a[][], int n, int ipvt[], double b[]) {
+    public static void luSolve(double a[][], int n, int ipvt[], double b[]) {
         int i;
 
         // find first nonzero b element

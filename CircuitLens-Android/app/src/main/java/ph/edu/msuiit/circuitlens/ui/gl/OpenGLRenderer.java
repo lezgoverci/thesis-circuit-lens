@@ -49,9 +49,8 @@ public class OpenGlRenderer extends RajawaliRenderer{
         cirsim.updateCircuit();
 
         circuit3D = cirsim.getCircuitCanvas();
-
+        circuit3D.setScaleY(-1);
         //circuit3D.drawBounds(circuit3D);
-        //circuit3D.getTransformedBoundingVolume().setBoundingColor(100);
         getCurrentScene().addChild(circuit3D);
 
         Log.d(getClass().getSimpleName(), "width: " + getViewportWidth());

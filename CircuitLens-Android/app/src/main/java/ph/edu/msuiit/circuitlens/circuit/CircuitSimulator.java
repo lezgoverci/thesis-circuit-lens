@@ -586,6 +586,32 @@ public class CircuitSimulator {
         }
     }
 
+    public void centerCircuit(){
+        int minx = 10000, maxx = -10000, miny = 10000, maxy = -10000;
+        for (int i = 0; i < elmList.size(); i++) {
+            CircuitElm ce = getElm(i);
+            miny = min(ce.y, min(ce.y2, miny));
+            maxy = max(ce.y, max(ce.y2, maxy));
+            minx = min(ce.x, min(ce.x2, minx));
+            maxx = max(ce.x, max(ce.x2, maxx));
+        }
+
+        int centerX = Math.round((minx+maxx)/2.0f);
+        int centerY = Math.round((miny+maxy)/2.0f);
+
+        Log.d(getClass().getSimpleName(),"centerX: "+centerX);
+        Log.d(getClass().getSimpleName(),"centerY: "+centerY);
+
+        for (int i=0; i< elmList.size(); i++){
+            CircuitElm ce = getElm(i);
+            ce.x -= centerX;
+            ce.y  -= centerY;
+            ce.x2 -= centerX;
+            ce.y2 -= centerY;
+            ce.setPoints();
+        }
+    }
+
     public void needAnalyze() {
         unstable = true;
         analyzeFlag = true;
@@ -1854,6 +1880,7 @@ public class CircuitSimulator {
             p += l;
 
         }
+        centerCircuit();
         generateCanvas();
         handleResize();
         needAnalyze();
@@ -2250,7 +2277,17 @@ public class CircuitSimulator {
             minx = min(ce.x, min(ce.x2, minx));
             maxx = max(ce.x, max(ce.x2, maxx));
         }
+
+        Log.d(getClass().getSimpleName(),"minx: " + minx);
+        Log.d(getClass().getSimpleName(),"maxx: " + maxx);
+        Log.d(getClass().getSimpleName(),"miny: " + miny);
+        Log.d(getClass().getSimpleName(),"maxy: " + maxy);
+
         cv.setCircuitBounds(minx, miny, maxx, maxy);
+
+        Log.d(getClass().getSimpleName(),"circuitCenterX: " + cv.getCircuitCenterX());
+        Log.d(getClass().getSimpleName(),"circuitCenterY: " + cv.getCircuitCenterY());
+
         needAnalyze();
         circuitBottom = 0;
     }

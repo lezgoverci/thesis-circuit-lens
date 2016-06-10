@@ -1,10 +1,11 @@
 package ph.edu.msuiit.circuitlens;
 
 import android.util.Log;
+
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
+
 import ph.edu.msuiit.circuitlens.render.OpenCvMapper;
-import ph.edu.msuiit.circuitlens.ui.ARView;
 import ph.edu.msuiit.circuitlens.ui.AndroidCameraAdapter;
 import ph.edu.msuiit.circuitlens.ui.CircuitLensView;
 

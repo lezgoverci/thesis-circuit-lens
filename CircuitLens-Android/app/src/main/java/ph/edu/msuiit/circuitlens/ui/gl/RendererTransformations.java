@@ -60,6 +60,8 @@ public class RendererTransformations extends OpenGlRenderer {
          **/
 
         Log.d("renderInit1","entering init scene");
+        getCurrentCamera().setPosition(0,0,500);
+        getCurrentCamera().setFarPlane(5000);
 
         /*
         //setInitCircuitProjectionValues();       // set default projection values
@@ -69,8 +71,7 @@ public class RendererTransformations extends OpenGlRenderer {
         setInitViewportTransformation();        // Set Viewport transformation
 
         getCurrentCamera().setZ(500);
-        getCurrentCamera().setFarPlane(5000);
-        getCurrentCamera().setPosition(0,0,500);
+
         Log.d("renderInit2","done init scene");*/
     }
 

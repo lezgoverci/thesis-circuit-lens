@@ -2,7 +2,6 @@ package ph.edu.msuiit.circuitlens.ui;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -10,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
@@ -37,8 +37,8 @@ public class ArActivity extends Activity implements CameraBridgeViewBase.CvCamer
             {
                 // this needs to be defined on the renderer:
                 //Log.d(this.getClass().getSimpleName(),": " + event.getX()+ "," + event.getY());
-                //mRenderer.onTouchEvent(event);
-                mTakePhoto = true;
+                mRenderer.onTouchEvent(event);
+                //mTakePhoto = true;
                 Log.d("touch", "touched in Rajawali");
             }
             return true;

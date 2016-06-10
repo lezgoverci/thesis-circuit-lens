@@ -1,17 +1,20 @@
 package ph.edu.msuiit.circuitlens.circuit;
 
-import org.rajawali3d.Geometry3D;
+import android.util.Log;
+
 import org.rajawali3d.Object3D;
 import org.rajawali3d.cameras.Camera;
+import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.Matrix4;
 import org.rajawali3d.math.Plane;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.util.GLU;
 
 import java.nio.FloatBuffer;
+import java.util.Vector;
 
 public class OpenGlUtils {
-    public static void getWorldPosition(float x, float y, int[] viewPort, Camera camera, Object3D object3D, Vector3 position) {
+    public static void getWorldPosition(float x, float y, int[] viewPort, Camera camera, Object3D object3D, Vector3 hitPoint) {
         double[] nearPos = new double[4];
         double[] farPos = new double[4];
 
@@ -32,26 +35,31 @@ public class OpenGlUtils {
         Vector3 farVec = new Vector3(farPos[0] / farPos[3], farPos[1] / farPos[3], farPos[2] / farPos[3]);
 
         double factor = (Math.abs(object3D.getZ()) + nearVec.z) / (camera.getFarPlane() - camera.getNearPlane());
+
+        Vector3 position = new Vector3();
         position.setAll(farVec);
         position.subtract(nearVec);
         position.multiply(factor);
         position.add(camera.getPosition());
 
-        Plane plane = new Plane();
+        Vector3 child1 = object3D.getWorldPosition();
+        Vector3 child2 = object3D.getChildAt(0).getWorldPosition();
+        Vector3 child3 = object3D.getChildAt(1).getWorldPosition();
 
-        /*
-        Vector3  rayDir = Vector3.subtractAndCreate(nearVec, farVec);
+        Vector3 rayDir = Vector3.subtractAndCreate(nearVec, farVec);
+        Plane plane = new Plane(child1, child2, child3);
+
         double denorm = rayDir.dot(plane.getNormal());
         if (denorm != 0) {
-            double t = -(rayStart.dot(plane.getNormal()) + plane.getD()) / denorm;
-            if (t < 0) return false;
-            if (hitPoint != null) hitPoint.addAndSet(rayStart, Vector3.scaleAndCreate(rayDir, t));
-                return true;
-            } else if (plane.getPointSide(rayStart) == Plane.PlaneSide.ONPLANE) {
-            if (hitPoint != null) hitPoint.setAll(rayStart);
-                return true;
-            } else {
-                return false;
-           }*/
+            double t = -(position.dot(plane.getNormal()) + plane.getD()) / denorm;
+            if (hitPoint != null) hitPoint.addAndSet(position, Vector3.scaleAndCreate(rayDir, t));
+        } else if (plane.getPointSide(position) == Plane.PlaneSide.ONPLANE) {
+            if (hitPoint != null) hitPoint.setAll(position);
+        }
+
+        hitPoint.rotateBy(object3D.getOrientation());
+        hitPoint.y = -hitPoint.y;
+
+        Log.d("OpenGlUtils", "hitPoint: "+hitPoint);
     }
 }

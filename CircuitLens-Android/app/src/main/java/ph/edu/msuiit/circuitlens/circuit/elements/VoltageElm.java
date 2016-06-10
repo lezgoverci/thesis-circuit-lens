@@ -312,12 +312,11 @@ public class VoltageElm extends CircuitElm {
             if (waveform == WF_DC) {
                 drawDots(voltage3D, point1, point2, curcount);
             } else {
-                drawDots(voltage3D, point1, lead1, curcount);
-                drawDots(voltage3D, point2, lead2, -curcount);
+                drawDots(voltage3D, point1, point2, curcount);
+                //drawDots(voltage3D, point2, lead2, -curcount);
             }
         }
         drawPosts(voltage3D);
-        drawBoundingBox(voltage3D);
 
         return voltage3D;
     }
@@ -337,8 +336,8 @@ public class VoltageElm extends CircuitElm {
         if (waveform == WF_DC) {
             drawDots(circuitElm3D, point1, point2, curcount);
         } else {
-            drawDots(circuitElm3D, point1, lead1, curcount);
-            drawDots(circuitElm3D, point2, lead2, -curcount);
+            drawDots(circuitElm3D, point1, point2, curcount);
+            //drawDots(circuitElm3D, point2, lead2, -curcount);
         }
     }
 

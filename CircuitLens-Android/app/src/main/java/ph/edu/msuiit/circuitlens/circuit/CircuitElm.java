@@ -483,16 +483,16 @@ public abstract class CircuitElm {
                 if (dots == null) {
                     Material material = new Material();
                     material.setColor(Color.YELLOW);
-                    dots = new Cube(4);
+                    dots = new Cube(3);
                     dots.setMaterial(material);
                     dots.setRenderChildrenAsBatch(true);
                     object3D.addChild(dots);
                 }
-                dots.setPosition(x0, y0, 5);
+                dots.setPosition(x0, y0, 3);
             } else if (dots.getNumChildren() == 0) {
                 Object3D dot = dots.clone();
                 dots.addChild(dot);
-                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 5);
+                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 3);
             } else {
                 Object3D dot;
                 if (count < dots.getNumChildren()) {
@@ -501,13 +501,10 @@ public abstract class CircuitElm {
                     dot = dots.getChildAt(0).clone();
                     dots.addChild(dot);
                 }
-                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 5);
+                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 3);
             }
             count++;
-            //g.setColor(Color.yellow);
-            //g.fillOval(x0 - 1, y0 - 1, 4, 4);
         }
-
     }
 
     public void getInfo(String arr[]) {
@@ -667,8 +664,8 @@ public abstract class CircuitElm {
         this.sim = sim;
     }
 
-    public void move(int dx, int dy) {
-
+    public void move(int newX, int newY) {
+        circuitElm3D.setPosition(newX, newY, 0);
     }
 
     public void selectRect(Rect r) {

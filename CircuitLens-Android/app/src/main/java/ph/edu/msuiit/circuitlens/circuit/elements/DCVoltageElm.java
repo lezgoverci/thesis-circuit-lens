@@ -9,8 +9,4 @@ public class DcVoltageElm extends VoltageElm {
     public Class getDumpClass() {
         return VoltageElm.class;
     }
-
-    public int getShortcut() {
-        return 'v';
-    }
 }

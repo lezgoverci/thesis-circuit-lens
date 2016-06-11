@@ -93,10 +93,6 @@ public class WireElm extends CircuitElm {
 //        }
 //    }
 
-    public int getShortcut() {
-        return 'w';
-    }
-
     Material wireMaterial;
 
     @Override

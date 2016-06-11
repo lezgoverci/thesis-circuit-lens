@@ -99,10 +99,6 @@ public class DiodeElm extends CircuitElm {
         current = diode.calculateCurrent(volts[0] - volts[1]);
     }
 
-    public int getShortcut() {
-        return 'd';
-    }
-
     Material triangleMaterial, lineMaterial;
 
     @Override

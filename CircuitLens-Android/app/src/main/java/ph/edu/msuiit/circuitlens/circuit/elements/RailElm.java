@@ -88,9 +88,8 @@ public class RailElm extends VoltageElm {
         }
         drawPosts(rail3D);
         curcount = updateDotCount(-current, curcount);
-        if (sim.getDragElm() != this) {
-            //drawDots(rail3D, point1, lead1, curcount);
-        }
+
+        //drawDots(rail3D, point1, lead1, curcount);
         return rail3D;
     }
 
@@ -118,10 +117,5 @@ public class RailElm extends VoltageElm {
     @Override
     public boolean hasGroundConnection(int n1) {
         return true;
-    }
-
-    @Override
-    public int getShortcut() {
-        return 'V';
     }
 }

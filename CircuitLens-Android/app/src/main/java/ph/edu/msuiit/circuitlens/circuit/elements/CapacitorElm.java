@@ -123,10 +123,6 @@ public class CapacitorElm extends CircuitElm {
 //        //arr[4] = "U = " + getUnitText(.5*capacitance*v*v, "J");
 //    }
 
-    public int getShortcut() {
-        return 'c';
-    }
-
     @Override
     public void updateObject3D() {
         if (circuitElm3D == null) {
@@ -164,10 +160,10 @@ public class CapacitorElm extends CircuitElm {
         drawThickLine(capacitor3D, plate2[0], plate2[1], color2Material);
 //
         updateDotCount();
-        if (sim.getDragElm() != this) {
-            drawDots(capacitor3D, point1, lead1, curcount);
-            drawDots(capacitor3D, point2, lead2, -curcount);
-        }
+
+        drawDots(capacitor3D, point1, lead1, curcount);
+        drawDots(capacitor3D, point2, lead2, -curcount);
+
         drawPosts(capacitor3D);
         if (sim.isShowingValues()) {
             String s = getShortUnitText(capacitance, "F", shortFormat);

@@ -58,10 +58,6 @@ public class GroundElm extends CircuitElm {
         return true;
     }
 
-    public int getShortcut() {
-        return 'g';
-    }
-
     @Override
     public void updateObject3D() {
         if(circuitElm3D == null) {

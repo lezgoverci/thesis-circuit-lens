@@ -72,26 +72,6 @@ public class Graphics {
         object3D.addChild(triangle);
     }
 
-    public void drawDots(Object3D object3D, Point pa, Point pb, double pos) {
-        //if (sim.isStopped() || pos == 0 || !sim.isShowingCurrent()) {
-        //    return;
-        //}
-        int dx = pb.x - pa.x;
-        int dy = pb.y - pa.y;
-        double dn = Math.sqrt(dx * dx + dy * dy);
-        int ds = 16;
-        pos %= ds;
-        if (pos < 0) {
-            pos += ds;
-        }
-        double di = 0;
-        for (di = pos; di < dn; di += ds) {
-            int x0 = (int) (pa.x + di * dx / dn);
-            int y0 = (int) (pa.y + di * dy / dn);
-            drawSquare(object3D, x0, y0, 5, Color.YELLOW);
-        }
-    }
-
     private void drawSquare(Object3D object3D, int x0, int y0, int side, int color) {
         Material material = new Material();
         material.setColor(color);

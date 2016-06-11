@@ -147,10 +147,6 @@ public class SwitchElm extends CircuitElm {
 //        }
 //    }
 
-    public int getShortcut() {
-        return 's';
-    }
-
     Line3D thickLine;
 
     @Override

@@ -455,9 +455,7 @@ public abstract class CircuitElm {
 
     public void doDots(Object3D object3D) {
         updateDotCount();
-        //if (sim.getDragElm() != this) {
         drawDots(object3D, point1, point2, curcount);
-        //}
     }
 
     Object3D dots;
@@ -591,10 +589,6 @@ public abstract class CircuitElm {
         return false;
     }
 
-/*    public boolean canViewInScope() {
-        return getPostCount() <= 2;
-    }*/
-
     public boolean comparePair(int x1, int x2, int y1, int y2) {
         return ((x1 == y1 && x2 == y2) || (x1 == y2 && x2 == y1));
     }
@@ -613,14 +607,6 @@ public abstract class CircuitElm {
 
     public static int sign(int x) {
         return (x < 0) ? -1 : (x == 0) ? 0 : 1;
-    }
-
-    public boolean needsShortcut() {
-        return getShortcut() > 0;
-    }
-
-    public int getShortcut() {
-        return 0;
     }
 
     public boolean isGraphicElmt() {

@@ -5,9 +5,7 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
-import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.Cube;
 import org.rajawali3d.renderer.RajawaliRenderer;
@@ -62,16 +60,10 @@ public class OpenGlRenderer extends RajawaliRenderer{
         Log.d(getClass().getSimpleName(), "height: " + getViewportHeight());
     }
 
-    private static final double PI_OVER_2 = Math.PI/2.0;
-    private static boolean prevFlipX, prevFlipY;
-
     @Override
     public void onRender(final long elapsedTime, final double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
         cirsim.updateCircuit();
-        circuit3D.setRotation(Vector3.Axis.X,50);
-        //circuit3D.rotate(Vector3.Axis.Y,1);
-        //circuit3D.rotate(Vector3.Axis.Z,1);
     }
 
     public void onOffsetsChanged(float x, float y, float z, float w, int i, int j) {

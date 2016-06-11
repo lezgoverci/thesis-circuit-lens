@@ -45,7 +45,7 @@ public class VoltageElm extends CircuitElm {
     }
 
     public VoltageElm(int xa, int ya, int xb, int yb, int f,
-            StringTokenizer st) {
+                      StringTokenizer st) {
         super(xa, ya, xb, yb, f);
         maxVoltage = 5;
         frequency = 40;
@@ -179,34 +179,34 @@ public class VoltageElm extends CircuitElm {
             case WF_DC: {
                 break;
             }
-           case WF_SQUARE:
+            case WF_SQUARE:
                 xc2 = (int) (wl * 2 * dutyCycle - wl + xc);
                 xc2 = max(xc - wl + 3, min(xc + wl - 3, xc2));
-               drawThickLine(object3D, xc - wl, yc - wl, xc - wl, yc);
-               drawThickLine(object3D, xc - wl, yc - wl, xc2, yc - wl);
-               drawThickLine(object3D, xc2, yc - wl, xc2, yc + wl);
-               drawThickLine(object3D, xc + wl, yc + wl, xc2, yc + wl);
-               drawThickLine(object3D, xc + wl, yc, xc + wl, yc + wl);
-               break;
-           case WF_PULSE:
-               yc += wl / 2;
-               drawThickLine(object3D, xc - wl, yc - wl, xc - wl, yc);
-               drawThickLine(object3D, xc - wl, yc - wl, xc - wl / 2, yc - wl);
-               drawThickLine(object3D, xc - wl / 2, yc - wl, xc - wl / 2, yc);
-               drawThickLine(object3D, xc - wl / 2, yc, xc + wl, yc);
-               break;
-           case WF_SAWTOOTH:
-               drawThickLine(object3D, xc, yc - wl, xc - wl, yc);
-               drawThickLine(object3D, xc, yc - wl, xc, yc + wl);
-               drawThickLine(object3D, xc, yc + wl, xc + wl, yc);
-               break;
-           case WF_TRIANGLE: {
-               int xl = 5;
-               drawThickLine(object3D, xc - xl * 2, yc, xc - xl, yc - wl);
-               drawThickLine(object3D, xc - xl, yc - wl, xc, yc);
-               drawThickLine(object3D, xc, yc, xc + xl, yc + wl);
-               drawThickLine(object3D, xc + xl, yc + wl, xc + xl * 2, yc);
-               break;
+                drawThickLine(object3D, xc - wl, yc - wl, xc - wl, yc);
+                drawThickLine(object3D, xc - wl, yc - wl, xc2, yc - wl);
+                drawThickLine(object3D, xc2, yc - wl, xc2, yc + wl);
+                drawThickLine(object3D, xc + wl, yc + wl, xc2, yc + wl);
+                drawThickLine(object3D, xc + wl, yc, xc + wl, yc + wl);
+                break;
+            case WF_PULSE:
+                yc += wl / 2;
+                drawThickLine(object3D, xc - wl, yc - wl, xc - wl, yc);
+                drawThickLine(object3D, xc - wl, yc - wl, xc - wl / 2, yc - wl);
+                drawThickLine(object3D, xc - wl / 2, yc - wl, xc - wl / 2, yc);
+                drawThickLine(object3D, xc - wl / 2, yc, xc + wl, yc);
+                break;
+            case WF_SAWTOOTH:
+                drawThickLine(object3D, xc, yc - wl, xc - wl, yc);
+                drawThickLine(object3D, xc, yc - wl, xc, yc + wl);
+                drawThickLine(object3D, xc, yc + wl, xc + wl, yc);
+                break;
+            case WF_TRIANGLE: {
+                int xl = 5;
+                drawThickLine(object3D, xc - xl * 2, yc, xc - xl, yc - wl);
+                drawThickLine(object3D, xc - xl, yc - wl, xc, yc);
+                drawThickLine(object3D, xc, yc, xc + xl, yc + wl);
+                drawThickLine(object3D, xc + xl, yc + wl, xc + xl * 2, yc);
+                break;
             }
             case WF_AC: {
                 int i;
@@ -220,7 +220,7 @@ public class VoltageElm extends CircuitElm {
                     ox = xc + i;
                     oy = yy;
                 }
-               break;
+                break;
             }
         }
 
@@ -308,13 +308,11 @@ public class VoltageElm extends CircuitElm {
             drawWaveform(voltage3D, ps1);
         }
         //updateDotCount();
-        if (sim.getDragElm() != this) {
-            if (waveform == WF_DC) {
-                drawDots(voltage3D, point1, point2, curcount);
-            } else {
-                drawDots(voltage3D, point1, point2, curcount);
-                //drawDots(voltage3D, point2, lead2, -curcount);
-            }
+        if (waveform == WF_DC) {
+            drawDots(voltage3D, point1, point2, curcount);
+        } else {
+            drawDots(voltage3D, point1, point2, curcount);
+            //drawDots(voltage3D, point2, lead2, -curcount);
         }
         drawPosts(voltage3D);
 
@@ -323,13 +321,13 @@ public class VoltageElm extends CircuitElm {
 
     @Override
     public void updateObject3D() {
-        if(circuitElm3D == null) {
+        if (circuitElm3D == null) {
             circuitElm3D = generateObject3D();
         }
         update2Leads();
-        int color1 =  getVoltageColor(volts[0]);
+        int color1 = getVoltageColor(volts[0]);
         color1Material.setColor(color1);
-        int color2 =  getVoltageColor(volts[1]);
+        int color2 = getVoltageColor(volts[1]);
         color2Material.setColor(color2);
 
         updateDotCount();

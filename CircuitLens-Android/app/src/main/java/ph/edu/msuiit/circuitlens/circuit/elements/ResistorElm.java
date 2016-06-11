@@ -65,11 +65,6 @@ public class ResistorElm extends CircuitElm {
     }
 
     @Override
-    public int getShortcut() {
-        return 'r';
-    }
-
-    @Override
     public void updateObject3D() {
         if (circuitElm3D == null) {
             circuitElm3D = generateObject3D();

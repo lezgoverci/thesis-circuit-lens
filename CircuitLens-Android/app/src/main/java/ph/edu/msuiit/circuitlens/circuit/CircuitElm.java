@@ -490,7 +490,7 @@ public abstract class CircuitElm {
             } else if (dots.getNumChildren() == 0) {
                 Object3D dot = dots.clone();
                 dots.addChild(dot);
-                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 3);
+                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 0);
             } else {
                 Object3D dot;
                 if (count < dots.getNumChildren()) {
@@ -499,7 +499,7 @@ public abstract class CircuitElm {
                     dot = dots.getChildAt(0).clone();
                     dots.addChild(dot);
                 }
-                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 3);
+                dot.setPosition(x0 - dots.getX(), y0 - dots.getY(), 0);
             }
             count++;
         }

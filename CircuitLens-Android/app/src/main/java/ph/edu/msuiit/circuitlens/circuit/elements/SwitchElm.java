@@ -181,7 +181,7 @@ public class SwitchElm extends CircuitElm {
         interpPoint(lead1, lead2, ps2, 1, 2);
 
         Material material = new Material();
-        material.setColor(Color.WHITE);
+        material.setColor(whiteColor);
         Stack<Vector3> points = new Stack<>();
         points.add(new Vector3(0,0,0));
         points.add(new Vector3(32,0,0));

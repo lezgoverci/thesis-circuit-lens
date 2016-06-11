@@ -4,7 +4,6 @@ package ph.edu.msuiit.circuitlens.circuit;
 // For information about the theory behind this, see Electronic Circuit & System Simulation Methods by Pillage
 
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.util.Log;
 
 import org.rajawali3d.Object3D;
@@ -60,21 +59,21 @@ public class CircuitSimulator {
     double voltageRange = 5;
     double currentMult, powerMult;
 
-    Class dumpTypes[], shortcuts[];
+    Class dumpTypes[];
     int circuitBottom;
     ArrayList<String> undoStack, redoStack;
 
-    private boolean whiteBackground;//printable
-    private boolean stopped = false;//stoppedCheckItemState
+    private boolean whiteBackground;
+    private boolean stopped = false;
     private double currentBarValue;
-    private boolean showPowerDissipation;//powerCheckItemState
+    private boolean showPowerDissipation;
     private double powerBarValue;
     private int speedBarValue;
-    private boolean showCurrent = true;//dotsCheckItemState
+    private boolean showCurrent;
     private boolean smallGrid;
-    private boolean showVoltage;//voltsCheckItemState
-    private boolean showValues;//showValuesCheckItemState
-    private boolean euroResistor;//euroResistorCheckItem
+    private boolean showVoltage;
+    private boolean showValues;
+    private boolean euroResistor;
     public CircuitCanvas3D cv;
     ArrayList<CircuitNode> nodeList;
     CircuitElm voltageSources[];
@@ -1415,7 +1414,7 @@ public class CircuitSimulator {
             elmList.clear();
             hintType = -1;
             timeStep = 5e-6;
-            showCurrent = false;
+            showCurrent = true;
             smallGrid = false;
             showPowerDissipation = false;
             showVoltage = true;

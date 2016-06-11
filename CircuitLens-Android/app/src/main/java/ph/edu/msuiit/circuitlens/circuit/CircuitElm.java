@@ -3,7 +3,6 @@ package ph.edu.msuiit.circuitlens.circuit;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.Rect;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
@@ -32,7 +31,7 @@ public abstract class CircuitElm {
     protected Object3D circuitElm3D;
     private static final int colorScaleCount = 32;
     private static final int colorScale[] = new int[colorScaleCount];
-    public static int whiteColor;
+    public static int whiteColor = Color.WHITE, selectColor = Color.CYAN;
 
     protected int x, y, x2, y2, flags, nodes[], voltSource;
     protected int dx, dy, dsign;
@@ -301,7 +300,7 @@ public abstract class CircuitElm {
             return;
         }
         Material material = new Material();
-        material.setColor(Color.WHITE);
+        material.setColor(whiteColor);
         Circle3D circle = new Circle3D(new Vector3(x0, y0, 1), 3, 1, true);
         circle.setMaterial(material);
         object3D.addChild(circle);
@@ -322,15 +321,22 @@ public abstract class CircuitElm {
     }
 
     public void setBbox(Point p1, Point p2, double w) {
+        setBbox(p1.x, p1.y, p2.x, p2.y, w);
+    }
+
+    public void setBbox(int x1, int y1, int x2, int y2, double w) {
+        if (x1 > x2) {
+            int q = x1;
+            x1 = x2;
+            x2 = q;
+        }
+        if (y1 > y2) {
+            int q = y1;
+            y1 = y2;
+            y2 = q;
+        }
         int iw = (int) Math.floor(w);
-        boundingBox.set(p1.x - iw, p1.y - iw, p2.x + iw, p2.y + iw);
-        /*
-        setBbox(p1.x, p1.y, p2.x, p2.y);
-        int gx = p2.y - p1.y;
-        int gy = p1.x - p2.x;
-        int dpx = (int) (dpx1 * w);
-        int dpy = (int) (dpy1 * w);
-        adjustBbox(p1.x + dpx, p1.y + dpy, p1.x - dpx, p1.y - dpy);*/
+        boundingBox.set(x1 - iw, y1 - iw, x2 + iw, y2 + iw);
     }
 
     public void adjustBbox(int x1, int y1, int x2, int y2) {
@@ -383,7 +389,7 @@ public abstract class CircuitElm {
             return;
         }
 
-        Bitmap rasterText = Graphics.textAsBitmap(s, 12, Color.WHITE);
+        Bitmap rasterText = Graphics.textAsBitmap(s, 12, whiteColor);
         Material textMaterial = new Material();
         textMaterial.setColor(Color.TRANSPARENT);
         Texture texture = new Texture("text", rasterText);
@@ -514,7 +520,15 @@ public abstract class CircuitElm {
         return 3;
     }
 
+    public boolean needsHighlight() {
+        return sim.touchElm == this || selected;
+    }
+
     public int getVoltageColor(double volts) {
+        if (needsHighlight()) {
+            return selectColor;
+        }
+
         if (!sim.isShowingVoltage()) {
             if (!sim.isShowingPowerDissipation()) // && !conductanceCheckItem.getState())
             {

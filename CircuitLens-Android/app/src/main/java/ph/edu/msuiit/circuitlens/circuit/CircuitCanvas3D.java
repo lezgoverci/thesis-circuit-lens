@@ -94,6 +94,8 @@ public class CircuitCanvas3D extends Object3D{
             Log.d(getClass().getSimpleName(), "touched element: " + elm.getClass().getSimpleName());
             if (elm instanceof SwitchElm) {
                 sim.doSwitch((SwitchElm) elm);
+            } else{
+                sim.touchElm = elm;
             }
         }
     }

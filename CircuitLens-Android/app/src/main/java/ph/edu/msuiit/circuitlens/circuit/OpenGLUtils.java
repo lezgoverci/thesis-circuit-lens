@@ -37,11 +37,9 @@ public class OpenGlUtils {
         Vector3 nearVec = new Vector3(nearPos[0] / nearPos[3], nearPos[1] / nearPos[3], nearPos[2] / nearPos[3]);
         Vector3 farVec = new Vector3(farPos[0] / farPos[3], farPos[1] / farPos[3], farPos[2] / farPos[3]);
 
-        double factor = (Math.abs(object3D.getZ()) + nearVec.z) / (camera.getFarPlane() - camera.getNearPlane());
+        double factor = (object3D.getZ() + nearVec.z) / (camera.getFarPlane() - camera.getNearPlane());
 
-        Vector3 position = new Vector3();
-        position.setAll(farVec);
-        position.subtract(nearVec);
+        Vector3 position = Vector3.subtractAndCreate(farVec, nearVec);
         position.multiply(factor);
         position.add(camera.getPosition());
 

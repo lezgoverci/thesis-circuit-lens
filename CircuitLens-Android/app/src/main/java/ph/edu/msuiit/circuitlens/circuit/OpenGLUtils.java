@@ -21,10 +21,13 @@ public class OpenGlUtils {
         Matrix4 viewMatrix = camera.getViewMatrix();
         Matrix4 projectionMatrix = camera.getProjectionMatrix();
 
+        // map screen coordinates to near plane (winZ=0)
         GLU.gluUnProject(x, viewPort[3] - y, 0,
                 viewMatrix.getDoubleValues(), 0,
                 projectionMatrix.getDoubleValues(), 0,
                 viewPort, 0, nearPos, 0);
+
+        // map screen coordinates to far plane (winZ=0)
         GLU.gluUnProject(x, viewPort[3] - y, 1.f,
                 viewMatrix.getDoubleValues(), 0,
                 projectionMatrix.getDoubleValues(), 0,
@@ -42,12 +45,14 @@ public class OpenGlUtils {
         position.multiply(factor);
         position.add(camera.getPosition());
 
+        // get 3 co-planar points
         Vector3 child1 = object3D.getWorldPosition();
         Vector3 child2 = object3D.getChildAt(0).getWorldPosition();
         Vector3 child3 = object3D.getChildAt(1).getWorldPosition();
 
-        Vector3 rayDir = Vector3.subtractAndCreate(nearVec, farVec);
         Plane plane = new Plane(child1, child2, child3);
+
+        Vector3 rayDir = Vector3.subtractAndCreate(nearVec, farVec);
 
         double denorm = rayDir.dot(plane.getNormal());
         if (denorm != 0) {
@@ -57,7 +62,10 @@ public class OpenGlUtils {
             if (hitPoint != null) hitPoint.setAll(position);
         }
 
+        // apply rotation of circuitCanvas3D to hitPoint
         hitPoint.rotateBy(object3D.getOrientation());
+
+        // invert y since scaleY is negative
         hitPoint.y = -hitPoint.y;
 
         Log.d("OpenGlUtils", "hitPoint: "+hitPoint);

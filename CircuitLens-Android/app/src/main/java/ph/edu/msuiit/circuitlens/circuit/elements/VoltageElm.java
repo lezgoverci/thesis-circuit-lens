@@ -302,6 +302,9 @@ public class VoltageElm extends CircuitElm {
 
             interpPoint2(lead1, lead2, ps1, ps2, 1, hs);
             drawThickLine(voltage3D, ps1, ps2, color2Material);
+
+            String s = getShortUnitText(getVoltage(), "V", shortFormat);
+            drawValues(voltage3D, s, 16);
         } else {
             setBbox(point1, point2, circleSize);
             interpPoint(lead1, lead2, ps1, .5);

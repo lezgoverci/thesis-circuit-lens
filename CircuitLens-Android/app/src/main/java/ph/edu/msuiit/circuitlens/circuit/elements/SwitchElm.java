@@ -170,8 +170,6 @@ public class SwitchElm extends CircuitElm {
         int openhs = 16;
         setBbox(point1, point2, openhs);
 
-        drawBoundingBox(switch3d);
-
         draw2Leads(switch3d);
 
 //        if (!needsHighlight()) {

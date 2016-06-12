@@ -293,6 +293,8 @@ public class VoltageElm extends CircuitElm {
         draw2Leads(voltage3D);
         color1Material = new Material();
         color2Material = new Material();
+        Point ps1 = new Point();
+        Point ps2 = new Point();
         if (waveform == WF_DC) {
 //            setPowerColor(g, false);
 

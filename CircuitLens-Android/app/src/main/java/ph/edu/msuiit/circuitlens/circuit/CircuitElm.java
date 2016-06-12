@@ -41,9 +41,6 @@ public abstract class CircuitElm {
     public boolean selected;
     protected CircuitSimulator sim;
 
-    protected Point ps1 = new Point();
-    protected Point ps2 = new Point();
-
     static {
         for (int i = 0; i < colorScaleCount; i++) {
             double v = i * 2. / colorScaleCount - 1;

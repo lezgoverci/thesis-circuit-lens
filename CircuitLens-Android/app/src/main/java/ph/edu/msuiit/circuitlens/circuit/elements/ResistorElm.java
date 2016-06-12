@@ -83,6 +83,10 @@ public class ResistorElm extends CircuitElm {
 
     public Object3D generateObject3D() {
         Object3D resistor3D = new Object3D();
+
+        Point ps1 = new Point();
+        Point ps2 = new Point();
+
         colorMaterials = new Material[SEGMENTS];
         int i;
         int ox = 0;

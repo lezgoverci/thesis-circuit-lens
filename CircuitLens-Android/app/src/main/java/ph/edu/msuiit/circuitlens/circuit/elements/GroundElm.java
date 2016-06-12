@@ -1,6 +1,7 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
 import android.graphics.Color;
+import android.graphics.Point;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
@@ -71,6 +72,9 @@ public class GroundElm extends CircuitElm {
 
     public Object3D generateObject3D() {
         Object3D ground3d = new Object3D();
+
+        Point ps1 = new Point();
+        Point ps2 = new Point();
 
         wireMaterial = new Material();
         drawThickLine(ground3d, point1, point2, wireMaterial);

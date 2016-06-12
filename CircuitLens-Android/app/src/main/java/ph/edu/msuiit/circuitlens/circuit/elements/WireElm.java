@@ -6,10 +6,11 @@ import org.rajawali3d.materials.Material;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
+import ph.edu.msuiit.circuitlens.circuit.SiUnits;
 
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
-import static ph.edu.msuiit.circuitlens.circuit.Graphics.getCurrentDText;
-import static ph.edu.msuiit.circuitlens.circuit.Graphics.getVoltageText;
+import static ph.edu.msuiit.circuitlens.circuit.SiUnits.getCurrentDText;
+import static ph.edu.msuiit.circuitlens.circuit.SiUnits.getVoltageText;
 
 public class WireElm extends CircuitElm {
 
@@ -42,8 +43,8 @@ public class WireElm extends CircuitElm {
 
     public void getInfo(String arr[]) {
         arr[0] = "wire";
-        arr[1] = "I = " + getCurrentDText(getCurrent(), showFormat);
-        arr[2] = "V = " + getVoltageText(volts[0], showFormat);
+        arr[1] = "I = " + getCurrentDText(getCurrent(), SiUnits.showFormat);
+        arr[2] = "V = " + getVoltageText(volts[0], SiUnits.showFormat);
     }
 
     public int getDumpType() {

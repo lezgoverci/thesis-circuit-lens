@@ -26,6 +26,8 @@ import ph.edu.msuiit.circuitlens.circuit.elements.WireElm;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static ph.edu.msuiit.circuitlens.circuit.SiUnits.getUnitText;
+import static ph.edu.msuiit.circuitlens.circuit.SiUnits.showFormat;
 
 public class CircuitSimulator {
 
@@ -232,12 +234,10 @@ public class CircuitSimulator {
                     touchElm.getInfo(info);
                 else
                     info[0] = "V = " +
-                            CircuitElm.getUnitText(touchElm.getPostVoltage(mousePost), "V");
+                            getUnitText(touchElm.getPostVoltage(mousePost), "V", SiUnits.showFormat);
 
             } else {
-                CircuitElm.showFormat.setMinimumFractionDigits(2);
-                info[0] = "t = " + CircuitElm.getUnitText(t, "s");
-                CircuitElm.showFormat.setMinimumFractionDigits(0);
+                info[0] = "t = " + getUnitText(t, "s", SiUnits.showFormat);
             }
             if (hintType != -1) {
                 for (i = 0; info[i] != null; i++)
@@ -313,8 +313,8 @@ public class CircuitSimulator {
             }
             InductorElm ie = (InductorElm) c1;
             CapacitorElm ce = (CapacitorElm) c2;
-            return "res.f = " + CircuitElm.getUnitText(1 / (2 * Math.PI * Math.sqrt(ie.getInductance()
-                    * ce.getCapacitance())), "Hz");
+            return "res.f = " + getUnitText(1 / (2 * Math.PI * Math.sqrt(ie.getInductance()
+                    * ce.getCapacitance())), "Hz", showFormat);
         }
         if (hintType == HINT_RC) {
             if (!(c1 instanceof ResistorElm)) {
@@ -325,8 +325,8 @@ public class CircuitSimulator {
             }
             ResistorElm re = (ResistorElm) c1;
             CapacitorElm ce = (CapacitorElm) c2;
-            return "RC = " + CircuitElm.getUnitText(re.getResistance() * ce.getCapacitance(),
-                    "s");
+            return "RC = " + getUnitText(re.getResistance() * ce.getCapacitance(),
+                    "s", showFormat);
         }
         if (hintType == HINT_3DB_C) {
             if (!(c1 instanceof ResistorElm)) {
@@ -338,7 +338,7 @@ public class CircuitSimulator {
             ResistorElm re = (ResistorElm) c1;
             CapacitorElm ce = (CapacitorElm) c2;
             return "f.3db = "
-                    + CircuitElm.getUnitText(1 / (2 * Math.PI * re.getResistance() * ce.getCapacitance()), "Hz");
+                    + getUnitText(1 / (2 * Math.PI * re.getResistance() * ce.getCapacitance()), "Hz", showFormat);
         }
         if (hintType == HINT_3DB_L) {
             if (!(c1 instanceof ResistorElm)) {
@@ -350,7 +350,7 @@ public class CircuitSimulator {
             ResistorElm re = (ResistorElm) c1;
             InductorElm ie = (InductorElm) c2;
             return "f.3db = "
-                    + CircuitElm.getUnitText(re.getResistance() / (2 * Math.PI * ie.getInductance()), "Hz");
+                    + getUnitText(re.getResistance() / (2 * Math.PI * ie.getInductance()), "Hz", showFormat);
         }
         if (hintType == HINT_TWINT) {
             if (!(c1 instanceof ResistorElm)) {
@@ -362,7 +362,7 @@ public class CircuitSimulator {
             ResistorElm re = (ResistorElm) c1;
             CapacitorElm ce = (CapacitorElm) c2;
             return "fc = "
-                    + CircuitElm.getUnitText(1 / (2 * Math.PI * re.getResistance() * ce.getCapacitance()), "Hz");
+                    + getUnitText(1 / (2 * Math.PI * re.getResistance() * ce.getCapacitance()), "Hz", showFormat);
         }
         return null;
     }

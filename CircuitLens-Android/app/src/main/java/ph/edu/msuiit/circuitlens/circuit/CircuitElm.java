@@ -13,8 +13,6 @@ import org.rajawali3d.primitives.Cube;
 import org.rajawali3d.primitives.Line3D;
 import org.rajawali3d.primitives.Plane;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Stack;
 
 import ph.edu.msuiit.circuitlens.circuit.elements.RailElm;
@@ -23,8 +21,8 @@ import ph.edu.msuiit.circuitlens.ui.gl.Circle3D;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static ph.edu.msuiit.circuitlens.circuit.Graphics.getCurrentDText;
-import static ph.edu.msuiit.circuitlens.circuit.Graphics.getVoltageDText;
+import static ph.edu.msuiit.circuitlens.circuit.SiUnits.getCurrentDText;
+import static ph.edu.msuiit.circuitlens.circuit.SiUnits.getVoltageDText;
 
 public abstract class CircuitElm {
 
@@ -46,8 +44,6 @@ public abstract class CircuitElm {
     protected Point ps1 = new Point();
     protected Point ps2 = new Point();
 
-    public static final NumberFormat showFormat, shortFormat, noCommaFormat;
-
     static {
         for (int i = 0; i < colorScaleCount; i++) {
             double v = i * 2. / colorScaleCount - 1;
@@ -63,14 +59,6 @@ public abstract class CircuitElm {
                 colorScale[i] = Color.rgb(n2, n1, n3);
             }
         }
-
-        showFormat = DecimalFormat.getInstance();
-        showFormat.setMaximumFractionDigits(2);
-        shortFormat = DecimalFormat.getInstance();
-        shortFormat.setMaximumFractionDigits(1);
-        noCommaFormat = DecimalFormat.getInstance();
-        noCommaFormat.setMaximumFractionDigits(10);
-        noCommaFormat.setGroupingUsed(false);
     }
 
     public CircuitSimulator getCS() {
@@ -299,6 +287,7 @@ public abstract class CircuitElm {
         if (sim.getCircuitNode(n) != null && sim.getCircuitNode(n).links.size() == 2) {
             return;
         }
+
         Material material = new Material();
         material.setColor(whiteColor);
         Circle3D circle = new Circle3D(new Vector3(x0, y0, 1), 3, 1, true);
@@ -515,8 +504,8 @@ public abstract class CircuitElm {
     }
 
     public int getBasicInfo(String arr[]) {
-        arr[1] = "I = " + getCurrentDText(getCurrent(), showFormat);
-        arr[2] = "Vd = " + getVoltageDText(getVoltageDiff(), showFormat);
+        arr[1] = "I = " + getCurrentDText(getCurrent(), SiUnits.showFormat);
+        arr[2] = "Vd = " + getVoltageDText(getVoltageDiff(), SiUnits.showFormat);
         return 3;
     }
 
@@ -630,35 +619,6 @@ public abstract class CircuitElm {
     public abstract void updateObject3D();
 
     public abstract Object3D generateObject3D();
-
-    public synchronized static String getUnitText(double v, String u) {
-        double va = Math.abs(v);
-        if (va < 1e-14) {
-            return "0 " + u;
-        }
-        if (va < 1e-9) {
-            return showFormat.format(v * 1e12) + " p" + u;
-        }
-        if (va < 1e-6) {
-            return showFormat.format(v * 1e9) + " n" + u;
-        }
-        if (va < 1e-3) {
-            return showFormat.format(v * 1e6) + " " + CircuitSimulator.muString + u;
-        }
-        if (va < 1) {
-            return showFormat.format(v * 1e3) + " m" + u;
-        }
-        if (va < 1e3) {
-            return showFormat.format(v) + " " + u;
-        }
-        if (va < 1e6) {
-            return showFormat.format(v * 1e-3) + " k" + u;
-        }
-        if (va < 1e9) {
-            return showFormat.format(v * 1e-6) + " M" + u;
-        }
-        return showFormat.format(v * 1e-9) + " G" + u;
-    }
 
     public void setSim(CircuitSimulator sim) {
         this.sim = sim;

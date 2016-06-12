@@ -13,8 +13,8 @@ import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickCircle;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawTriangle;
-import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
+import static ph.edu.msuiit.circuitlens.circuit.SiUnits.getShortUnitText;
 
 public class CurrentElm extends CircuitElm {
 
@@ -26,7 +26,7 @@ public class CurrentElm extends CircuitElm {
     }
 
     public CurrentElm(int xa, int ya, int xb, int yb, int f,
-            StringTokenizer st) {
+                      StringTokenizer st) {
         super(xa, ya, xb, yb, f);
         try {
             currentValue = new Double(st.nextToken()).doubleValue();
@@ -53,12 +53,12 @@ public class CurrentElm extends CircuitElm {
         ashaft2 = interpPoint(lead1, lead2, .6);
         center = interpPoint(lead1, lead2, .5);
         Point p2 = interpPoint(lead1, lead2, .75);
-        arrowPoints = new Point[]{p2, new Point(center.x-4,center.y),  new Point(center.x+4,center.y)};
+        arrowPoints = new Point[]{p2, new Point(center.x - 4, center.y), new Point(center.x + 4, center.y)};
     }
 
     @Override
     public void updateObject3D() {
-        if(circuitElm3D == null){
+        if (circuitElm3D == null) {
             circuitElm3D = generateObject3D();
         }
         update2Leads();
@@ -70,7 +70,7 @@ public class CurrentElm extends CircuitElm {
 
     Material colorMaterial;
 
-    public Object3D generateObject3D()  {
+    public Object3D generateObject3D() {
         Object3D currentSource3D = new Object3D();
         int cr = 12;
         draw2Leads(currentSource3D);
@@ -85,7 +85,7 @@ public class CurrentElm extends CircuitElm {
         setBbox(point1, point2, cr);
 
         if (sim.isShowingValues()) {
-            String s = getShortUnitText(currentValue, "A", shortFormat);
+            String s = getShortUnitText(currentValue, "A");
             if (dx == 0 || dy == 0) {
                 drawValues(currentSource3D, s, cr);
             }

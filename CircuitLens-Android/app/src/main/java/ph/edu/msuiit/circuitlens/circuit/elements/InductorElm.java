@@ -7,10 +7,9 @@ import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
-import ph.edu.msuiit.circuitlens.circuit.Graphics;
 
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawCoil;
-import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
+import static ph.edu.msuiit.circuitlens.circuit.SiUnits.getShortUnitText;
 
 public class InductorElm extends CircuitElm {
 
@@ -103,7 +102,7 @@ public class InductorElm extends CircuitElm {
         coilMaterials = new Material[30];
         drawCoil(inductor3d, 8, lead1, lead2, coilMaterials);
         if (sim.isShowingValues()) {
-            String s = getShortUnitText(inductance, "H", shortFormat);
+            String s = getShortUnitText(inductance, "H");
             drawValues(inductor3d, s, hs);
         }
 

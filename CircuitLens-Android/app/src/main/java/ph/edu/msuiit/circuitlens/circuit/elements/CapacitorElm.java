@@ -10,9 +10,9 @@ import java.util.StringTokenizer;
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
 
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
-import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint2;
+import static ph.edu.msuiit.circuitlens.circuit.SiUnits.getShortUnitText;
 
 public class CapacitorElm extends CircuitElm {
 
@@ -166,7 +166,7 @@ public class CapacitorElm extends CircuitElm {
 
         drawPosts(capacitor3D);
         if (sim.isShowingValues()) {
-            String s = getShortUnitText(capacitance, "F", shortFormat);
+            String s = getShortUnitText(capacitance, "F");
             drawValues(capacitor3D, s, hs);
         }
 

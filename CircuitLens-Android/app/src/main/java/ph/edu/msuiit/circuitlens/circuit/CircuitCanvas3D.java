@@ -12,7 +12,7 @@ import java.util.Stack;
 
 import ph.edu.msuiit.circuitlens.circuit.elements.SwitchElm;
 
-public class CircuitCanvas3D extends Object3D{
+public class CircuitCanvas3D extends Object3D {
     private final CircuitSimulator sim;
     private int x1;
     private int x2;
@@ -39,7 +39,7 @@ public class CircuitCanvas3D extends Object3D{
         sim = circuitSimulator;
     }
 
-    public void setCircuitBounds(int x1, int y1, int x2, int y2){
+    public void setCircuitBounds(int x1, int y1, int x2, int y2) {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
@@ -47,32 +47,32 @@ public class CircuitCanvas3D extends Object3D{
     }
 
     public int getCircuitWidth() {
-        return x2-x1;
+        return x2 - x1;
     }
 
     public int getCircuitHeight() {
-        return y2-y1;
+        return y2 - y1;
     }
 
-    public int getCircuitCenterX(){
-        return x1+getCircuitWidth()/2;
+    public int getCircuitCenterX() {
+        return x1 + getCircuitWidth() / 2;
     }
 
-    public int getCircuitCenterY(){
-        return y1+getCircuitHeight()/2;
+    public int getCircuitCenterY() {
+        return y1 + getCircuitHeight() / 2;
     }
 
-    public void drawBounds(Object3D object3D){
-        drawThickLine(object3D,x1,y1,x2,y1); // top
-        drawThickLine(object3D,x1,y1,x1,y2); // left
-        drawThickLine(object3D,x2,y1,x2,y2); // right
-        drawThickLine(object3D,x1,y2,x2,y2); // bottom
-        drawThickLine(object3D,x1,y1,x2,y1); // top
+    public void drawBounds(Object3D object3D) {
+        drawThickLine(object3D, x1, y1, x2, y1); // top
+        drawThickLine(object3D, x1, y1, x1, y2); // left
+        drawThickLine(object3D, x2, y1, x2, y2); // right
+        drawThickLine(object3D, x1, y2, x2, y2); // bottom
+        drawThickLine(object3D, x1, y1, x2, y1); // top
 
         int x0 = getCircuitCenterX();
         int y0 = getCircuitCenterY();
-        drawThickLine(object3D,x0-15,y0-15,x0+15,y0+15);
-        drawThickLine(object3D,x0+15,y0-15,x0-15,y0+15);
+        drawThickLine(object3D, x0 - 15, y0 - 15, x0 + 15, y0 + 15);
+        drawThickLine(object3D, x0 + 15, y0 - 15, x0 - 15, y0 + 15);
     }
 
     public static void drawThickLine(Object3D object3D, int x, int y, int x2, int y2) {
@@ -80,21 +80,22 @@ public class CircuitCanvas3D extends Object3D{
         material.setColor(Color.BLUE);
 
         Stack<Vector3> points = new Stack<>();
-        points.add(new Vector3(x,y,0));
-        points.add(new Vector3(x2,y2,0));
-        Line3D thickLine = new Line3D(points,10);
+        points.add(new Vector3(x, y, 0));
+        points.add(new Vector3(x2, y2, 0));
+        Line3D thickLine = new Line3D(points, 10);
         thickLine.setMaterial(material);
 
         object3D.addChild(thickLine);
     }
 
-    public void onTouch(int x, int y){
+    public void onTouch(int x, int y) {
         CircuitElm elm = sim.getElmAtPosition(x, y);
-        if(elm != null) {
-            Log.d(getClass().getSimpleName(), "touched element: " + elm.getClass().getSimpleName());
-            if (elm instanceof SwitchElm) {
+        if (elm != null) {
+            if (sim.touchElm == elm) {
+                sim.touchElm = null;
+            } else if (elm instanceof SwitchElm) {
                 sim.doSwitch((SwitchElm) elm);
-            } else{
+            } else {
                 sim.touchElm = elm;
             }
         }

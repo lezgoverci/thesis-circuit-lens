@@ -1,7 +1,6 @@
 package ph.edu.msuiit.circuitlens.circuit.elements;
 
 import android.graphics.Point;
-import android.util.Log;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
@@ -9,12 +8,11 @@ import org.rajawali3d.materials.Material;
 import java.util.StringTokenizer;
 
 import ph.edu.msuiit.circuitlens.circuit.CircuitElm;
-import ph.edu.msuiit.circuitlens.circuit.Graphics;
 
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.drawThickLine;
-import static ph.edu.msuiit.circuitlens.circuit.Graphics.getShortUnitText;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint;
 import static ph.edu.msuiit.circuitlens.circuit.Graphics.interpPoint2;
+import static ph.edu.msuiit.circuitlens.circuit.SiUnits.getShortUnitText;
 
 public class ResistorElm extends CircuitElm {
 
@@ -135,7 +133,7 @@ public class ResistorElm extends CircuitElm {
         }
 
         if (sim.isShowingValues()) {
-            String s = getShortUnitText(resistance, "", shortFormat);
+            String s = getShortUnitText(resistance, "");
             drawValues(resistor3D, s, hs);
         }
         drawPosts(resistor3D);

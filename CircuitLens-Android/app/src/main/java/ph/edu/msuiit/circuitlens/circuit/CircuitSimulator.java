@@ -1508,6 +1508,7 @@ public class CircuitSimulator {
 
         }
         centerCircuit();
+        analyzeCircuit();
         generateCanvas();
         handleResize();
         needAnalyze();

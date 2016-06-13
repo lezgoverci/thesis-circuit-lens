@@ -91,13 +91,12 @@ public class CircuitCanvas3D extends Object3D {
     public void onTouch(int x, int y) {
         CircuitElm elm = sim.getElmAtPosition(x, y);
         if (elm != null) {
-            if (sim.touchElm == elm) {
-                sim.touchElm = null;
-            } else if (elm instanceof SwitchElm) {
+            if (elm instanceof SwitchElm) {
                 sim.doSwitch((SwitchElm) elm);
-            } else {
-                sim.touchElm = elm;
             }
+            sim.touchElm = elm;
+        } else{
+            sim.touchElm = null;
         }
     }
 }

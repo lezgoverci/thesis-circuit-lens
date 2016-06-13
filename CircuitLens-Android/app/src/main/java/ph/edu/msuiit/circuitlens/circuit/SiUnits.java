@@ -57,7 +57,7 @@ public class SiUnits {
         return getUnitText(v, "V", numberFormat);
     }
 
-    public enum SiUnit{
+    enum SiUnit{
         PICO  (1e-12,"p"),
         NANO  (1e-9,"n"),
         MICRO (1e-6,"u"),

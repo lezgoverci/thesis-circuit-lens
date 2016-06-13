@@ -884,7 +884,7 @@ public class CircuitSimulator {
     void calcCircuitBottom() {
         circuitBottom = 0;
         for (int i = 0; i != elmList.size(); i++) {
-            Rect rect = getElm(i).boundingBox;
+            Rectangle rect = getElm(i).boundingBox;
             int bottom = rect.height() + rect.top;
             if (bottom > circuitBottom) {
                 circuitBottom = bottom;
@@ -1505,13 +1505,13 @@ public class CircuitSimulator {
                 break;
             }
             p += l;
-
         }
+    }
+
+    public void prepareCircuit(){
         centerCircuit();
-        analyzeCircuit();
         generateCanvas();
         handleResize();
-        needAnalyze();
     }
 
     public static CircuitElm createElm(String line, CircuitSimulator cs) {

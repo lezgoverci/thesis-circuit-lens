@@ -1,9 +1,9 @@
 package ph.edu.msuiit.circuitlens.circuit;
 
 /**
- *  Custom Rect Class compatible with negative coordinates
+ *  Custom Rectangle Class compatible with negative coordinates
  */
-public class Rect {
+public class Rectangle {
     public int left;
     public int top;
     public int right;
@@ -24,7 +24,7 @@ public class Rect {
         return Math.abs(top - bottom);
     }
 
-    public boolean intersect(Rect rect) {
+    public boolean intersect(Rectangle rect) {
         return intersect(rect.left, rect.top, rect.right, rect.bottom);
     }
 
@@ -70,7 +70,7 @@ public class Rect {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
-        sb.append("Rect("); sb.append(left); sb.append(", ");
+        sb.append("Rectangle("); sb.append(left); sb.append(", ");
         sb.append(top); sb.append(") - ("); sb.append(right);
         sb.append(", "); sb.append(bottom); sb.append(")");
         return sb.toString();

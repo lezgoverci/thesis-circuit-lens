@@ -72,17 +72,6 @@ public class Graphics {
         object3D.addChild(triangle);
     }
 
-    private void drawSquare(Object3D object3D, int x0, int y0, int side, int color) {
-        Material material = new Material();
-        material.setColor(color);
-        Cube cube = new Cube(side);
-        cube.setX(x0);
-        cube.setY(y0);
-        cube.setZ(3);
-        cube.setMaterial(material);
-        object3D.addChild(cube);
-    }
-
     public static void drawCoil(Object3D object3D, int hs, Point p1, Point p2,
                                 Material[] coilMaterials) {
         int segments = 30;

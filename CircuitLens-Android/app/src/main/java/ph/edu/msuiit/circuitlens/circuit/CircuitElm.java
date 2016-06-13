@@ -37,7 +37,7 @@ public abstract class CircuitElm {
     protected Point point1, point2, lead1, lead2;
     protected double volts[];
     protected double current, curcount;
-    protected Rect boundingBox;
+    protected Rectangle boundingBox;
     public boolean selected;
     protected CircuitSimulator sim;
 
@@ -93,7 +93,7 @@ public abstract class CircuitElm {
     }
 
     public void initBoundingBox() {
-        boundingBox = new Rect();
+        boundingBox = new Rectangle();
         boundingBox.set(min(x, x2), min(y, y2),
                 abs(x2 - x) + 1, abs(y2 - y) + 1);
 
@@ -281,7 +281,7 @@ public abstract class CircuitElm {
     }
 
     public void drawPost(Object3D object3D, int x0, int y0, int n) {
-        if (sim.getCircuitNode(n) != null && sim.getCircuitNode(n).links.size() == 2) {
+        if (sim.getCircuitNode(n) != null && !needsHighlight() && sim.getCircuitNode(n).links.size() == 2) {
             return;
         }
 
@@ -625,7 +625,7 @@ public abstract class CircuitElm {
         circuitElm3D.setPosition(newX, newY, 0);
     }
 
-    public void selectRect(Rect r) {
+    public void selectRect(Rectangle r) {
         selected = r.intersect(boundingBox);
     }
 

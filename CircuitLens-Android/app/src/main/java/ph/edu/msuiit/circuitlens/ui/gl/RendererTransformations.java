@@ -2,6 +2,7 @@ package ph.edu.msuiit.circuitlens.ui.gl;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.TextView;
 
 import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.Quaternion;
@@ -9,7 +10,7 @@ import org.rajawali3d.math.Quaternion;
 /**
  * Created by vercillius on 6/3/2016.
  */
-public class RendererTransformations extends OpenGlRenderer {
+public class RendererTransformations extends ArRajawaliRenderer {
 
     private double mPosX;
     private double mPosY;
@@ -46,8 +47,8 @@ public class RendererTransformations extends OpenGlRenderer {
     private boolean isSetInitialValues = false;
 
 
-    public RendererTransformations(Context context) {
-        super(context);
+    public RendererTransformations(Context context, TextView timeTextView, TextView infoTextView) {
+        super(context, null);
     }
 
     @Override
@@ -59,8 +60,8 @@ public class RendererTransformations extends OpenGlRenderer {
          *  Rotate -> Translate -> Scale
          **/
 
-        Log.d("renderInit1","entering init scene");
-        getCurrentCamera().setPosition(0,0,500);
+        Log.d("renderInit1", "entering init scene");
+        getCurrentCamera().setPosition(0, 0, 500);
         getCurrentCamera().setFarPlane(5000);
 
         /*
@@ -138,12 +139,12 @@ public class RendererTransformations extends OpenGlRenderer {
         // default near plane z = 1.0
         // default far plane z = 120.0
         // default FOV = 45.0
-        Log.d("checkCameraParameters"," going to use parameters values in renderer");
+        Log.d("checkCameraParameters", " going to use parameters values in renderer");
         getCurrentCamera().updatePerspective(mHorizontalFOV, mVerticalFOV);
         getCurrentCamera().setProjectionMatrix(mCameraWidth, mCameraHeight);
         //Log.d("rendererValues","Horizontal FOV: " + getCurrentCamera().get);
         //TODO use camera values set in camera parameter values
-        Log.d("checkCameraParameters"," parameters values are used in renderer");
+        Log.d("checkCameraParameters", " parameters values are used in renderer");
     }
 
     private void setInitViewportTransformation() {
@@ -157,14 +158,14 @@ public class RendererTransformations extends OpenGlRenderer {
 
         // if camera matrix is not yet set, do not render
         //if (!mCameraValuesDirty) {
-            renderImage();
+        renderImage();
         //}
-        Log.d("checkDimensions","Viewport: " + getViewportWidth() + " x " + getViewportHeight());
+        Log.d("checkDimensions", "Viewport: " + getViewportWidth() + " x " + getViewportHeight());
     }
 
     private void renderImage() {
 
-        if(mIsTakePhoto){
+        if (mIsTakePhoto) {
             mInitQuaternionOrientation = circuit3D.getOrientation();
             mInitYaw = mInitQuaternionOrientation.getYaw();
             mInitPitch = mInitQuaternionOrientation.getPitch();
@@ -176,7 +177,7 @@ public class RendererTransformations extends OpenGlRenderer {
             isSetInitialValues = true;
         }
 
-        if(isSetInitialValues) {
+        if (isSetInitialValues) {
             // proceed to rendering
             renderImageOrientation();
             renderImageTranslation();
@@ -202,13 +203,13 @@ public class RendererTransformations extends OpenGlRenderer {
             double pitch = MathUtil.radiansToDegrees(/*circuit3D.getOrientation().getPitch() +*/ diffPitch);
 
             Quaternion orient = new Quaternion();
-            orient.fromEuler(-yaw,pitch,roll);
+            orient.fromEuler(-yaw, pitch, roll);
             circuit3D.setOrientation(orient);
 
         } else {
 
             Quaternion orient = new Quaternion();
-            orient.fromEuler(mYaw,mPitch,mRoll);
+            orient.fromEuler(mYaw, mPitch, mRoll);
             circuit3D.setOrientation(orient);
         }
     }
@@ -228,12 +229,12 @@ public class RendererTransformations extends OpenGlRenderer {
             double posY = /*circuit3D.getY() +*/ diffPosY;
             double posZ = /*circuit3D.getZ() +*/ diffPosZ;
 
-            circuit3D.setX((int)posX);
-            circuit3D.setY((int)posY * -1);
+            circuit3D.setX((int) posX);
+            circuit3D.setY((int) posY * -1);
             //circuit3D.setZ((int)posZ * 1);
 
             //circuit3D.setZ(posZ);
-            Log.d("rendererValues","X: " + circuit3D.getX() + " Y: " + circuit3D.getY()  + " Z: " + circuit3D.getZ() + "");
+            Log.d("rendererValues", "X: " + circuit3D.getX() + " Y: " + circuit3D.getY() + " Z: " + circuit3D.getZ() + "");
 
         } else {
             circuit3D.setX(mPosX);
@@ -250,15 +251,15 @@ public class RendererTransformations extends OpenGlRenderer {
 
     public void setCameraValues(int width, int height, double verticalFOV, double horizontalFOV, double aspectRatio) {
         //TODO check if this comes first before rendering
-        Log.d("checkCameraParameters"," going to save parameters values in renderer");
+        Log.d("checkCameraParameters", " going to save parameters values in renderer");
         mCameraHeight = height;
         mCameraWidth = width;
         mVerticalFOV = verticalFOV;
         mHorizontalFOV = horizontalFOV;
         mAspectRatio = aspectRatio;
         mCameraValuesDirty = false;
-        setViewPort(mCameraWidth,mCameraHeight);
-        Log.d("checkViewport"," view renderer: h" + getViewportHeight() + " w: " + getViewportWidth() );
+        setViewPort(mCameraWidth, mCameraHeight);
+        Log.d("checkViewport", " view renderer: h" + getViewportHeight() + " w: " + getViewportWidth());
     }
 
 

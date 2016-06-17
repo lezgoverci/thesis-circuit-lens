@@ -5,8 +5,7 @@ import org.junit.Test;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import ph.edu.msuiit.circuitlens.circuit.CircuitSimulator;
-import ph.edu.msuiit.circuitlens.circuit.SiUnits;
+import ph.edu.msuiit.circuitlens.cirsim.SiUnits;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;

@@ -1,139 +1,117 @@
 package ph.edu.msuiit.circuitlens.ui;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.SurfaceView;
-import android.view.View;
 import android.view.WindowManager;
 
 import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Mat;
-import org.rajawali3d.surface.RajawaliSurfaceView;
 
-import ph.edu.msuiit.circuitlens.CircuitLensController;
+import ph.edu.msuiit.circuitlens.main.controller.CircuitLensController;
 import ph.edu.msuiit.circuitlens.R;
-import ph.edu.msuiit.circuitlens.ui.gl.RendererTransformations;
+import ph.edu.msuiit.circuitlens.main.model.CircuitLensModel;
+import ph.edu.msuiit.circuitlens.main.view.CircuitLensView;
 
 
-public class ArActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2,CircuitLensView {
+public class ArActivity extends Activity{
     private static final String TAG = "CircuitLens::ArActivity";
-    private long startTime;
-    protected CircuitLensController mController;
-    protected CameraBridgeViewBase mOpenCvCameraView;
-    protected RendererTransformations mRenderer;
-    protected RajawaliSurfaceView mSurface;
-
-    protected View.OnTouchListener mTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            if(event.getAction() == MotionEvent.ACTION_DOWN)
-            {
-                // this needs to be defined on the renderer:
-                //Log.d(this.getClass().getSimpleName(),": " + event.getX()+ "," + event.getY());
-                mRenderer.onTouchEvent(event);
-                //mTakePhoto = true;
-                Log.d("touch", "touched in Rajawali");
-            }
-            return true;
-        }
-    };
-
-    // V: camera shutter
-    private boolean mTakePhoto = false;
+    private static final int PERMISSIONS_REQUEST_ACCESS_CAMERA = 1;
+    CircuitLensModel mModel;
+    CircuitLensView mView;
+    CircuitLensController mController;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
-                case LoaderCallbackInterface.SUCCESS:
-                {
+                case LoaderCallbackInterface.SUCCESS: {
                     Log.d(TAG, "OpenCV loaded successfully");
-                    mOpenCvCameraView.enableView();
-                    Log.d("checkOpenCvCameraView"," is enabled");
                     mController.onResume();
-
-                } break;
-                default:
-                {
+                }
+                break;
+                default: {
                     super.onManagerConnected(status);
-                } break;
+                }
+                break;
             }
         }
     };
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.CAMERA)) {
+                // TODO: show reason for permission
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CAMERA},
+                        PERMISSIONS_REQUEST_ACCESS_CAMERA);
+            }
+        } else{
+            loadOpenCv();
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        // If the Android version is lower than Jellybean, use this call to hide
-        // the status bar.
-//        if (Build.VERSION.SDK_INT < 16) {
-//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        } else{
-//            View decorView = getWindow().getDecorView();
-//            // Hide the status bar in Jellybean up
-//            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-//            decorView.setSystemUiVisibility(uiOptions);
-//        }
-
         setContentView(R.layout.activity_ar);
 
+        initialize();
+    }
+
+    public void initialize(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String serverUri = preferences.getString("server_uri","ws://127.0.0.1:8080/ws");
-        boolean rotate = preferences.getBoolean("rotate",false);
+        String serverUri = preferences.getString("server_uri", "ws://127.0.0.1:8080/ws");
+        boolean rotate = preferences.getBoolean("rotate", false);
 
-        mRenderer = new RendererTransformations(this);
-
-        mController = new CircuitLensController(this,serverUri);
-        mController.onCreate();
-        Log.d("checkController"," is bound to activity");
-
-        initializeViews();
-        initializeRenderer();
-
-
-    }
-
-    public void initializeViews(){
-        mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.surface_view);
-        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-        mOpenCvCameraView.setCvCameraViewListener(this);
-        Log.d("checkCameraView"," is bound to surface view");
-    }
-
-    private void initializeRenderer(){
-        mSurface = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-        mSurface.setOnTouchListener(mTouchListener);
-        mSurface.setTransparent(true);
-        mSurface.setSurfaceRenderer(mRenderer);
-        mSurface.setZOrderMediaOverlay(true);
-        Log.d("checkViewport","initial surface h: " + mSurface.getHeight() + " w: " + mSurface.getWidth());
-        Log.d("checkViewport","initial renderer h: " + mRenderer.getViewportHeight()+ "w: " + mRenderer.getViewportWidth());
-        Log.d("checkViewport","initial camera h: " + mOpenCvCameraView.getHeight()+ " w: " + mOpenCvCameraView.getWidth());
+        mModel = new CircuitLensModel();
+        mModel.setServerUri(serverUri);
+        mView = new CircuitLensView(this);
+        mController = new CircuitLensController(mModel, mView);
     }
 
     @Override
-    public void onPause()
-    {
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    loadOpenCv();
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
         super.onPause();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
-
+        if(mController != null)
+            mController.onPause();
     }
 
-    @Override
-    public void onResume()
-    {
-        super.onResume();
+    public void loadOpenCv(){
         if (!OpenCVLoader.initDebug()) {
             Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, mLoaderCallback);
@@ -142,144 +120,11 @@ public class ArActivity extends Activity implements CameraBridgeViewBase.CvCamer
             Log.d(TAG, "OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
-
-        Log.d("checkOnResume", "done");
     }
 
     public void onDestroy() {
         super.onDestroy();
-        mController.onDestroy();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
-
+        if(mController != null)
+            mController.onClose();
     }
-
-    public void onCameraViewStarted(int width, int height) {
-        startTime = System.currentTimeMillis();
-    }
-
-    public void onCameraViewStopped() {
-    }
-
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        Log.d("checkOnCameraFrame","entering");
-        Mat frame = inputFrame.rgba();
-        long currentTime = System.currentTimeMillis();
-        if((currentTime - startTime) >= 3000){
-            Log.d(TAG,"diff: "+String.valueOf(currentTime-startTime));
-            startTime = currentTime;
-
-            // TODO: check if image is blurry
-
-            mController.onFocus(inputFrame);
-        }
-
-
-        // Update renderer using the current frame
-        mController.map(frame,mTakePhoto); //TODO use AsyncTask?
-        mTakePhoto = false;
-
-        Log.d("checkViewport","surface h: " + mSurface.getHeight() + " w: " + mSurface.getWidth());
-        Log.d("checkViewport","renderer h: " + mRenderer.getViewportHeight()+ " w: " + mRenderer.getViewportWidth());
-        Log.d("checkViewport","camera h: " + mOpenCvCameraView.getHeight()+ " w: " + mOpenCvCameraView.getWidth());
-
-        return frame;
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        boolean ret = super.onTouchEvent(event);
-        Log.d("touch", "touched in Opencv");
-        return ret;
-    }
-
-
-    @Override
-    public void showMessage(String message) {
-
-    }
-
-    @Override
-    public void setOrientation(double roll, double yaw, double pitch) {
-        mRenderer.setOrientation(roll,yaw,pitch);
-    }
-
-    @Override
-    public void setOrientationRoll(double roll) {
-        mRenderer.setOrientationRoll(roll);
-    }
-
-    @Override
-    public void setOrientationYaw(double yaw) {
-        mRenderer.setOrientationYaw(yaw);
-    }
-
-    @Override
-    public void setOrientationPitch(double pitch) {
-        mRenderer.setOrientationPitch(pitch);
-    }
-
-    @Override
-    public void setTranslation(double x, double y, double z) {
-        mRenderer.setTranslation(x,y,z);
-    }
-
-    @Override
-    public void setTranslationX(double x) {
-        mRenderer.setTranslationX(x);
-    }
-
-    @Override
-    public void setTranslationY(double y) {
-        mRenderer.setTranslationY(y);
-    }
-
-    @Override
-    public void setTranslationZ(double z) {
-        mRenderer.setTranslationZ(z);
-    }
-
-    @Override
-    public void setScaleTransformation(double x, double y, double z) {
-        mRenderer.setScaleTransformation(x,y,z);
-    }
-
-    @Override
-    public void setScaleTransformationX(double x) {
-        mRenderer.setScaleTransformationX(x);
-    }
-
-    @Override
-    public void setScaleTransformationY(double y) {
-        mRenderer.setScaleTransformationY(y);
-    }
-
-    @Override
-    public void setScaleTransformationZ(double z) {
-        mRenderer.setScaleTransformationZ(z);
-    }
-
-    @Override
-    public void setCameraMatrix(double[] cameraMatrix) {
-        int width = (int)cameraMatrix[0];
-        int height = (int)cameraMatrix[1];
-        double vertical = cameraMatrix[2];
-        double horizontal = cameraMatrix[3];
-        double aspectRatio = cameraMatrix[4];
-
-        if(mRenderer != null){
-            mRenderer.setCameraValues(width,height,vertical,horizontal,aspectRatio);
-        }
-    }
-
-    @Override
-    public void setProjectionMatrix(double[] projectionMatrix) {
-
-    }
-
-    @Override
-    public void setTrigger(boolean isTakePhoto) {
-        mRenderer.setTrigger(isTakePhoto);
-    }
-
 }

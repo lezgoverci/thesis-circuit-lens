@@ -17,14 +17,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         xmlns:opencv="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/surfaceView"
+        android:id="@+id/surface_view"
         opencv:camera_id="-1"
         android:layout_gravity="left|center_vertical" />
 
     <org.rajawali3d.surface.RajawaliSurfaceView
         android:id="@+id/rajawali_surface"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         surfaceview:frameRate="60.0"
         surfaceview:renderMode="RENDER_WHEN_DIRTY"/>
+
+    <TextView
+        android:id="@+id/time_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMediumInverse"
+        android:text="t=1s"
+        android:layout_gravity="left|bottom"
+        android:layout_margin="10dp" />
+
+    <TextView
+        android:id="@+id/info_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMediumInverse"
+        android:text=""
+        android:layout_gravity="right|bottom"
+        android:layout_margin="10dp" />
 </FrameLayout>

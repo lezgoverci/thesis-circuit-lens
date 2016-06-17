@@ -10,10 +10,4 @@
         android:singleLine="true"
         android:title="@string/pref_title_server" />
 
-    <CheckBoxPreference
-        android:capitalize="words"
-        android:defaultValue="true"
-        android:key="rotate"
-        android:title="Debug rotate" />
-
 </PreferenceScreen>

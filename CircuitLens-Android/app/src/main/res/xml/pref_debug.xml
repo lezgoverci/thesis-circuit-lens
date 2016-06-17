@@ -1,0 +1,13 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="test_circuit"
+        android:title="@string/pref_title_debug_test" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="rotate"
+        android:title="@string/pref_title_debug_rotate" />
+
+</PreferenceScreen>

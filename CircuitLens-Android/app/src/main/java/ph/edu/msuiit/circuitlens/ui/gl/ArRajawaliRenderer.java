@@ -27,7 +27,8 @@ public class ArRajawaliRenderer extends RajawaliRenderer implements ArRenderer{
         if(mListener != null) {
             mListener.onInitScene();
         }
-        getCurrentScene().addChild(circuit3D);
+        if(circuit3D != null)
+            getCurrentScene().addChild(circuit3D);
         initialized = true;
     }
 

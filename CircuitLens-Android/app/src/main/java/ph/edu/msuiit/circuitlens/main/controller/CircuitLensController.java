@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Mat;
+import org.rajawali3d.Object3D;
 import org.rajawali3d.cameras.Camera;
 import org.rajawali3d.math.vector.Vector3;
 
@@ -128,15 +129,27 @@ public class CircuitLensController implements CameraBridgeViewBase.CvCameraViewL
     @Override
     public void onRender(long elapsedTime, double deltaTime) {
         if(mModel.updateCircuitCanvas3D()){
-            mView.setBottomLeftText("t="+mModel.getTimeText());
-            mView.setBottomRightText(mModel.getHintText());
+            mView.setUpperLeftText("t=" + mModel.getTimeText());
+            mView.setBottomLeftText(mModel.getHintText());
+        }
+        if(mModel.rotateCircuit()){
+            Object3D circuit3D = mModel.getCircuitCanvas();
+            if(circuit3D != null) {
+                circuit3D.rotate(Vector3.Axis.X, 1);
+                circuit3D.rotate(Vector3.Axis.Y, 0.5);
+                circuit3D.rotate(Vector3.Axis.Z, 0.25);
+            }
         }
     }
 
     @Override
     public void onInitScene() {
-        mModel.simulateTestCircuit();
-        mView.showCircuit(mModel.getCircuitCanvas());
+        if(mModel.useTestCircuit()) {
+            mModel.simulateTestCircuit();
+            mView.showCircuit(mModel.getCircuitCanvas());
+        }
+    }
+
     public void onSettingsButtonClick() {
         mView.openSettingsScreen();
     }

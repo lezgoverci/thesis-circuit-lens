@@ -1,27 +1,30 @@
 package ph.edu.msuiit.circuitlens.ui;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
-import ph.edu.msuiit.circuitlens.main.controller.CircuitLensController;
 import ph.edu.msuiit.circuitlens.R;
+import ph.edu.msuiit.circuitlens.main.controller.CircuitLensController;
 import ph.edu.msuiit.circuitlens.main.model.CircuitLensModel;
 import ph.edu.msuiit.circuitlens.main.view.CircuitLensView;
 
 
-public class ArActivity extends Activity{
+public class ArActivity extends AppCompatActivity {
     private static final String TAG = "CircuitLens::ArActivity";
     private static final int PERMISSIONS_REQUEST_ACCESS_CAMERA = 1;
     CircuitLensModel mModel;
@@ -78,9 +81,12 @@ public class ArActivity extends Activity{
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String serverUri = preferences.getString("server_uri", "ws://127.0.0.1:8080/ws");
         boolean rotate = preferences.getBoolean("rotate", false);
+        boolean useTestCircuit = preferences.getBoolean("test_circuit", false);
 
         mModel = new CircuitLensModel();
         mModel.setServerUri(serverUri);
+        mModel.setRotate(rotate);
+        mModel.setUseTestCircuit(useTestCircuit);
         mView = new CircuitLensView(this);
         mController = new CircuitLensController(mModel, mView);
     }

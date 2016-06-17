@@ -5,8 +5,12 @@
     <!-- Strings related to Settings -->
 
     <string name="pref_header_general">General</string>
+    <string name="pref_header_debug">Debug</string>
 
     <string name="pref_title_server">Server URI</string>
     <string name="pref_default_server">ws://127.0.0.1:8080/ws</string>
+
+    <string name="pref_title_debug_test">Use test circuit</string>
+    <string name="pref_title_debug_rotate">Rotate circuit</string>
 
 </resources>

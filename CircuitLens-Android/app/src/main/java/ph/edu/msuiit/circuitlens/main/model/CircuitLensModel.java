@@ -18,6 +18,9 @@ public class CircuitLensModel {
     String mServerUri;
     RemoteNetlistGenerator mNetlistGenerator;
     CircuitSimulator mSimulator;
+    boolean mStopped;
+    private boolean rotate;
+    private boolean useTestCircuit;
 
     public CircuitLensModel() {
         mSimulator = new CircuitSimulator();
@@ -72,7 +75,10 @@ public class CircuitLensModel {
     }
 
     public boolean updateCircuitCanvas3D() {
-        return mSimulator.updateCircuit();
+        if(mSimulator.cv != null) {
+            return mSimulator.updateCircuit();
+        }
+        return false;
     }
 
     public String getTimeText() {
@@ -85,5 +91,30 @@ public class CircuitLensModel {
 
     public void onTapCircuit(int x, int y) {
         mSimulator.onTap(x,y);
+    }
+
+    public void setStopped(boolean stopped) {
+        mStopped = stopped;
+    }
+
+    public boolean getStopped(){
+        return mStopped;
+    }
+
+
+    public void setRotate(boolean rotate) {
+        this.rotate = rotate;
+    }
+
+    public boolean rotateCircuit() {
+        return rotate;
+    }
+
+    public void setUseTestCircuit(boolean useTestCircuit) {
+        this.useTestCircuit = useTestCircuit;
+    }
+
+    public boolean useTestCircuit() {
+        return useTestCircuit;
     }
 }

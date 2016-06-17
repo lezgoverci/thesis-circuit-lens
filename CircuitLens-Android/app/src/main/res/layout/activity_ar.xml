@@ -1,48 +1,40 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:surfaceview="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
-    tools:context=".ui.ArActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true"
+    tools:context="ph.edu.msuiit.circuitlens.ui.ArActivity">
 
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
+    <include layout="@layout/content_ar" />
 
-    <!-- This FrameLayout insets its children based on system windows using
-         android:fitsSystemWindows. -->
-
-    <org.opencv.android.JavaCameraView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        xmlns:opencv="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/surface_view"
-        opencv:camera_id="-1"
-        android:layout_gravity="left|center_vertical" />
-
-    <org.rajawali3d.surface.RajawaliSurfaceView
-        android:id="@+id/rajawali_surface"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        surfaceview:frameRate="60.0"
-        surfaceview:renderMode="RENDER_WHEN_DIRTY"/>
-
-    <TextView
-        android:id="@+id/time_text_view"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/settingsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMediumInverse"
-        android:text="t=1s"
-        android:layout_gravity="left|bottom"
-        android:layout_margin="10dp" />
+        android:layout_gravity="top|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@color/colorPrimaryText"
+        android:src="@drawable/ic_action_settings" />
 
-    <TextView
-        android:id="@+id/info_text_view"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/focusButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMediumInverse"
-        android:text=""
-        android:layout_gravity="right|bottom"
-        android:layout_margin="10dp" />
-</FrameLayout>
+        android:layout_gravity="center_vertical|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@color/colorPrimaryText"
+        android:src="@drawable/ic_action_focus" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/playButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@color/colorPrimaryText"
+        android:src="@drawable/ic_action_play" />
+
+
+</android.support.design.widget.CoordinatorLayout>

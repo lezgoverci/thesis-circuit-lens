@@ -137,5 +137,16 @@ public class CircuitLensController implements CameraBridgeViewBase.CvCameraViewL
     public void onInitScene() {
         mModel.simulateTestCircuit();
         mView.showCircuit(mModel.getCircuitCanvas());
+    public void onSettingsButtonClick() {
+        mView.openSettingsScreen();
+    }
+
+    public void onFocusButtonClick() {
+        long currentTime = System.currentTimeMillis();
+        startTime = currentTime + 3000;
+    }
+
+    public void onPlayButtonClick() {
+        mModel.setStopped(false);
     }
 }

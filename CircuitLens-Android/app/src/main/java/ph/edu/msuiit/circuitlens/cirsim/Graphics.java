@@ -133,11 +133,11 @@ public class Graphics {
         object3D.addChild(circle);
     }
 
-    public static Bitmap textAsBitmap(String text, int textsize, int color) {
+    public static Bitmap textAsBitmap(String text, int textSize, int color) {
         Rect bounds = new Rect();
         Paint paint = new Paint();
-        paint.setTextSize(textsize);
-        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+        paint.setTextSize(textSize);
+        paint.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
         paint.setAntiAlias(true);
         paint.getTextBounds(text,0,text.length(),bounds);
         paint.setColor(color);

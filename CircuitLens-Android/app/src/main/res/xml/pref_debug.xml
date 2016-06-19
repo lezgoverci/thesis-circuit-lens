@@ -10,4 +10,9 @@
         android:key="rotate"
         android:title="@string/pref_title_debug_rotate" />
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="fps_enabled"
+        android:title="@string/pref_title_debug_fps" />
+
 </PreferenceScreen>

@@ -146,7 +146,7 @@ public class ResistorElm extends CircuitElm {
         }
 
         if (sim.isShowingValues()) {
-            String s = getShortUnitText(resistance, "");
+            String s = getShortUnitText(resistance, sim.ohmString);
             drawValues(resistor3D, s, hs);
         }
         drawPosts(resistor3D);

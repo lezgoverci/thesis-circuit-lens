@@ -52,6 +52,8 @@ public class ArActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        fetchSettings();
+
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -78,19 +80,32 @@ public class ArActivity extends AppCompatActivity {
     }
 
     public void initialize(){
+        mModel = new CircuitLensModel();
+        mView = new CircuitLensView(this);
+        mController = new CircuitLensController(mModel, mView);
+    }
+
+    private void fetchSettings(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String serverUri = preferences.getString("server_uri", "ws://127.0.0.1:8080/ws");
         boolean rotate = preferences.getBoolean("rotate", false);
         boolean useTestCircuit = preferences.getBoolean("test_circuit", true);
         boolean fpsMeterEnabled = preferences.getBoolean("fps_enabled", false);
+        boolean conventionalCurrent = preferences.getBoolean("conventional_current", true);
+        boolean showVoltageColor = preferences.getBoolean("show_voltage_color", true);
+        boolean showCurrent = preferences.getBoolean("show_current", true);
+        boolean showPowerDissipation = preferences.getBoolean("show_power_dissipation", false);
+        boolean europeanResistor = preferences.getBoolean("european_resistor", false);
 
-        mModel = new CircuitLensModel();
         mModel.setServerUri(serverUri);
         mModel.setRotate(rotate);
         mModel.setUseTestCircuit(useTestCircuit);
         mModel.setFpsMeterEnabled(fpsMeterEnabled);
-        mView = new CircuitLensView(this);
-        mController = new CircuitLensController(mModel, mView);
+        mModel.setConventionalCurrent(conventionalCurrent);
+        mModel.setShowVoltageColor(showVoltageColor);
+        mModel.setShowCurrent(showCurrent);
+        mModel.setShowPowerDissipation(showPowerDissipation);
+        mModel.setEuropeanResistor(europeanResistor);
     }
 
     @Override

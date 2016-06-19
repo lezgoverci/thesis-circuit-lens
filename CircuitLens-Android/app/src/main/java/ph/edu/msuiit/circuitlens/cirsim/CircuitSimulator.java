@@ -75,6 +75,7 @@ public class CircuitSimulator {
     private boolean showVoltage;
     private boolean showValues;
     private boolean euroResistor;
+    private boolean conventionalCurrent;
     public Circuit3D cv;
     ArrayList<CircuitNode> nodeList;
     CircuitElm voltageSources[];
@@ -95,6 +96,23 @@ public class CircuitSimulator {
         //dumpTypes[(int) 'B'] = Scope.class;
         cv = new Circuit3D(this);
         euroResistor = false;
+        conventionalCurrent = true;
+    }
+
+    public boolean isEuroResistor() {
+        return euroResistor;
+    }
+
+    public void setEuroResistor(boolean euroResistor) {
+        this.euroResistor = euroResistor;
+    }
+
+    public boolean isConventionalCurrent() {
+        return conventionalCurrent;
+    }
+
+    public void setConventionalCurrent(boolean conventionalCurrent) {
+        this.conventionalCurrent = conventionalCurrent;
     }
 
     public boolean whiteBackground() {
@@ -896,6 +914,22 @@ public class CircuitSimulator {
 
     public boolean isShowingVoltage() {
         return showVoltage;
+    }
+
+    public void setShowPowerDissipation(boolean showPowerDissipation) {
+        this.showPowerDissipation = showPowerDissipation;
+    }
+
+    public void setShowCurrent(boolean showCurrent) {
+        this.showCurrent = showCurrent;
+    }
+
+    public void setShowVoltage(boolean showVoltage) {
+        this.showVoltage = showVoltage;
+    }
+
+    public void setShowValues(boolean showValues) {
+        this.showValues = showValues;
     }
 
     public boolean isShowingValues() {

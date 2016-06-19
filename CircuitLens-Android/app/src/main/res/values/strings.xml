@@ -13,4 +13,10 @@
     <string name="pref_title_debug_test">Use test circuit</string>
     <string name="pref_title_debug_rotate">Rotate circuit</string>
     <string name="pref_title_debug_fps">Show OpenCV CameraView FPS</string>
+
+    <string name="pref_title_conventional_current">Use conventional current</string>
+    <string name="pref_title_show_voltage_color">Show voltage color</string>
+    <string name="pref_title_show_current">Show current flow</string>
+    <string name="pref_title_show_power_dissipation">Show power dissipation</string>
+    <string name="pref_title_european_resistor">Use european resistor symbol</string>
 </resources>

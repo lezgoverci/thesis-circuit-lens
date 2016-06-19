@@ -49,7 +49,7 @@ public class CircuitLensController implements CameraBridgeViewBase.CvCameraViewL
      *  Controller is created.
      */
     public void onCreate() {
-        mModel.connectToServer();
+
     }
 
     /*
@@ -80,9 +80,10 @@ public class CircuitLensController implements CameraBridgeViewBase.CvCameraViewL
 
     public void onResume() {
         if(mModel.fpsMeterEnabled()) {
-            mView.enableFpsMeter();
+            mView.enableFpsMeter(true);
         }
         mView.enableCameraView();
+        mModel.connectToServer();
     }
 
     /*
@@ -156,7 +157,7 @@ public class CircuitLensController implements CameraBridgeViewBase.CvCameraViewL
     }
 
     public void onSettingsButtonClick() {
-        mView.openSettingsScreen();
+        mView.showPopUpMenu();
     }
 
     public void onFocusButtonClick() {

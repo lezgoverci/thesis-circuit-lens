@@ -142,7 +142,9 @@ public class ResistorElm extends CircuitElm {
                 drawThickLine(resistor3D, ps2, ps4, colorMaterials[i]);
             }
             interpPoint2(lead1, lead2, ps1, ps2, 1, hs);
-            drawThickLine(resistor3D, ps1, ps2, colorMaterials[0]);
+            i--;
+            if(i>=0)
+                drawThickLine(resistor3D, ps1, ps2, colorMaterials[i]);
         }
 
         if (sim.isShowingValues()) {

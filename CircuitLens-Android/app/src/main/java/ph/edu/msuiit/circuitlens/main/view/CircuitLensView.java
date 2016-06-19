@@ -1,11 +1,14 @@
 package ph.edu.msuiit.circuitlens.main.view;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ListPopupWindow;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
@@ -39,7 +42,7 @@ public class CircuitLensView {
     private RajawaliSurfaceView mSurface;
     private ArRajawaliRenderer mRenderer;
     private CameraBridgeViewBase mOpenCvCameraView;
-    private FloatingActionButton settingsButton;
+    private FloatingActionButton optionsButton;
     private FloatingActionButton focusButton;
     private FloatingActionButton playButton;
 
@@ -66,11 +69,11 @@ public class CircuitLensView {
         mSurface.setOnTouchListener(mTouchListener);
         mSurface.setTransparent(true);
 
-        settingsButton = (FloatingActionButton) mActivity.findViewById(R.id.settingsButton);
+        optionsButton = (FloatingActionButton) mActivity.findViewById(R.id.settingsButton);
         focusButton = (FloatingActionButton) mActivity.findViewById(R.id.focusButton);
         playButton = (FloatingActionButton) mActivity.findViewById(R.id.playButton);
 
-        settingsButton.setOnClickListener(onClickListener);
+        optionsButton.setOnClickListener(onClickListener);
         focusButton.setOnClickListener(onClickListener);
         playButton.setOnClickListener(onClickListener);
 
@@ -145,8 +148,34 @@ public class CircuitLensView {
         });
     }
 
-    public void enableFpsMeter(){
-        mOpenCvCameraView.enableFpsMeter();
+    public void enableFpsMeter(boolean enabled){
+        if(enabled)
+            mOpenCvCameraView.enableFpsMeter();
+        else mOpenCvCameraView.disableFpsMeter();
+    }
+
+    public void showPopUpMenu(){
+        PopupMenu popupMenu = new PopupMenu(mActivity, optionsButton);
+        popupMenu.getMenu().add("Open");
+        popupMenu.getMenu().add("Save circuit");
+        popupMenu.getMenu().add("Settings");
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                if(item.getTitle() == "Settings"){
+                    openSettingsScreen();
+                }
+                return true;
+            }
+        });
+        popupMenu.show();
+        if (popupMenu.getDragToOpenListener() instanceof ListPopupWindow.ForwardingListener)
+        {
+            ListPopupWindow.ForwardingListener listener = (ListPopupWindow.ForwardingListener) popupMenu.getDragToOpenListener();
+            listener.getPopup().setVerticalOffset(-optionsButton.getHeight());
+            listener.getPopup().setHorizontalOffset(-listener.getPopup().getWidth()-optionsButton.getWidth()/2);
+            listener.getPopup().show();
+        }
     }
 
     // Set orientation

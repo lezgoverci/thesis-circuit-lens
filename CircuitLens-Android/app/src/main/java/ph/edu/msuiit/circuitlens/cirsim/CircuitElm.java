@@ -447,14 +447,21 @@ public abstract class CircuitElm {
 
     public void doDots(Object3D object3D) {
         updateDotCount();
-        drawDots(object3D, point1, point2, curcount);
+            drawDots(object3D, point1, point2, curcount);
     }
 
     Object3D dots;
 
     public void drawDots(Object3D object3D, Point pa, Point pb, double pos) {
         if (sim.isStopped() || pos == 0 || !sim.isShowingCurrent()) {
+            if(dots != null) {
+                object3D.removeChild(dots);
+                dots = null;
+            }
             return;
+        }
+        if (!sim.isConventionalCurrent()){
+            pos = -pos;
         }
         int dx = pb.x - pa.x;
         int dy = pb.y - pa.y;
@@ -466,8 +473,8 @@ public abstract class CircuitElm {
         }
         int count = 0;
         for (double di = pos; di < dn; di += ds) {
-            int x0 = (int) (pa.x + di * dx / dn);
-            int y0 = (int) (pa.y + di * dy / dn);
+            int x0 = (int) (pa.x + di * dx / dn );
+            int y0 = (int) (pa.y + di * dy / dn );
 
             if (count == 0) {
                 if (dots == null) {
@@ -516,8 +523,10 @@ public abstract class CircuitElm {
         }
 
         if (!sim.isShowingVoltage()) {
-            if (!sim.isShowingPowerDissipation()) // && !conductanceCheckItem.getState())
+            if (sim.isShowingPowerDissipation()) // && !conductanceCheckItem.getState())
             {
+                return getPowerColor(getPower());
+            } else{
                 return whiteColor;
             }
         }

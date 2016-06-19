@@ -18,11 +18,15 @@ public class CircuitLensModel {
     String mServerUri;
     RemoteNetlistGenerator mNetlistGenerator;
     CircuitSimulator mSimulator;
-    boolean mStopped;
-    private boolean rotate;
-    private boolean useTestCircuit;
-
-    private boolean mFpsMeterEnabled;
+    boolean stopped;
+    boolean rotate;
+    boolean useTestCircuit;
+    boolean fpsMeter;
+    boolean conventionalCurrent;
+    boolean showVoltageColor;
+    boolean showCurrent;
+    boolean showPowerDissipation;
+    boolean europeanResistor;
 
     public CircuitLensModel() {
         mSimulator = new CircuitSimulator();
@@ -96,12 +100,12 @@ public class CircuitLensModel {
     }
 
     public void setStoppedSimulator(boolean stopped) {
-        mStopped = stopped;
+        this.stopped = stopped;
         mSimulator.setStopped(stopped);
     }
 
     public boolean getStoppedSimulator(){
-        return mStopped;
+        return stopped;
     }
 
 
@@ -122,10 +126,55 @@ public class CircuitLensModel {
     }
 
     public boolean fpsMeterEnabled() {
-        return mFpsMeterEnabled;
+        return fpsMeter;
     }
 
     public void setFpsMeterEnabled(boolean fpsMeterEnabled) {
-        mFpsMeterEnabled = fpsMeterEnabled;
+        fpsMeter = fpsMeterEnabled;
+    }
+
+    public boolean isConventionalCurrent() {
+        return conventionalCurrent;
+    }
+
+    public void setConventionalCurrent(boolean conventionalCurrent) {
+        mSimulator.setConventionalCurrent(conventionalCurrent);
+        this.conventionalCurrent = conventionalCurrent;
+    }
+
+    public boolean isShowVoltageColor() {
+        return showVoltageColor;
+    }
+
+    public void setShowVoltageColor(boolean showVoltageColor) {
+        mSimulator.setShowVoltage(showVoltageColor);
+        this.showVoltageColor = showVoltageColor;
+    }
+
+    public boolean isShowCurrent() {
+        return showCurrent;
+    }
+
+    public void setShowCurrent(boolean showCurrent) {
+        mSimulator.setShowCurrent(showCurrent);
+        this.showCurrent = showCurrent;
+    }
+
+    public boolean isShowPowerDissipation() {
+        return showPowerDissipation;
+    }
+
+    public void setShowPowerDissipation(boolean showPowerDissipation) {
+        mSimulator.setShowPowerDissipation(showPowerDissipation);
+        this.showPowerDissipation = showPowerDissipation;
+    }
+
+    public boolean isEuropeanResistor() {
+        return europeanResistor;
+    }
+
+    public void setEuropeanResistor(boolean europeanResistor) {
+        mSimulator.setEuroResistor(europeanResistor);
+        this.europeanResistor = europeanResistor;
     }
 }

@@ -10,4 +10,28 @@
         android:singleLine="true"
         android:title="@string/pref_title_server" />
 
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="conventional_current"
+        android:title="@string/pref_title_conventional_current" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="show_voltage_color"
+        android:title="@string/pref_title_show_voltage_color" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="show_current"
+        android:title="@string/pref_title_show_current" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="european_resistor"
+        android:title="@string/pref_title_european_resistor" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="show_power_dissipation"
+        android:title="@string/pref_title_show_power_dissipation" />
 </PreferenceScreen>

@@ -1,7 +1,9 @@
 package ph.edu.msuiit.circuitlens.main.view;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -129,9 +131,18 @@ public class CircuitLensView {
         return mRenderer.getViewportHeight();
     }
 
-    public void openSettingsScreen(){
+    public void openSettingsScreen() {
         Intent intent = new Intent(mActivity, SettingsActivity.class);
         mActivity.startActivity(intent);
+    }
+
+    public void setPlayButtonIcon(final int drawableId) {
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                playButton.setImageDrawable(ContextCompat.getDrawable(mActivity, drawableId));
+            }
+        });
     }
 
     // Set orientation
@@ -171,7 +182,7 @@ public class CircuitLensView {
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.settingsButton:
                     mController.onSettingsButtonClick();
                     break;

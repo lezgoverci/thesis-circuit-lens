@@ -15,10 +15,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
         android:layout_margin="@dimen/fab_margin"
+        app:elevation="1dp"
         app:backgroundTint="@color/colorFloatingActionButton"
         app:borderWidth="0dp"
+        app:fabSize="mini"
         app:rippleColor="@color/colorAccent"
-        android:src="@drawable/ic_action_settings" />
+        android:src="@drawable/ic_action_more" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/focusButton"
@@ -26,10 +28,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|end"
         android:layout_margin="@dimen/fab_margin"
+        app:elevation="1dp"
         app:backgroundTint="@color/colorFloatingActionButton"
         app:rippleColor="@color/colorAccent"
-        app:borderWidth="0dp"
-        android:src="@drawable/ic_action_focus" />
+        android:src="@mipmap/ic_launcher" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/playButton"
@@ -37,6 +39,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        app:fabSize="mini"
+        app:elevation="1dp"
         app:backgroundTint="@color/colorFloatingActionButton"
         app:rippleColor="@color/colorAccent"
         app:borderWidth="0dp"

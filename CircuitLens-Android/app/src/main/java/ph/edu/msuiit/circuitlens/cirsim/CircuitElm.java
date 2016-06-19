@@ -29,7 +29,7 @@ public abstract class CircuitElm {
     protected Object3D circuitElm3D;
     private static final int colorScaleCount = 32;
     private static final int colorScale[] = new int[colorScaleCount];
-    public static int whiteColor = Color.WHITE, selectColor = Color.CYAN;
+    public static int whiteColor = Color.WHITE, selectColor = Color.parseColor("#18FFFF"), yellowColor = Color.parseColor("#FFCC00");
 
     protected int x, y, x2, y2, flags, nodes[], voltSource;
     protected int dx, dy, dsign;
@@ -307,7 +307,7 @@ public abstract class CircuitElm {
     }
 
     public void setBbox(Point p1, Point p2, double w) {
-        setBbox(p1.x, p1.y, p2.x, p2.y, w);
+        setBbox(p1.x, p1.y, p2.x, p2.y, w*1.5);
     }
 
     public void setBbox(int x1, int y1, int x2, int y2, double w) {
@@ -321,7 +321,7 @@ public abstract class CircuitElm {
             y1 = y2;
             y2 = q;
         }
-        int iw = (int) Math.floor(w);
+        int iw = (int) Math.floor(w*1.5);
         boundingBox.set(x1 - iw, y1 - iw, x2 + iw, y2 + iw);
     }
 
@@ -472,7 +472,7 @@ public abstract class CircuitElm {
             if (count == 0) {
                 if (dots == null) {
                     Material material = new Material();
-                    material.setColor(Color.YELLOW);
+                    material.setColor(yellowColor);
                     dots = new Cube(3);
                     dots.setMaterial(material);
                     dots.setRenderChildrenAsBatch(true);

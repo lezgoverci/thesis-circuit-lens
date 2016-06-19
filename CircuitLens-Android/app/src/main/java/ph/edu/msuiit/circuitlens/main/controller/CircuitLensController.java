@@ -8,6 +8,7 @@ import org.rajawali3d.Object3D;
 import org.rajawali3d.cameras.Camera;
 import org.rajawali3d.math.vector.Vector3;
 
+import ph.edu.msuiit.circuitlens.R;
 import ph.edu.msuiit.circuitlens.main.model.CircuitLensModel;
 import ph.edu.msuiit.circuitlens.main.view.CircuitLensView;
 import ph.edu.msuiit.circuitlens.netlist.RemoteNetlistGenerator.RpCallback;
@@ -78,6 +79,9 @@ public class CircuitLensController implements CameraBridgeViewBase.CvCameraViewL
     }
 
     public void onResume() {
+        if(mModel.fpsMeterEnabled()) {
+            mView.enableFpsMeter();
+        }
         mView.enableCameraView();
     }
 
@@ -146,6 +150,7 @@ public class CircuitLensController implements CameraBridgeViewBase.CvCameraViewL
     public void onInitScene() {
         if(mModel.useTestCircuit()) {
             mModel.simulateTestCircuit();
+            onChangeSimulatorState();
             mView.showCircuit(mModel.getCircuitCanvas());
         }
     }
@@ -160,6 +165,16 @@ public class CircuitLensController implements CameraBridgeViewBase.CvCameraViewL
     }
 
     public void onPlayButtonClick() {
-        mModel.setStopped(false);
+        boolean stopped = mModel.getStoppedSimulator();
+        mModel.setStoppedSimulator(!stopped);
+        onChangeSimulatorState();
+    }
+
+    public void onChangeSimulatorState(){
+        if(mModel.getStoppedSimulator()){
+            mView.setPlayButtonIcon(R.drawable.ic_action_play);
+        } else{
+            mView.setPlayButtonIcon(R.drawable.ic_action_stop);
+        }
     }
 }

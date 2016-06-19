@@ -81,12 +81,14 @@ public class ArActivity extends AppCompatActivity {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String serverUri = preferences.getString("server_uri", "ws://127.0.0.1:8080/ws");
         boolean rotate = preferences.getBoolean("rotate", false);
-        boolean useTestCircuit = preferences.getBoolean("test_circuit", false);
+        boolean useTestCircuit = preferences.getBoolean("test_circuit", true);
+        boolean fpsMeterEnabled = preferences.getBoolean("fps_enabled", false);
 
         mModel = new CircuitLensModel();
         mModel.setServerUri(serverUri);
         mModel.setRotate(rotate);
         mModel.setUseTestCircuit(useTestCircuit);
+        mModel.setFpsMeterEnabled(fpsMeterEnabled);
         mView = new CircuitLensView(this);
         mController = new CircuitLensController(mModel, mView);
     }

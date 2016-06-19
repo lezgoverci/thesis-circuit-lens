@@ -145,6 +145,10 @@ public class CircuitLensView {
         });
     }
 
+    public void enableFpsMeter(){
+        mOpenCvCameraView.enableFpsMeter();
+    }
+
     // Set orientation
     //void setOrientation(double roll, double yaw, double pitch);
     //void setOrientationRoll(double roll);

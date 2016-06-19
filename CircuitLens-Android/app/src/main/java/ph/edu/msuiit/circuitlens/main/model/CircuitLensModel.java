@@ -22,6 +22,8 @@ public class CircuitLensModel {
     private boolean rotate;
     private boolean useTestCircuit;
 
+    private boolean mFpsMeterEnabled;
+
     public CircuitLensModel() {
         mSimulator = new CircuitSimulator();
         mSimulator.init();
@@ -93,11 +95,12 @@ public class CircuitLensModel {
         mSimulator.onTap(x,y);
     }
 
-    public void setStopped(boolean stopped) {
+    public void setStoppedSimulator(boolean stopped) {
         mStopped = stopped;
+        mSimulator.setStopped(stopped);
     }
 
-    public boolean getStopped(){
+    public boolean getStoppedSimulator(){
         return mStopped;
     }
 
@@ -116,5 +119,13 @@ public class CircuitLensModel {
 
     public boolean useTestCircuit() {
         return useTestCircuit;
+    }
+
+    public boolean fpsMeterEnabled() {
+        return mFpsMeterEnabled;
+    }
+
+    public void setFpsMeterEnabled(boolean fpsMeterEnabled) {
+        mFpsMeterEnabled = fpsMeterEnabled;
     }
 }

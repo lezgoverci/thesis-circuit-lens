@@ -18,19 +18,19 @@ public class SiUnits {
     }
 
     public static String getUnitText(double magnitude, String unit, NumberFormat showFormat){
-        SiUnit[] units = SiUnit.values();
-        for(int i=0;i<units.length;i++){
-            double value = units[i].value;
-            String symbol = units[i].symbol;
+        Prefix[] prefixes = Prefix.values();
+        for(int i=0;i<prefixes.length;i++){
+            double value = prefixes[i].value;
+            String symbol = prefixes[i].symbol;
             if(magnitude < 1e-14) return "0" + unit;
-            if(magnitude < (value * 1000) || (i==units.length-1))
+            if(magnitude < (value * 1000) || (i==prefixes.length-1))
                 return showFormat.format(magnitude / value) + symbol + unit;
         }
         return showFormat.format(magnitude) + unit;
     }
 
     public static String getShortUnitText(double magnitude, String unit) {
-        SiUnit[] units = SiUnit.values();
+        Prefix[] units = Prefix.values();
         for(int i=0;i<units.length;i++){
             double value = units[i].value;
             String symbol = units[i].symbol;
@@ -57,13 +57,13 @@ public class SiUnits {
         return getUnitText(v, "V", numberFormat);
     }
 
-    enum SiUnit{
+    enum Prefix {
         PICO  (1e-12,"p"),
         NANO  (1e-9,"n"),
         MICRO (1e-6,"\u00B5"),
         MILLI (1e-3,"m"),
         NONE  (1,""),
-        KILO  (1e3,"K"),
+        KILO  (1e3,"k"),
         MEGA  (1e6,"M"),
         GIGA  (1e9, "G"),
         TERA  (1e12, "T");
@@ -71,7 +71,7 @@ public class SiUnits {
         private final double value;
         private final String symbol;
 
-        SiUnit(double value, String symbol){
+        Prefix(double value, String symbol){
             this.value = value;
             this.symbol = symbol;
         }

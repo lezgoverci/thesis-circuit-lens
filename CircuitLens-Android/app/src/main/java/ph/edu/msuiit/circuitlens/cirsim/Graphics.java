@@ -110,7 +110,7 @@ public class Graphics {
         Stack<Vector3> points = new Stack<>();
         points.add(new Vector3(x,y,0));
         points.add(new Vector3(x2,y2,0));
-        Line3D thickLine = new Line3D(points,6);
+        Line3D thickLine = new Line3D(points,5);
         thickLine.setMaterial(material);
 
         object3D.addChild(thickLine);

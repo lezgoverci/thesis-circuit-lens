@@ -39,6 +39,10 @@ public class OpenGlUtils {
         position.multiply(factor);
         position.add(camera.getPosition());
 
+        // Creating a plane requires at least 3 points
+        if(object3D.getNumChildren() < 2)
+            return;
+
         // get 3 co-planar points
         Vector3 child1 = object3D.getWorldPosition();
         Vector3 child2 = object3D.getChildAt(0).getWorldPosition();

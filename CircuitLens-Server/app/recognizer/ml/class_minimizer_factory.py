@@ -11,6 +11,6 @@ class MinimizerFactory(sif.SLMItemFactory):
         if 'batch_gradient_descent' == minimizer:
             return bgd.BatchGradientDescent(args)
         elif 'normal_equation' == minimizer:
-            return ne.NormalEquation()
+            return ne.NormalEquation(args)
         else:
             raise ValueError('Invalid minimizer.')

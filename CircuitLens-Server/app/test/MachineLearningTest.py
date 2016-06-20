@@ -17,17 +17,23 @@ class MachineLearningTest(unittest.TestCase):
         self.__features = np.array([[1, x] for x in onedFeatures], dtype=np.float32)
         self.__responses = np.array([1400, 1600, 1700, 1875, 1100, 1550, 2350, 2450, 1425, 1700], dtype=np.float32)
         
-        # onedFeatures = [1, 2]
+        # onedFeatures = [1, 2, 3, 4, 5]
         # self.__features = np.array([[1, x] for x in onedFeatures], dtype=np.float32)
-        # self.__responses = np.array([1, 2], dtype=np.float32)
+        # self.__responses = np.array([1, 2, 3, 4, 5], dtype=np.float32)
+
+        # onedFeatures = [95, 85, 80, 70, 60]
+        # self.__features = np.array([[1, x] for x in onedFeatures], dtype=np.float32)
+        # self.__responses = np.array([85, 95, 70, 65, 70], dtype=np.float32)
     
     def test_linear_regression_using_batch_gradient_descent(self):
         args = {
             'type': ('regression', None),
-            'mathematical_model': ('linear', None),
+            'mathematical_model': ('linear', {
+                'thetas': np.array([30, 40], dtype=np.float32)
+            }),
             'minimizer': ('batch_gradient_descent', {
-                'learning_rate': 0.00001,
-                'iterations': 10
+                'learning_rate': 0.0001,
+                'iterations': 100000000
             })
         }
 

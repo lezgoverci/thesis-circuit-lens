@@ -59,9 +59,7 @@ class LinearMathematicalModel(mm.MathematicalModel):
     
     def getCostDerivative(self):
         self.__setupThetas()
-        # print "derivative multiplier: " + str(np.dot(self.__features, self.__thetas) - self.__responses)
-        print "dividend: " + str(np.dot(np.dot(self.__features, self.__thetas) - self.__responses, self.__features))
-        # print "features: " + str(self.__features)
+
         return np.dot(np.dot(self.__features, self.__thetas) - self.__responses, self.__features) / len(self.__responses)
 
     #-----------------------------------------

@@ -58,15 +58,8 @@ class BatchGradientDescent(m.Minimizer):
         counter = 1
         while True:
             oldThetas = self.__mathematicalModel.getThetas()
-            c = self.__mathematicalModel.getCostDerivative()
 
-            # print "cost derivative: " + str(c)
-            # print "subtractor: " + str(self.__alpha * c)
-
-            newThetas = oldThetas - (self.__alpha * c)
-
-            print "new thetas: " + str(newThetas)
-            # newThetas = oldThetas - (self.__alpha * self.__mathematicalModel.getCostDerivative())
+            newThetas = oldThetas - (self.__alpha * self.__mathematicalModel.getCostDerivative())
             self.__mathematicalModel.setThetas(newThetas)
 
             counter += 1

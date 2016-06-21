@@ -35,3 +35,6 @@ class SLMRegressionType(st.SLMType):
     
     def predict(self, feature):
         return self.__minimizer.getMathematicalModel().getHypothesis(feature)
+
+    def dump(self):
+        return {}

@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 
 class SLMType(object):
     __metaclass__ = ABCMeta
-    
+
     #-----------------------------------------
     # Setters
     #-----------------------------------------
@@ -25,4 +25,8 @@ class SLMType(object):
     
     @abstractmethod
     def predict(self, feature):
+        pass
+    
+    @abstractmethod
+    def dump(self):
         pass

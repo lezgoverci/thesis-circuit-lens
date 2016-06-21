@@ -36,10 +36,13 @@ class SLMMultivariateClassificationType(st.SLMType):
 
     def train(self, features, responses):
         mathematicalModel = self.__minimizer.getMathematicalModel()
+
+        maxResponse = responses.max()
         for response in responses:
             if self.__classes.get(response, None) is None:
                 currentResponses = responses.copy()
                 currentResponses[currentResponses != response] = 0
+                currentResponses[currentResponses > 0] = maxResponse
 
                 mathematicalModel.setFeatures(features).setResponses(currentResponses)
                 self.__minimizer.minimize()

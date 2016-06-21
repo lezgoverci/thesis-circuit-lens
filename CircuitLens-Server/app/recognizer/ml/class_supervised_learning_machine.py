@@ -108,7 +108,7 @@ class SupervisedLearningMachine:
     
     def write(self, filename):
         data = {
-            'mathematicalModel': self.__items['mathematical_model'].dump(),
+            'mathematical_model': self.__items['mathematical_model'].dump(),
             'minimizer': self.__items['minimizer'].dump(),
             'type': self.__items['type'].dump()
         }

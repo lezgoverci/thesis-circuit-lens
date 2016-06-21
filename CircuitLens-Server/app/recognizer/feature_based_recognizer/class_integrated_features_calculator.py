@@ -19,7 +19,7 @@ class IntegratedFeaturesCalculator:
         
         return self
     
-    def get(self, recalculate=False):
+    def get(self, recalculate=False, flatten=True):
         if self.__calculatedFeature is not None and not recalculate:
             return self.__calculatedFeature
             
@@ -51,6 +51,6 @@ class IntegratedFeaturesCalculator:
 
             calculatedFeature.append(feature.setArguments(featureArgs).getCalculatedFeature(recalculate))
         
-        self.__calculatedFeature = np.array(calculatedFeature)
+        self.__calculatedFeature = np.array(calculatedFeature.flatten() if flatten else calculatedFeature)
         
         return self.__calculatedFeature

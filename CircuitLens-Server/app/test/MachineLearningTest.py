@@ -25,38 +25,38 @@ class MachineLearningTest(unittest.TestCase):
         # self.__features = np.array([[1, x] for x in onedFeatures], dtype=np.float32)
         # self.__responses = np.array([85, 95, 70, 65, 70], dtype=np.float32)
     
-    # def test_linear_regression_using_batch_gradient_descent(self):
-    #     args = {
-    #         'type': ('regression', None),
-    #         'mathematical_model': ('linear', {
-    #             'thetas': np.array([30, 40], dtype=np.float32)
-    #         }),
-    #         'minimizer': ('batch_gradient_descent', {
-    #             'learning_rate': 0.01,
-    #             'iterations': 100000
-    #         })
-    #     }
+    def test_linear_regression_using_batch_gradient_descent(self):
+        args = {
+            'type': ('regression', None),
+            'mathematical_model': ('linear', {
+                'thetas': np.array([30, 40], dtype=np.float32)
+            }),
+            'minimizer': ('batch_gradient_descent', {
+                'learning_rate': 0.01,
+                'iterations': 100000
+            })
+        }
 
-    #     machine = mf.MachineFactory.create('sl_machine', args)
-    #     machine.train(self.__features, self.__responses)
+        machine = mf.MachineFactory.create('sl_machine', args)
+        machine.train(self.__features, self.__responses)
 
-    #     print machine.getThetas()
+        print machine.getThetas()
 
-    #     assert(True)
+        assert(True)
 
-    # def test_linear_regression_using_normal_equation(self):
-    #     args = {
-    #         'type': ('regression', None),
-    #         'mathematical_model': ('linear', None),
-    #         'minimizer': ('normal_equation', None)
-    #     }
+    def test_linear_regression_using_normal_equation(self):
+        args = {
+            'type': ('regression', None),
+            'mathematical_model': ('linear', None),
+            'minimizer': ('normal_equation', None)
+        }
 
-    #     machine = mf.MachineFactory.create('sl_machine', args)
-    #     machine.train(self.__features, self.__responses)
+        machine = mf.MachineFactory.create('sl_machine', args)
+        machine.train(self.__features, self.__responses)
 
-    #     print machine.getThetas()
+        print machine.getThetas()
 
-    #     assert(True)
+        assert(True)
     
     def test_linear_classification_using_normal_equation(self):
         args = {
@@ -76,6 +76,20 @@ class MachineLearningTest(unittest.TestCase):
         args = {
             'type': ('multivariate_classification', None),
             'mathematical_model': ('linear', None),
+            'minimizer': ('normal_equation', None)
+        }
+
+        machine = mf.MachineFactory.create('sl_machine', args)
+        machine.train(self.__features, self.__responses)
+
+        self.assertTrue(3 == machine.predict(np.array([1, 4], dtype=np.float32)))
+
+    def test_quadratic_multivariate_classification_using_normal_equation(self):
+        self.__responses = np.array([5, 4, 3], dtype=np.float32)
+
+        args = {
+            'type': ('multivariate_classification', None),
+            'mathematical_model': ('quadratic', None),
             'minimizer': ('normal_equation', None)
         }
 

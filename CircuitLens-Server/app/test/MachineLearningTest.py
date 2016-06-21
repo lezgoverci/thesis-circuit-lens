@@ -8,7 +8,7 @@ if root_dir not in sys.path:
 
 import unittest
 
-import recognizer.ml.class_machine_factory as mf
+import ml.class_machine_factory as mf
 import numpy as np
 
 class MachineLearningTest(unittest.TestCase):
@@ -96,7 +96,7 @@ class MachineLearningTest(unittest.TestCase):
         machine = mf.MachineFactory.create('sl_machine', args)
         machine.train(self.__features, self.__responses)
 
-        self.assertTrue(5 == machine.predict(np.array([1, 4.8], dtype=np.float32)))
+        self.assertTrue(5 == machine.predict(np.array([1, 4.7], dtype=np.float32)))
 
 def runtests():
     unittest.main()

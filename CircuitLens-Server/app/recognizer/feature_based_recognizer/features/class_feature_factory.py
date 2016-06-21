@@ -10,6 +10,7 @@ import class_roundness_feature as rf
 import class_semi_minor_major_axes_feature as smmaf
 import class_num_contours_feature as ncf
 import class_black_white_feature as bwf
+import class_hull_feature as hf
 
 class FeatureFactory:
     @staticmethod
@@ -36,5 +37,7 @@ class FeatureFactory:
             return ncf.NumContoursFeature()
         elif 'black_white' == feature:
             return bwf.BlackWhiteFeature()
+        elif 'hull' == feature:
+            return hf.HullFeature()
         else:
             return nf.NullFeature()

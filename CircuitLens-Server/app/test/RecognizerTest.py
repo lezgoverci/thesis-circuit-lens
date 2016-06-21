@@ -15,25 +15,28 @@ import numpy as np
 class RecognizerTest(unittest.TestCase):
     def setUp(self):
         self.__imagesDir = 'D:\\Thesis\\Recognizer\\training_set\\'
-        self.__recognizer = rf.RecognizerFactory.create('features_using')
+        self.__recognizer = rf.RecognizerFactory.create('ml_quadratic')
         
         # For training only
-        # classesImagesMap = {
-        #     'inductor': self.__imagesDir + 'symbol_inductor.png',
-        #     'resistor': self.__imagesDir + 'symbol_resistor.png',
-        #     'diode': self.__imagesDir + 'symbol_diode.png',
-        #     'capacitor': self.__imagesDir + 'symbol_capacitor.png',
-        #     'voltage_source': self.__imagesDir + 'symbol_voltage_source.png',
-        #     'voltage_source_2': self.__imagesDir + 'symbol_voltage_source2.png',
-        #     'ground': self.__imagesDir + 'ground.png'
-        # }
+        classesImagesMap = {
+            'inductor': self.__imagesDir + 'symbol_inductor.png',
+            'resistor': self.__imagesDir + 'symbol_resistor.png',
+            'diode': self.__imagesDir + 'symbol_diode.png',
+            'capacitor': self.__imagesDir + 'symbol_capacitor.png',
+            'voltage_source': self.__imagesDir + 'symbol_voltage_source.png',
+            'voltage_source_2': self.__imagesDir + 'symbol_voltage_source2.png',
+            'ground': self.__imagesDir + 'ground.png'
+        }
         
-        # for className, imgName in classesImagesMap.iteritems():
-        #     gray = bf.BasicFunctions.loadImage(imgName)
-        #     classesImagesMap[className] = gray
+        for className, imgName in classesImagesMap.iteritems():
+            gray = bf.BasicFunctions.loadImage(imgName)
+            classesImagesMap[className] = gray
 
-        # self.__recognizer.train(classesImagesMap)
-        
+        self.__recognizer.train(classesImagesMap)
+    
+    # def test_always_passes(self):
+    #     self.assertTrue(True)
+
     def test_curved_capacitor_recognized(self):
         expectedClass = 'capacitor'
         queryImgName = 'capacitor'

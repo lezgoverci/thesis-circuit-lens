@@ -13,7 +13,8 @@ import unittest
 import numpy as np
 
 class RecognizerTest(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.__imagesDir = 'D:\\Thesis\\Recognizer\\training_set\\'
         self.__recognizer = rf.RecognizerFactory.create('ml_quadratic')
         

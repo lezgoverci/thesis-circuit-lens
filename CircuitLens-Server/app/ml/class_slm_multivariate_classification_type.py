@@ -46,7 +46,6 @@ class SLMMultivariateClassificationType(st.SLMType):
     def train(self, features, responses):
         mathematicalModel = self.__minimizer.getMathematicalModel()
 
-        f = []
         maxResponse = responses.max()
         index = 0
         for response in responses:
@@ -60,27 +59,21 @@ class SLMMultivariateClassificationType(st.SLMType):
                 self.__minimizer.minimize()
 
                 self.__classes[response] = mathematicalModel.getThetas()
-                f.append(mathematicalModel.getThetas())
-            
+
             index += 1
 
-        bf.BasicFunctions.static2DPlotter(f)
+            #TEMPORARY
+            theta = self.__classes[response]
+            print "r: %d => y = %+lf%+lfx%+lfx^2" % (response, theta[0], theta[1], theta[2])
+
         return self
     
     def predict(self, feature):
         maxHypothesis = -float('inf')
         mathematicalModel = self.__minimizer.getMathematicalModel()
-        finalResponse = None
 
-        for response, thetas in self.__classes.iteritems():
-            hypothesis = mathematicalModel.setThetas(thetas).getHypothesis(feature)
-
-            if hypothesis > maxHypothesis:
-                maxHypothesis = hypothesis
-                finalResponse = response
-            
-        return finalResponse
-
+        return max(self.__classes, key = lambda x: mathematicalModel.setThetas(self.__classes[x]).getHypothesis(feature))
+    
     def dump(self):
         return {
             'classes': self.__classes

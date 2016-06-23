@@ -140,17 +140,16 @@ class BasicFunctions:
         return cleared_matrix
     
     @staticmethod
-    def static2DPlotter(thetas):
+    def static2DPlotter(thetas, f = lambda theta, x: theta[0] + theta[1]*x + (theta[2]*x**2)):
         import matplotlib.pyplot as plt
 
         r = np.arange(50, 250, 0.25)
 
-        f = lambda i, x: thetas[i][0] + thetas[i][1]*x + (thetas[i][2]*x**2)
-
         axes = plt.gca()
-        axes.plot(r, f(0, r), 'bo', r, f(1, r), 'k', r, f(2, r), 'c4', r, f(3, r), 'gv', r, f(4, r), 'mH', r, f(5, r), 'y2', r, f(6, r), 'rs')
-        
-        axes.set_xlim([100, 210])
-        axes.set_ylim([-100, 100])
+        for theta in thetas:
+            axes.plot(r, f(theta, r))
+
+        axes.set_xlim([-10000, 10000])
+        axes.set_ylim([-10000, 10000])
         
         plt.show()

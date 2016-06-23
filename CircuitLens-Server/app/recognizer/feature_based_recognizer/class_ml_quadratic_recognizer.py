@@ -13,9 +13,10 @@ class MLQuadraticRecognizer(r.Recognizer):
         self.__featuresCalculator = ifc.IntegratedFeaturesCalculator()
         self.__responsesClassesMap = {}
 
-        temp = {'fs_and_rs_selector': lambda fs, rs, i: self.__selectFeaturesAndResponses(fs, rs, i)}
         args = {
-            'type': ('multivariate_classification', temp),
+            'type': ('multivariate_classification', {
+                            'fs_and_rs_selector': lambda fs, rs, i: self.__selectFeaturesAndResponses(fs, rs, i)
+            }),
             'mathematical_model': ('quadratic', None),
             'minimizer': ('normal_equation', None)
         }
@@ -61,6 +62,10 @@ class MLQuadraticRecognizer(r.Recognizer):
 
         features = [1]
         features.extend(self.__extractFeatures(self.__img))
+
+        #TEMPORARY
+        print features
+
         features = self.__NDTo2DFeatures(np.array([features], dtype=np.float32))
         self.__class = self.__responsesClassesMap[self.__machine.predict(np.array(features[0], dtype=np.float32))]
 
@@ -70,15 +75,32 @@ class MLQuadraticRecognizer(r.Recognizer):
         counter = 1
         featuresSet = []
 
-        for className, img in classesImageMap.iteritems():
+        for className, imgs in classesImageMap.iteritems():
             if self.__responsesClassesMap.get(className, None) is None:
                 self.__responsesClassesMap[className] = counter
                 self.__responsesClassesMap[counter] = className
                 counter += 1
 
             features = [self.__responsesClassesMap[className]]
-            features.extend(self.__extractFeatures(img))
+
+            featureAccumulator = None
+            accCounter = 0
+            for img in imgs:
+                currentFeatures = np.array(self.__extractFeatures(img), dtype=np.float32)
+                if featureAccumulator is None:
+                    featureAccumulator = np.zeros(currentFeatures.shape[0], dtype=np.float32)
+                
+                featureAccumulator += currentFeatures
+                accCounter += 1
+            
+            featureAccumulator /= counter
+            features.extend(list(featureAccumulator))
             featuresSet.append(features)
+
+            #TEMPORARY
+            print "===================================="
+            print className + " details:"
+            print "(%lf, %lf)" % (features[0], features[1])
 
         twoDFeatureSet = self.__NDTo2DFeatures(np.array(featuresSet, dtype=np.float32))
         twoDFeatureSet = sorted(twoDFeatureSet, key = lambda f: f[1])
@@ -87,6 +109,9 @@ class MLQuadraticRecognizer(r.Recognizer):
         for i in range(len(twoDFeatureSet)):
             responses.append(twoDFeatureSet[i][0])
             twoDFeatureSet[i][0] = 1
+        
+        #TEMPORARY
+        print self.__responsesClassesMap
 
         self.__machine.train(twoDFeatureSet, np.array(responses, dtype=np.float32))
         
@@ -106,7 +131,7 @@ class MLQuadraticRecognizer(r.Recognizer):
                         'name': 'hull',
                         'arguments': {
                             'img': img,
-                            'centroid': centroid
+                            'm': m
                         }
                     }]
         
@@ -114,16 +139,19 @@ class MLQuadraticRecognizer(r.Recognizer):
         return self.__featuresCalculator.get(recalculate)
     
     def __selectFeaturesAndResponses(self, fs, rs, i):
-        targetF = fs[i]
-        
         if 0 == i:
-            newFeatures = [fs[-1], targetF, fs[1]]
+            diff = (fs[1] - fs[0]) / 2
+            newFeatures = [fs[0] - diff, fs[0], fs[0] + diff]
+            r = [0, rs[i], 0]
         elif i == len(fs) - 1:
-            newFeatures = [fs[i - 1], targetF, fs[0]]
+            diff = (fs[i] - fs[i-1]) / 2
+            newFeatures = [fs[i] - diff, fs[i], fs[i] + diff]
+            r = [0, rs[i], 0]
         else:
-            newFeatures = [fs[i - 1], targetF, fs[i + 1]]
+            newFeatures = [(fs[i] + fs[i - 1]) / 2, fs[i], (fs[i] + fs[i + 1]) / 2]
+            r = [0, rs[i], 0]
 
-        return np.array(newFeatures, dtype=np.float32), np.array([0, rs[i], 0], dtype=np.float32)
+        return np.array(newFeatures, dtype=np.float32), np.array(r, dtype=np.float32)
     
     def __NDTo2DFeatures(self, features):
         numD = features.shape[1] - 1

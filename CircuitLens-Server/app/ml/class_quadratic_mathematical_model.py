@@ -34,10 +34,9 @@ class QuadraticMathematicalModel(mm.MathematicalModel):
 
     def setFeatures(self, features):
         self.__features = []
-        multiplier = lambda (x, y): x * y
 
         for trainingSet in features:
-            self.__features.append(self.__toQuadraticFeatures(trainingSet, multiplier))
+            self.__features.append(self.__toQuadraticFeatures(trainingSet))
 
         self.__features = np.array(self.__features, np.float32)
         return self

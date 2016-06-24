@@ -60,14 +60,8 @@ class MLQuadraticRecognizer(r.Recognizer):
         if self.__img is None:
             return self
 
-        features = [1]
-        features.extend(self.__extractFeatures(self.__img))
-
-        #TEMPORARY
-        print features
-
-        features = self.__NDTo2DFeatures(np.array([features], dtype=np.float32))
-        self.__class = self.__responsesClassesMap[self.__machine.predict(np.array(features[0], dtype=np.float32))]
+        features = self.__NDTo2DFeatures(np.array(self.__extractFeatures(self.__img), dtype=np.float32))
+        self.__class = self.__responsesClassesMap[self.__machine.predict(features)]
 
         return self
     
@@ -81,37 +75,26 @@ class MLQuadraticRecognizer(r.Recognizer):
                 self.__responsesClassesMap[counter] = className
                 counter += 1
 
-            features = [self.__responsesClassesMap[className]]
+            extractedFeatures = [self.__NDTo2DFeatures(np.array(self.__extractFeatures(img), dtype=np.float32),
+                                                      self.__responsesClassesMap[className]) for img in imgs]
 
-            featureAccumulator = None
-            accCounter = 0
-            for img in imgs:
-                currentFeatures = np.array(self.__extractFeatures(img), dtype=np.float32)
-                if featureAccumulator is None:
-                    featureAccumulator = np.zeros(currentFeatures.shape[0], dtype=np.float32)
-                
-                featureAccumulator += currentFeatures
-                accCounter += 1
-            
-            featureAccumulator /= counter
-            features.extend(list(featureAccumulator))
-            featuresSet.append(features)
+            minVal = min(extractedFeatures, key = lambda x: x[1])
+            maxVal = max(extractedFeatures, key = lambda x: x[1])
 
-            #TEMPORARY
-            print "===================================="
-            print className + " details:"
-            print "(%lf, %lf)" % (features[0], features[1])
+            featuresSet.append({
+                'ave': (minVal + maxVal) / 2,
+                'min': minVal,
+                'max': maxVal
+            })
 
-        twoDFeatureSet = self.__NDTo2DFeatures(np.array(featuresSet, dtype=np.float32))
-        twoDFeatureSet = sorted(twoDFeatureSet, key = lambda f: f[1])
+        twoDFeatureSet = sorted(featuresSet, key = lambda x: x['ave'][1])
 
         responses = []
         for i in range(len(twoDFeatureSet)):
-            responses.append(twoDFeatureSet[i][0])
-            twoDFeatureSet[i][0] = 1
-        
-        #TEMPORARY
-        print self.__responsesClassesMap
+            responses.append(twoDFeatureSet[i]['ave'][0])
+            twoDFeatureSet[i]['ave'][0] = 1
+            twoDFeatureSet[i]['min'][0] = 1
+            twoDFeatureSet[i]['max'][0] = 1
 
         self.__machine.train(twoDFeatureSet, np.array(responses, dtype=np.float32))
         
@@ -140,23 +123,34 @@ class MLQuadraticRecognizer(r.Recognizer):
     
     def __selectFeaturesAndResponses(self, fs, rs, i):
         if 0 == i:
-            diff = (fs[1] - fs[0]) / 2
-            newFeatures = [fs[0] - diff, fs[0], fs[0] + diff]
+            curMax = (fs[0]['max'] + fs[1]['min']) / 2
+            curMax = curMax if curMax[1] >= fs[0]['ave'][1] else fs[0]['max']
+
+            newFeatures = [fs[0]['min'], (fs[0]['min'] + curMax) / 2, curMax]
             r = [0, rs[i], 0]
         elif i == len(fs) - 1:
-            diff = (fs[i] - fs[i-1]) / 2
-            newFeatures = [fs[i] - diff, fs[i], fs[i] + diff]
+            curMin = (fs[i-1]['max'] + fs[i]['min']) / 2
+            curMin = curMin if curMin[1] <= fs[i]['ave'][1] else fs[i]['min']
+
+            newFeatures = [curMin, (fs[i]['max'] + curMin) / 2, fs[i]['max']]
             r = [0, rs[i], 0]
         else:
-            newFeatures = [(fs[i] + fs[i - 1]) / 2, fs[i], (fs[i] + fs[i + 1]) / 2]
+            curMin = (fs[i-1]['max'] + fs[i]['min']) / 2
+            curMin = curMin if curMin[1] <= fs[i]['ave'][1] else fs[i]['min']
+
+            curMax = (fs[i+1]['min'] + fs[i]['max']) / 2
+            curMax = curMax if curMax[1] >= fs[i]['ave'][1] else fs[i]['max']
+
+            newFeatures = [curMin, (curMin + curMax) / 2, curMax]
+            
             r = [0, rs[i], 0]
 
         return np.array(newFeatures, dtype=np.float32), np.array(r, dtype=np.float32)
     
-    def __NDTo2DFeatures(self, features):
-        numD = features.shape[1] - 1
+    def __NDTo2DFeatures(self, features, firstDimVal=1):
+        numD = features.shape[0]
         if numD == 1:
-            return features
+            return np.array([firstDimVal, features[0]], dtype=np.float32)
         
         projectionLineUnitVector = np.zeros(numD, dtype=np.float32)
         multiplierUnitVector = np.zeros(numD, dtype=np.float32)
@@ -172,10 +166,6 @@ class MLQuadraticRecognizer(r.Recognizer):
         
         projectedFeatures = []
         divisor = np.dot(projectionLineUnitVector, projectionLineUnitVector)
-        i = 0
-        for feature in features:
-            dst = (np.dot(projectionLineUnitVector, feature[1:]) / divisor) * projectionLineUnitVector
-            projectedFeatures.append([features[i][0], np.linalg.norm(dst)])
-            i += 1
-        
-        return np.array(projectedFeatures, dtype=np.float32)
+
+        dst = (np.dot(projectionLineUnitVector, features) / divisor) * projectionLineUnitVector
+        return np.array([firstDimVal, np.linalg.norm(dst)], dtype=np.float32)
